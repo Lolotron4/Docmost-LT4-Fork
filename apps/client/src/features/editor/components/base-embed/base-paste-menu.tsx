@@ -5,8 +5,8 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { EditorMenuProps } from "@/features/editor/components/table/types/types.ts";
 import { basePasteMenuKey } from "@/features/editor/extensions/base-paste-menu";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
+import { useHasFeature } from "@/lt4/hooks/use-feature";
+import { Feature } from "@/lt4/features";
 import { convertMentionToBaseEmbed } from "./convert-mention-to-base-embed";
 import classes from "../integration-link/integration-paste-menu.module.css";
 

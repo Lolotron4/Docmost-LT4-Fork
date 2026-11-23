@@ -31,6 +31,7 @@ import { NoopAuditModule } from './integrations/audit/audit.module';
 import { ThrottleModule } from './integrations/throttle/throttle.module';
 import { OutboundModule } from './integrations/outbound/outbound.module';
 import { EncryptionModule } from './integrations/encryption/encryption.module';
+import { Lt4Module } from './lt4/lt4.module';
 
 const enterpriseModules = [];
 try {
@@ -102,6 +103,7 @@ try {
     TelemetryModule,
     ThrottleModule,
     OutboundModule,
+    Lt4Module,
     ...enterpriseModules,
   ],
   controllers: [AppController],

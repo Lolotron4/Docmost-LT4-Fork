@@ -5,7 +5,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router-dom";
 import { EmptyState } from "@/components/ui/empty-state";
-import { usePageEditMode } from "@/ee/page-verification/hooks/use-page-edit-mode";
+import { usePageEditMode } from "@/lt4/page-verification/hooks/use-page-edit-mode";
 import classes from "@/features/editor/styles/editor.module.css";
 import coverClasses from "@/features/page-cover/components/page-cover.module.css";
 import { resolveCover } from "@/features/page-cover/page-cover.utils";

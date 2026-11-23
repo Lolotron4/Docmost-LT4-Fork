@@ -2390,5 +2390,18 @@
   "Recently updated settings": "Recently updated settings",
   "Refresh recently updated pages": "Refresh recently updated pages",
   "Updated by {{name}}": "Updated by {{name}}",
-  "Use up to {{maxValues}} values per filter and {{maxLength}} characters per value.": "Use up to {{maxValues}} values per filter and {{maxLength}} characters per value."
+  "Use up to {{maxValues}} values per filter and {{maxLength}} characters per value.": "Use up to {{maxValues}} values per filter and {{maxLength}} characters per value.",
+  "Not available yet in this edition": "Not available yet in this edition",
+  "Soon": "Soon",
+  "Export has been disabled by an administrator": "Export has been disabled by an administrator",
+  "Databases are not available yet in this edition": "Databases are not available yet in this edition",
+  "Page access": "Page access",
+  "Restricted page access": "Restricted page access",
+  "This page inherits restrictions from": "This page inherits restrictions from",
+  "Only people with access to both pages can see it.": "Only people with access to both pages can see it.",
+  "Who can access this page?": "Who can access this page?",
+  "Everyone in the space": "Everyone in the space",
+  "Only selected people": "Only selected people",
+  "Only editors of this page can change its access.": "Only editors of this page can change its access.",
+  "{{count}} members": "{{count}} members"
 }

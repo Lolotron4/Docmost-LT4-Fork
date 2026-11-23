@@ -39,10 +39,10 @@ import {
 } from "@/components/icons";
 import { useTranslation } from "react-i18next";
 import { insertBaseEmbedBlock } from "@/features/editor/components/base-embed/insert-base-embed";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
-import { UpgradeBadge } from "@/ee/components/upgrade-badge";
+import { useHasFeature } from "@/lt4/hooks/use-feature";
+import { Feature } from "@/lt4/features";
+import { useUpgradeLabel } from "@/lt4/hooks/use-upgrade-label";
+import { UpgradeBadge } from "@/lt4/components/upgrade-badge";
 import { isBetaBaseForms } from "@/lib/config.ts";
 
 interface Props {

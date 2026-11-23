@@ -55,12 +55,12 @@ import { mobileSidebarAtom } from "@/components/layouts/global/hooks/atoms/sideb
 import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-toggle-sidebar.ts";
 import { searchSpotlight } from "@/features/search/constants";
 const TemplatePickerModal = React.lazy(
-  () => import("@/ee/template/components/template-picker-modal"),
+  () => import("@/lt4/template/components/template-picker-modal"),
 );
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
-import { Feature } from "@/ee/features";
-import { useExportDisabled } from "@/ee/security/hooks/use-export-disabled.ts";
+import { useHasFeature } from "@/lt4/hooks/use-feature";
+import { useUpgradeLabel } from "@/lt4/hooks/use-upgrade-label";
+import { Feature } from "@/lt4/features";
+import { useExportDisabled } from "@/lt4/security/hooks/use-export-disabled.ts";
 import { ErrorBoundary } from "react-error-boundary";
 
 export function SpaceSidebar() {

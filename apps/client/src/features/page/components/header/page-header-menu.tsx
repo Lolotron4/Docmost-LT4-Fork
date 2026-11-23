@@ -49,11 +49,11 @@ import MovePageModal from "@/features/page/components/move-page-modal.tsx";
 import PageAttachmentsModal from "@/features/attachments/components/page-attachments-modal.tsx";
 import PresentationModal from "@/features/editor/components/presentation/presentation-modal.tsx";
 import { useTimeAgo } from "@/hooks/use-time-ago.tsx";
-import { PageShareModal } from "@/ee/page-permission";
+import { PageShareModal } from "@/lt4/page-permission";
 import {
   PageVerificationMenuItem,
   PageVerificationModal,
-} from "@/ee/page-verification";
+} from "@/lt4/page-verification";
 import {
   useFavoriteIds,
   useAddFavoriteMutation,
@@ -64,8 +64,8 @@ import {
   useWatchPageMutation,
   useUnwatchPageMutation,
 } from "@/features/page/queries/watcher-query";
-import { useExportDisabled } from "@/ee/security/hooks/use-export-disabled.ts";
-import { usePrintBlockReason } from "@/ee/security/hooks/use-disable-print.ts";
+import { useExportDisabled } from "@/lt4/security/hooks/use-export-disabled.ts";
+import { usePrintBlockReason } from "@/lt4/security/hooks/use-disable-print.ts";
 
 interface PageHeaderMenuProps {
   readOnly?: boolean;

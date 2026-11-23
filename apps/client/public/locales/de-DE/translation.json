@@ -2390,5 +2390,18 @@
   "Recently updated settings": "Einstellungen für \"Kürzlich aktualisiert\"",
   "Refresh recently updated pages": "Kürzlich aktualisierte Seiten aktualisieren",
   "Updated by {{name}}": "Aktualisiert von {{name}}",
-  "Use up to {{maxValues}} values per filter and {{maxLength}} characters per value.": "Verwenden Sie bis zu {{maxValues}} Werte pro Filter und {{maxLength}} Zeichen pro Wert."
+  "Use up to {{maxValues}} values per filter and {{maxLength}} characters per value.": "Verwenden Sie bis zu {{maxValues}} Werte pro Filter und {{maxLength}} Zeichen pro Wert.",
+  "Not available yet in this edition": "In dieser Version noch nicht verfügbar",
+  "Soon": "Bald",
+  "Export has been disabled by an administrator": "Der Export wurde von einem Administrator deaktiviert",
+  "Databases are not available yet in this edition": "Datenbanken sind in dieser Version noch nicht verfügbar",
+  "Page access": "Seitenzugriff",
+  "Restricted page access": "Eingeschränkter Seitenzugriff",
+  "This page inherits restrictions from": "Diese Seite erbt Einschränkungen von",
+  "Only people with access to both pages can see it.": "Nur Personen mit Zugriff auf beide Seiten können sie sehen.",
+  "Who can access this page?": "Wer darf auf diese Seite zugreifen?",
+  "Everyone in the space": "Alle im Space",
+  "Only selected people": "Nur ausgewählte Personen",
+  "Only editors of this page can change its access.": "Nur Bearbeiter dieser Seite können den Zugriff ändern.",
+  "{{count}} members": "{{count}} Mitglieder"
 }

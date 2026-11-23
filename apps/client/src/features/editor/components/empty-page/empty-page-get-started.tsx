@@ -12,22 +12,22 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAtomValue } from "jotai";
 import { ErrorBoundary } from "react-error-boundary";
-import { useConvertPageToBaseMutation } from "@/ee/base/queries/base-query";
+import { useConvertPageToBaseMutation } from "@/lt4/base/queries/base-query";
 import {
   pageEditorAtom,
   titleEditorAtom,
   yjsSyncedAtom,
 } from "@/features/editor/atoms/editor-atoms";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
-import { ITemplate, type TemplateVariableValues } from "@/ee/template/types/template.types";
-import { applyTemplate } from "@/ee/template/services/template-service.ts";
-import { applyTemplateToPage } from "@/ee/template/template.utils";
+import { useHasFeature } from "@/lt4/hooks/use-feature";
+import { Feature } from "@/lt4/features";
+import { ITemplate, type TemplateVariableValues } from "@/lt4/template/types/template.types";
+import { applyTemplate } from "@/lt4/template/services/template-service.ts";
+import { applyTemplateToPage } from "@/lt4/template/template.utils";
 import { isBetaBaseForms } from "@/lib/config.ts";
 import classes from "./empty-page-get-started.module.css";
 
 const TemplatePickerModal = lazy(
-  () => import("@/ee/template/components/template-picker-modal"),
+  () => import("@/lt4/template/components/template-picker-modal"),
 );
 
 type EmptyPageGetStartedProps = {
