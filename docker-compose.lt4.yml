@@ -9,6 +9,7 @@
 #                  ACHTUNG: Für einen Test nie den Ordner einer laufenden Instanz verwenden!
 #   PROXY_NETWORK  Externes Netzwerk des Reverse-Proxys (Standard: npm-proxy-network)
 #   POSTGRES_IMAGE Postgres-Image (Standard: postgres:18)
+#   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
 #
 # Docmost ist nur über den Reverse-Proxy erreichbar (Port 3000 im Proxy-Netzwerk,
 # kein Port auf dem Host). Im Nginx Proxy Manager als Ziel "docmost-lt4" Port 3000 eintragen.
@@ -25,6 +26,8 @@ services:
       APP_SECRET: ${APP_SECRET:?APP_SECRET fehlt}
       DATABASE_URL: postgresql://docmost:${DB_PASSWORD:?DB_PASSWORD fehlt}@db:5432/docmost
       REDIS_URL: redis://redis:6379
+      FILE_UPLOAD_SIZE_LIMIT: ${FILE_UPLOAD_SIZE_LIMIT:-50mb}
+      FILE_IMPORT_SIZE_LIMIT: ${FILE_IMPORT_SIZE_LIMIT:-200mb}
     expose:
       - "3000"
     restart: unless-stopped
