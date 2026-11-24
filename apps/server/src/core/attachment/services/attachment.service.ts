@@ -162,7 +162,7 @@ export class AttachmentService {
       // Only index PDF, DOCX and TXT files
       if (
         !templateId &&
-        ['.pdf', '.docx', '.txt'].includes(attachment.fileExt.toLowerCase())
+        ['.pdf', '.docx', '.txt', '.md', '.csv'].includes(attachment.fileExt.toLowerCase())
       ) {
         await this.queueIndexContent(attachmentId);
       }
@@ -407,7 +407,7 @@ export class AttachmentService {
           spaceId: page.spaceId,
         });
 
-        if (['.pdf', '.docx', '.txt'].includes(source.fileExt.toLowerCase())) {
+        if (['.pdf', '.docx', '.txt', '.md', '.csv'].includes(source.fileExt.toLowerCase())) {
           await this.queueIndexContent(newId);
         }
       } catch (err) {
