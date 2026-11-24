@@ -17,6 +17,7 @@ import { IntegrationConnection } from '@docmost/db/types/entity.types';
 import { RedisService } from '@nestjs-labs/nestjs-ioredis';
 import type { Redis } from 'ioredis';
 import * as crypto from 'crypto';
+import { credentialEnvKey } from '../oauth/credential-env';
 
 const UNFURL_CACHE_TTL = 300; // 5 minutes
 // Short negative cache, so a card shows up soon after access changes.
@@ -79,6 +80,10 @@ export class UnfurlService {
       );
       if (publicResult) {
         return publicResult;
+      }
+      // LT4-Fork: Ohne OAuth-App kann sich niemand verbinden, also keine Verbinden-Karte.
+      if (!this.oauthCredentialsConfigured(provider)) {
+        return null;
       }
       // Not cached, so the card loads once the user connects.
       return this.buildNeedsConnection(
@@ -164,6 +169,18 @@ export class UnfurlService {
       await this.cacheNull(cacheKey, UNFURL_ERROR_CACHE_TTL);
       return null;
     }
+  }
+
+  private oauthCredentialsConfigured(provider: IntegrationProvider): boolean {
+    const oauth = provider.getOAuthConfig
+      ? provider.getOAuthConfig({})
+      : provider.definition.oauth;
+    if (!oauth) return false;
+    const type = provider.definition.type;
+    return (
+      !!process.env[credentialEnvKey('CLIENT_ID', type, oauth)] &&
+      !!process.env[credentialEnvKey('CLIENT_SECRET', type, oauth)]
+    );
   }
 
   private async cacheNull(cacheKey: string, ttl: number): Promise<void> {

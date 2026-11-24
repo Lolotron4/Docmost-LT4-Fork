@@ -271,7 +271,8 @@ export class GitHubService {
   ): Promise<any> {
     const response = await providerApiFetch('GitHub', `${apiBaseUrl}${path}`, {
       headers: {
-        Authorization: authorization,
+        // LT4-Fork: leere Autorisierung = anonyme Abfrage
+        ...(authorization ? { Authorization: authorization } : {}),
         Accept: 'application/vnd.github.v3+json',
         'User-Agent': 'Docmost',
       },

@@ -47,7 +47,7 @@ export default function ConnectionRow({
               </Text>
             ) : (
               <Text size="xs" c="dimmed" truncate>
-                {definition.description}
+                {t(definition.description)}
               </Text>
             )}
           </Stack>

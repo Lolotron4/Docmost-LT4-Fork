@@ -70,7 +70,7 @@ export default function IntegrationRow({
               )}
             </Group>
             <Text size="xs" c="dimmed" truncate>
-              {definition.description}
+              {t(definition.description)}
             </Text>
           </Stack>
         </Group>

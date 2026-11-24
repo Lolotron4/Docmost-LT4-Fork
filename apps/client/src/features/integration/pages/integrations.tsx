@@ -14,6 +14,16 @@ import {
 } from "../queries/integration-query";
 import { getOAuthInstallUrl } from "../services/integration-service";
 import { notifications } from "@mantine/notifications";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  getLt4IntegrationStatus,
+  installWithoutOAuth,
+} from "@/lt4/integrations/lt4-integration-service";
+import {
+  LT4_INTEGRATIONS_GUIDE_URL,
+  openOAuthRequiredModal,
+  openPublicInstallModal,
+} from "@/lt4/integrations/lt4-install-modal";
 
 export default function Integrations() {
   const { t } = useTranslation();
@@ -22,9 +32,47 @@ export default function Integrations() {
   const { data: installed, isLoading: loadingInstalled } =
     useInstalledIntegrations();
   const uninstallMutation = useUninstallIntegration();
+  const queryClient = useQueryClient();
+  // LT4-Fork: Ohne OAuth-App lassen sich GitHub und GitLab trotzdem installieren.
+  const { data: lt4Status } = useQuery({
+    queryKey: ["lt4-integration-status"],
+    queryFn: getLt4IntegrationStatus,
+  });
 
   const handleInstall = useCallback(
     async (type: string) => {
+      const status = lt4Status?.find((s) => s.type === type);
+      const name = available?.find((d) => d.type === type)?.name ?? type;
+      if (status && !status.oauthConfigured) {
+        if (!status.publicPreviews) {
+          openOAuthRequiredModal({ name, type, envKeys: status.envKeys });
+          return;
+        }
+        openPublicInstallModal({
+          name,
+          type,
+          envKeys: status.envKeys,
+          onConfirm: async () => {
+            try {
+              await installWithoutOAuth(type);
+              notifications.show({
+                message: t("{{name}} installed", { name }),
+              });
+              queryClient.invalidateQueries({
+                queryKey: ["installed-integrations"],
+              });
+            } catch (err: any) {
+              notifications.show({
+                message:
+                  err?.response?.data?.message ??
+                  t("Failed to start installation"),
+                color: "red",
+              });
+            }
+          },
+        });
+        return;
+      }
       try {
         const { authorizationUrl } = await getOAuthInstallUrl({ type });
         window.location.href = authorizationUrl;
@@ -36,7 +84,7 @@ export default function Integrations() {
         });
       }
     },
-    [t],
+    [t, lt4Status, available, queryClient],
   );
 
   const handleUninstall = useCallback(
@@ -84,7 +132,7 @@ export default function Integrations() {
           <>
             {" "}
             <Anchor
-              href="https://docmost.com/docs/self-hosting/integrations"
+              href={LT4_INTEGRATIONS_GUIDE_URL}
               target="_blank"
               rel="noopener noreferrer"
               size="sm"

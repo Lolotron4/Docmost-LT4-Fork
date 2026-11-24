@@ -191,10 +191,14 @@ describe('GitHub public unfurl', () => {
     expect(init.headers.Authorization).toBe('Basic YXBwLWlkOmFwcC1zZWNyZXQ=');
   });
 
-  it('never calls GitHub without the app credentials', async () => {
+  // LT4-Fork: ohne OAuth-App wird anonym (ohne Authorization-Header) abgefragt.
+  it('reads public data anonymously without the app credentials', async () => {
     delete process.env.INTEGRATION_GITHUB_CLIENT_SECRET;
 
-    await expect(unfurlPublic(PAGE)).rejects.toThrow();
-    expect(fetchMock).not.toHaveBeenCalled();
+    await expect(unfurlPublic(PAGE)).resolves.toMatchObject({
+      title: 'Add dark mode',
+    });
+    const [, init] = fetchMock.mock.calls[0];
+    expect(init.headers.Authorization).toBeUndefined();
   });
 });
