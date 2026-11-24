@@ -26,13 +26,16 @@ import { AnnouncementController } from './announcement/announcement.controller';
 import { AnnouncementService } from './announcement/announcement.service';
 import { ApiKeyController } from './api-key/api-key.controller';
 import { ApiKeyService } from './api-key/api-key.service';
+import { DocxExportController } from './docx-export/docx-export.controller';
+import { DocxExportService } from './docx-export/docx-export.service';
+import { PageAccessModule } from '../core/page/page-access/page-access.module';
 import { PersonalSpaceController } from './personal-space/personal-space.controller';
 import { PersonalSpaceService } from './personal-space/personal-space.service';
 
 @Module({
-  imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService],
+  imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

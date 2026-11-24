@@ -18,6 +18,7 @@ export const LT4_FEATURES: ReadonlySet<string> = new Set<string>([
   Feature.VIEWER_COMMENTS,
   Feature.ANNOUNCEMENTS,
   Feature.API_KEYS,
+  Feature.DOCX_EXPORT,
 ]);
 
 export const LT4_TIER = 'lt4';
