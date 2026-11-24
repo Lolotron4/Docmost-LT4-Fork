@@ -12,11 +12,14 @@ import { SsoProviderService } from './sso/sso-provider.service';
 import { SsoAuthService } from './sso/sso-auth.service';
 import { MfaController } from './mfa/mfa.controller';
 import { MfaService } from './mfa/mfa.service';
+import { BaseController } from './base/base.controller';
+import { BaseService } from './base/base.service';
+import { PageModule } from '../core/page/page.module';
 
 @Module({
-  imports: [TokenModule, AuthModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService],
+  imports: [TokenModule, AuthModule, PageModule],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService],
   exports: [MfaService],
 })
 export class Lt4Module {}
