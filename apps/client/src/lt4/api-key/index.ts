@@ -5,4 +5,7 @@ export interface IApiKey {
   createdAt: string;
   expiresAt?: string | null;
   lastUsedAt?: string | null;
+  scopes?: string[];
+  creatorId?: string;
+  creatorName?: string | null;
 }
