@@ -462,14 +462,21 @@ export class WorkspaceService {
       if (
         typeof updateWorkspaceDto.disablePublicSharing !== 'undefined' ||
         typeof updateWorkspaceDto.trashRetentionDays !== 'undefined' ||
-        typeof updateWorkspaceDto.restrictApiToAdmins !== 'undefined' ||
-        typeof updateWorkspaceDto.allowMemberTemplates !== 'undefined'
+        typeof updateWorkspaceDto.restrictApiToAdmins !== 'undefined'
       ) {
         if (!this.licenseCheckService.hasFeature(ws.licenseKey, Feature.SECURITY_SETTINGS, ws.plan)) {
           throw new ForbiddenException(
             'This feature requires a valid license',
           );
         }
+      }
+
+      // LT4-Fork: Mitglieder-Vorlagen hängen an den (eigenen) Vorlagen, nicht an den Sicherheitseinstellungen
+      if (
+        typeof updateWorkspaceDto.allowMemberTemplates !== 'undefined' &&
+        !this.licenseCheckService.hasFeature(ws.licenseKey, Feature.TEMPLATES, ws.plan)
+      ) {
+        throw new ForbiddenException('This feature requires a valid license');
       }
 
       if (

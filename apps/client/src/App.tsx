@@ -29,6 +29,10 @@ const SecuritySettings = lazyWithPrefetch(
   () => import("@/lt4/security/pages/security-settings"),
 );
 const AiSettings = lazyWithPrefetch(() => import("@/lt4/ai/pages/ai-settings"));
+const TemplatesPage = lazyWithPrefetch(() => import("@/lt4/template/pages/templates-page"));
+const TemplateEditorPage = lazyWithPrefetch(
+  () => import("@/lt4/template/pages/template-editor-page"),
+);
 const Home = lazyWithPrefetch(() => import("@/pages/dashboard/home"));
 const AccountSettings = lazyWithPrefetch(
   () => import("@/pages/settings/account/account-settings"),
@@ -153,6 +157,8 @@ export default function App() {
           <Route path={"/home"} element={<Home />} />
           <Route path={"/spaces"} element={<SpacesPage />} />
           <Route path={"/favorites"} element={<FavoritesPage />} />
+          <Route path={"/templates"} element={<TemplatesPage />} />
+          <Route path={"/templates/:templateId"} element={<TemplateEditorPage />} />
           <Route path={"/people/:userId"} element={<UserProfilePage />} />
           <Route path={"/labels/:labelName"} element={<LabelPage />} />
           <Route path={"/s/:spaceSlug"} element={<SpaceHome />} />

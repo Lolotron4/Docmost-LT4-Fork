@@ -641,7 +641,8 @@ export class AttachmentController {
     let TemplateAccessModule: any;
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      TemplateAccessModule = require('./../../ee/template/services/template-access.service');
+      // LT4-Fork: eigener Vorlagen-Dienst statt Enterprise-Modul
+      TemplateAccessModule = require('./../../lt4/template/template-access.service');
     } catch (err) {
       this.logger.debug(
         'Template module requested but EE module not bundled in this build',
