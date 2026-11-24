@@ -9,12 +9,13 @@ import {
 import { randomInt } from 'node:crypto';
 import { InjectKysely } from 'nestjs-kysely';
 import { sql } from 'kysely';
-import { KyselyDB } from '@docmost/db/types/kysely.types';
+import { KyselyDB, KyselyTransaction } from '@docmost/db/types/kysely.types';
 import { executeTx } from '@docmost/db/utils';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { User, Workspace } from '@docmost/db/types/entity.types';
 import { SignupService } from '../../core/auth/services/signup.service';
+import { validateSsoEnforcement } from '../../core/auth/auth.util';
 import { SessionService } from '../../core/session/session.service';
 import WorkspaceAbilityFactory from '../../core/casl/abilities/workspace-ability.factory';
 import {
@@ -173,6 +174,8 @@ export class JoinCodeService {
    * gleichzeitigen Anmeldungen hält.
    */
   async register(workspace: Workspace, dto: JoinRegisterDto) {
+    // Bei SSO-Pflicht nur über einen SSO-Anbieter beitreten.
+    validateSsoEnforcement(workspace);
     const email =
       dto.method === 'username'
         ? usernameToEmail(dto.username)
@@ -188,21 +191,7 @@ export class JoinCodeService {
     }
 
     const user = await executeTx(this.db, async (trx) => {
-      const row = await trx
-        .selectFrom('lt4JoinCodes')
-        .selectAll()
-        .where('workspaceId', '=', workspace.id)
-        .where('code', '=', normalizeJoinCode(dto.code))
-        .forUpdate()
-        .executeTakeFirst();
-      const problem = row ? this.problemOf(row) : 'This join link is invalid';
-      if (problem) throw new BadRequestException(problem);
-
-      await trx
-        .updateTable('lt4JoinCodes')
-        .set({ useCount: sql`use_count + 1` })
-        .where('id', '=', row.id)
-        .execute();
+      const codeRole = await this.consumeInTx(trx, workspace.id, dto.code);
 
       const created = await this.signupService.signup(
         { name: dto.name, email, password: dto.password },
@@ -210,7 +199,7 @@ export class JoinCodeService {
         trx,
       );
 
-      const role = row.role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.MEMBER;
+      const role = codeRole;
       await trx
         .updateTable('users')
         .set({ role })
@@ -226,6 +215,33 @@ export class JoinCodeService {
     }
     const authToken = await this.sessionService.createSessionAndToken(user);
     return { requiresLogin: false as const, authToken };
+  }
+
+  /**
+   * Prüft den Code und zählt eine Nutzung (in der Transaktion des Aufrufers,
+   * mit Zeilensperre). Gibt die Rolle für das neue Konto zurück.
+   */
+  async consumeInTx(
+    trx: KyselyTransaction,
+    workspaceId: string,
+    code: string,
+  ): Promise<UserRole.ADMIN | UserRole.MEMBER> {
+    const row = await trx
+      .selectFrom('lt4JoinCodes')
+      .selectAll()
+      .where('workspaceId', '=', workspaceId)
+      .where('code', '=', normalizeJoinCode(code))
+      .forUpdate()
+      .executeTakeFirst();
+    const problem = row ? this.problemOf(row) : 'This join link is invalid';
+    if (problem) throw new BadRequestException(problem);
+
+    await trx
+      .updateTable('lt4JoinCodes')
+      .set({ useCount: sql`use_count + 1` })
+      .where('id', '=', row.id)
+      .execute();
+    return row.role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.MEMBER;
   }
 
   // -------------------------------------------- Admin: Passwort setzen

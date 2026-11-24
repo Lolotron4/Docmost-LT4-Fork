@@ -124,6 +124,34 @@ export class MfaService {
       return { authToken: await this.completeLogin(user, 'password') };
     }
 
+    await this.setMfaCookie(user, workspace, res);
+    return state;
+  }
+
+  /**
+   * Für andere Anmeldewege (z. B. SSO): Ist ein zweiter Faktor nötig, wird
+   * das MFA-Cookie gesetzt und der Zwischenstand zurückgegeben, sonst null.
+   */
+  async startSecondFactor(
+    userId: string,
+    workspace: Workspace,
+    res: FastifyReply,
+  ): Promise<MfaLoginState | null> {
+    const user = await this.userRepo.findById(userId, workspace.id, {
+      includeUserMfa: true,
+    });
+    const state = this.loginState(user, workspace);
+    if (!state.userHasMfa && !state.requiresMfaSetup) return null;
+    await this.setMfaCookie(user, workspace, res);
+    return state;
+  }
+
+  /** Erzeugt die Sitzung nach erfolgreicher Anmeldung (Audit, letzte Anmeldung). */
+  async createLoginSession(user: User, source: string) {
+    return this.completeLogin(user, source);
+  }
+
+  private async setMfaCookie(user: User, workspace: Workspace, res: FastifyReply) {
     const mfaToken = await this.tokenService.generateMfaToken(
       user,
       workspace.id,
@@ -135,7 +163,6 @@ export class MfaService {
       maxAge: 5 * 60,
       secure: this.environmentService.isHttps(),
     });
-    return state;
   }
 
   async getLoginInfo(req: FastifyRequest, workspace: Workspace) {

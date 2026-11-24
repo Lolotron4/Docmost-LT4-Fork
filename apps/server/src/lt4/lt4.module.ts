@@ -7,13 +7,16 @@ import { AuthModule } from '../core/auth/auth.module';
 import { JoinCodeController } from './accounts/join-code.controller';
 import { JoinCodeService } from './accounts/join-code.service';
 import { SessionNameController } from './sessions/session-name.controller';
+import { SsoController } from './sso/sso.controller';
+import { SsoProviderService } from './sso/sso-provider.service';
+import { SsoAuthService } from './sso/sso-auth.service';
 import { MfaController } from './mfa/mfa.controller';
 import { MfaService } from './mfa/mfa.service';
 
 @Module({
   imports: [TokenModule, AuthModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController],
-  providers: [PagePermissionService, MfaService, JoinCodeService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService],
   exports: [MfaService],
 })
 export class Lt4Module {}
