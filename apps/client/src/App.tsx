@@ -34,6 +34,7 @@ const AnnouncementSettings = lazyWithPrefetch(
   () => import("@/lt4/announcement/pages/announcement-settings"),
 );
 const TemplatesPage = lazyWithPrefetch(() => import("@/lt4/template/pages/templates-page"));
+const ReviewsPage = lazyWithPrefetch(() => import("@/lt4/page-verification/pages/reviews-page"));
 const TemplateEditorPage = lazyWithPrefetch(
   () => import("@/lt4/template/pages/template-editor-page"),
 );
@@ -162,6 +163,7 @@ export default function App() {
           <Route path={"/spaces"} element={<SpacesPage />} />
           <Route path={"/favorites"} element={<FavoritesPage />} />
           <Route path={"/templates"} element={<TemplatesPage />} />
+          <Route path={"/reviews"} element={<ReviewsPage />} />
           <Route path={"/templates/:templateId"} element={<TemplateEditorPage />} />
           <Route path={"/people/:userId"} element={<UserProfilePage />} />
           <Route path={"/labels/:labelName"} element={<LabelPage />} />

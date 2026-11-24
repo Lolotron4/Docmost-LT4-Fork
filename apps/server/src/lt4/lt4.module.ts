@@ -31,11 +31,14 @@ import { DocxExportService } from './docx-export/docx-export.service';
 import { PageAccessModule } from '../core/page/page-access/page-access.module';
 import { PersonalSpaceController } from './personal-space/personal-space.controller';
 import { PersonalSpaceService } from './personal-space/personal-space.service';
+import { PageVerificationController } from './page-verification/page-verification.controller';
+import { PageVerificationService } from './page-verification/page-verification.service';
+import { PageVerificationSchedulerService } from './page-verification/page-verification-scheduler.service';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

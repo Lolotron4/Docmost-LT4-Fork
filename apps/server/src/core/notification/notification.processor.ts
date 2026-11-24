@@ -255,10 +255,10 @@ export class NotificationProcessor
     let eeModule: { PageVerificationSchedulerService?: unknown };
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      eeModule = require('../../ee/page-verification/page-verification-scheduler.service');
+      eeModule = require('../../lt4/page-verification/page-verification-scheduler.service');
     } catch {
       this.logger.debug(
-        'VERIFICATION_RECONCILE fired but EE scheduler not bundled in this build',
+        'VERIFICATION_RECONCILE fired but scheduler not bundled in this build',
       );
       return;
     }
