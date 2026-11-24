@@ -8,7 +8,7 @@ export type AiProvider = (typeof AI_PROVIDERS)[number];
 export const DEFAULT_MODELS: Record<AiProvider, string> = {
   anthropic: 'claude-opus-5-5',
   openai: 'gpt-5.1',
-  google: 'gemini-2.5-flash',
+  google: 'gemini-3.5-flash',
 };
 
 /** Claude-Modelle, bei denen die serverseitige Ausweichlösung bei Ablehnungen verfügbar ist. */
