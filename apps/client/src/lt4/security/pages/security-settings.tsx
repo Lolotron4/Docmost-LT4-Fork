@@ -1,6 +1,6 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 import { useState } from "react";
-import { Alert, Group, Switch, Text } from "@mantine/core";
+import { Alert, Divider, Group, Switch, Text } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -14,6 +14,7 @@ import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
 import { updateWorkspace } from "@/features/workspace/services/workspace-service.ts";
 import useUserRole from "@/hooks/use-user-role.tsx";
 import { getMfaStatus } from "@/lt4/mfa/mfa-service";
+import { SsoProvidersSection } from "@/lt4/sso/sso-providers-section";
 
 export default function SecuritySettings() {
   const { t } = useTranslation();
@@ -87,6 +88,10 @@ export default function SecuritySettings() {
           "Applies from the next sign-in. If a member loses their phone, you can reset their two-factor authentication under Members.",
         )}
       </Alert>
+
+      <Divider my="xl" />
+
+      <SsoProvidersSection />
     </>
   );
 }

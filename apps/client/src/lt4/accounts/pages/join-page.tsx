@@ -22,8 +22,14 @@ import { AuthLayout } from "@/features/auth/components/auth-layout.tsx";
 import classes from "@/features/auth/components/auth.module.css";
 import { DocumentTitle } from "@/components/ui/document-title.tsx";
 import APP_ROUTE from "@/lib/app-route.ts";
-import { getJoinLinkInfo, IJoinLinkInfo, registerWithJoinLink } from "../join-link-service";
+import {
+  getJoinLinkInfo,
+  IJoinLinkInfo,
+  registerWithJoinLink,
+} from "../join-link-service";
 import { USERNAME_PATTERN } from "../username";
+import SsoLogin from "@/lt4/components/sso-login";
+import { useWorkspacePublicDataQuery } from "@/features/workspace/queries/workspace-query.ts";
 
 type Method = "username" | "email";
 
@@ -36,6 +42,8 @@ export default function JoinPage() {
   const [checking, setChecking] = useState(false);
   const [method, setMethod] = useState<Method>("username");
   const [busy, setBusy] = useState(false);
+  const { data: publicData } = useWorkspacePublicDataQuery();
+  const ssoOnly = !!publicData?.enforceSso;
 
   const check = async (value = code) => {
     if (!value.trim()) return;
@@ -43,7 +51,10 @@ export default function JoinPage() {
     try {
       setInfo(await getJoinLinkInfo(value));
     } catch (err) {
-      notifications.show({ message: err?.response?.data?.message, color: "red" });
+      notifications.show({
+        message: err?.response?.data?.message,
+        color: "red",
+      });
     } finally {
       setChecking(false);
     }
@@ -63,7 +74,9 @@ export default function JoinPage() {
           ? null
           : t("3-32 characters: letters, digits, dot, dash or underscore"),
       email: (v) =>
-        method !== "email" || /^\S+@\S+\.\S+$/.test(v.trim()) ? null : t("Invalid email"),
+        method !== "email" || /^\S+@\S+\.\S+$/.test(v.trim())
+          ? null
+          : t("Invalid email"),
       password: (v) =>
         v.length >= 8 ? null : t("Password must be at least 8 characters"),
     },
@@ -94,7 +107,7 @@ export default function JoinPage() {
     } catch (err) {
       const message = err?.response?.data?.message;
       notifications.show({
-        message: t(Array.isArray(message) ? message[0] : message ?? "Error"),
+        message: t(Array.isArray(message) ? message[0] : (message ?? "Error")),
         color: "red",
       });
     } finally {
@@ -124,7 +137,11 @@ export default function JoinPage() {
             >
               <Stack gap="md">
                 {info && !info.valid && (
-                  <Alert color="red" variant="light" icon={<IconAlertCircle size={18} />}>
+                  <Alert
+                    color="red"
+                    variant="light"
+                    icon={<IconAlertCircle size={18} />}
+                  >
                     {t(info.reason ?? "This join link is invalid")}
                   </Alert>
                 )}
@@ -134,65 +151,81 @@ export default function JoinPage() {
                   value={code}
                   onChange={(e) => setCode(e.currentTarget.value)}
                   autoFocus
-                  styles={{ input: { fontFamily: "monospace", textTransform: "uppercase" } }}
+                  styles={{
+                    input: {
+                      fontFamily: "monospace",
+                      textTransform: "uppercase",
+                    },
+                  }}
                 />
-                <Button type="submit" loading={checking} disabled={!code.trim()}>
+                <Button
+                  type="submit"
+                  loading={checking}
+                  disabled={!code.trim()}
+                >
                   {t("Continue")}
                 </Button>
               </Stack>
             </form>
           ) : (
-            <form onSubmit={submit}>
-              <Stack gap="md">
-                <div>
-                  <Text size="sm" fw={500} mb={6}>
-                    {t("Sign in with")}
-                  </Text>
-                  <SegmentedControl
-                    fullWidth
-                    value={method}
-                    onChange={(v) => setMethod(v as Method)}
-                    data={[
-                      { value: "username", label: t("Username") },
-                      { value: "email", label: t("Email") },
-                    ]}
-                  />
-                </div>
-                <TextInput
-                  label={t("Name")}
-                  placeholder={t("Your name")}
-                  autoComplete="name"
-                  {...form.getInputProps("name")}
-                />
-                {method === "username" ? (
-                  <TextInput
-                    label={t("Username")}
-                    description={t("You sign in with this. No email address needed.")}
-                    placeholder="max.muster"
-                    autoComplete="username"
-                    autoCapitalize="none"
-                    {...form.getInputProps("username")}
-                  />
-                ) : (
-                  <TextInput
-                    type="email"
-                    label={t("Email")}
-                    placeholder="email@example.com"
-                    autoComplete="email"
-                    {...form.getInputProps("email")}
-                  />
-                )}
-                <PasswordInput
-                  label={t("Password")}
-                  description={t("At least 8 characters")}
-                  autoComplete="new-password"
-                  {...form.getInputProps("password")}
-                />
-                <Button type="submit" loading={busy}>
-                  {t("Create account")}
-                </Button>
-              </Stack>
-            </form>
+            <>
+              <SsoLogin mode="join" joinCode={code} />
+              {!ssoOnly && (
+                <form onSubmit={submit}>
+                  <Stack gap="md">
+                    <div>
+                      <Text size="sm" fw={500} mb={6}>
+                        {t("Sign in with")}
+                      </Text>
+                      <SegmentedControl
+                        fullWidth
+                        value={method}
+                        onChange={(v) => setMethod(v as Method)}
+                        data={[
+                          { value: "username", label: t("Username") },
+                          { value: "email", label: t("Email") },
+                        ]}
+                      />
+                    </div>
+                    <TextInput
+                      label={t("Name")}
+                      placeholder={t("Your name")}
+                      autoComplete="name"
+                      {...form.getInputProps("name")}
+                    />
+                    {method === "username" ? (
+                      <TextInput
+                        label={t("Username")}
+                        description={t(
+                          "You sign in with this. No email address needed.",
+                        )}
+                        placeholder="max.muster"
+                        autoComplete="username"
+                        autoCapitalize="none"
+                        {...form.getInputProps("username")}
+                      />
+                    ) : (
+                      <TextInput
+                        type="email"
+                        label={t("Email")}
+                        placeholder="email@example.com"
+                        autoComplete="email"
+                        {...form.getInputProps("email")}
+                      />
+                    )}
+                    <PasswordInput
+                      label={t("Password")}
+                      description={t("At least 8 characters")}
+                      autoComplete="new-password"
+                      {...form.getInputProps("password")}
+                    />
+                    <Button type="submit" loading={busy}>
+                      {t("Create account")}
+                    </Button>
+                  </Stack>
+                </form>
+              )}
+            </>
           )}
 
           <Text size="sm" ta="center" mt="md">

@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { AccountMfaSection } from "@/features/user/components/account-mfa-section";
 import SessionList from "@/features/session/components/session-list";
 import { DocumentTitle } from "@/components/ui/document-title.tsx";
+import { LinkedAccountsSection } from "@/lt4/sso/linked-accounts-section";
 
 export default function AccountSettings() {
   const { t } = useTranslation();
@@ -32,6 +33,8 @@ export default function AccountSettings() {
       <Divider my="lg" />
 
       <AccountMfaSection />
+
+      <LinkedAccountsSection />
 
       <Divider my="lg" />
 
