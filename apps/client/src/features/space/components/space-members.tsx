@@ -28,6 +28,7 @@ import { formatMemberCount } from "@/lib";
 import { useTranslation } from "react-i18next";
 import { SearchInput } from "@/components/common/search-input.tsx";
 import { AutoTooltipText } from "@/components/ui/auto-tooltip-text.tsx";
+import { displayEmail } from "@/lt4/accounts/username";
 
 type MemberType = "user" | "group";
 
@@ -166,7 +167,7 @@ export default function SpaceMembersList({
                           {member?.name}
                         </AutoTooltipText>
                         <Text fz="xs" c="dimmed">
-                          {member.type == "user" && member?.email}
+                          {member.type == "user" && displayEmail(member?.email)}
 
                           {member.type == "group" &&
                             `${t("Group")} - ${formatMemberCount(member?.memberCount, t)}`}

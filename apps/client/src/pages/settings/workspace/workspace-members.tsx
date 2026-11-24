@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useAtom } from "jotai";
 import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
 import { DocumentTitle } from "@/components/ui/document-title.tsx";
+import { JoinLinksPanel } from "@/lt4/accounts/components/join-links-panel";
 
 export default function WorkspaceMembers() {
   const { t } = useTranslation();
@@ -21,14 +22,14 @@ export default function WorkspaceMembers() {
 
   useEffect(() => {
     const currentTab = searchParams.get("tab");
-    if (currentTab === "invites") {
+    if (currentTab === "invites" || currentTab === "join-links") {
       setSegmentValue(currentTab);
     }
   }, [searchParams.get("tab")]);
 
   const handleSegmentChange = (value: string) => {
     setSegmentValue(value);
-    if (value === "invites") {
+    if (value === "invites" || value === "join-links") {
       navigate(`?tab=${value}`);
     } else {
       navigate("");
@@ -53,6 +54,7 @@ export default function WorkspaceMembers() {
               value: "members",
             },
             { label: t("Pending"), value: "invites" },
+            ...(isAdmin ? [{ label: t("Join links"), value: "join-links" }] : []),
           ]}
           withItemsBorders={false}
         />
@@ -62,7 +64,9 @@ export default function WorkspaceMembers() {
 
       <Space h="lg" />
 
-      {segmentValue === "invites" ? (
+      {segmentValue === "join-links" && isAdmin ? (
+        <JoinLinksPanel />
+      ) : segmentValue === "invites" ? (
         <WorkspaceInvitesTable />
       ) : (
         <WorkspaceMembersTable />

@@ -11,6 +11,8 @@ import {
   userRoleData,
 } from "@/features/workspace/types/user-role-data.ts";
 import useUserRole from "@/hooks/use-user-role.tsx";
+import { useMfaMembers } from "@/lt4/mfa/use-mfa-members";
+import { MfaMemberBadge } from "@/lt4/mfa/components/mfa-member-badge";
 import { UserRole } from "@/lib/types.ts";
 import { useTranslation } from "react-i18next";
 import Paginate from "@/components/common/paginate.tsx";
@@ -24,6 +26,7 @@ import { Link } from "react-router-dom";
 import { getUserProfileUrl } from "@/lib/config.ts";
 import { formatLocalized, useDateFnsLocale } from "@/lib/date-locale.ts";
 import rowClasses from "@/components/ui/clickable-table-row.module.css";
+import { displayEmail } from "@/lt4/accounts/username";
 
 export default function WorkspaceMembersTable() {
   const { t } = useTranslation();
@@ -39,6 +42,7 @@ export default function WorkspaceMembersTable() {
   });
   const changeMemberRoleMutation = useChangeMemberRoleMutation();
   const { isAdmin, isOwner } = useUserRole();
+  const mfaUserIds = useMfaMembers(isAdmin);
 
   const handleStatusChange = (value: MemberListStatus) => {
     setStatus(value);
@@ -124,7 +128,7 @@ export default function WorkspaceMembersTable() {
                                   locale,
                                 ),
                               })
-                            : user.email}
+                            : displayEmail(user.email)}
                         </Text>
                       </div>
                     </Group>
@@ -139,7 +143,10 @@ export default function WorkspaceMembersTable() {
                         {t("Deactivated")}
                       </Badge>
                     ) : (
-                      <Badge variant="light">{t("Active")}</Badge>
+                      <Group gap={6} wrap="nowrap">
+                        <Badge variant="light">{t("Active")}</Badge>
+                        {mfaUserIds.has(user.id) && <MfaMemberBadge />}
+                      </Group>
                     )}
                   </Table.Td>
                   <Table.Td>

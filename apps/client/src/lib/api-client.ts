@@ -95,6 +95,7 @@ function redirectToLogin() {
     APP_ROUTE.AUTH.MFA_CHALLENGE,
     APP_ROUTE.AUTH.MFA_SETUP_REQUIRED,
     "/invites",
+    "/join",
     // the oauth consent page redirects to login itself, preserving its query string
     "/oauth/consent",
   ];

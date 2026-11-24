@@ -811,7 +811,22 @@ export interface OauthTokens {
   workspaceId: string;
 }
 
+// LT4-Fork: Beitrittslinks
+export interface Lt4JoinCodes {
+  code: string;
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  expiresAt: Timestamp | null;
+  id: Generated<string>;
+  maxUses: number | null;
+  revokedAt: Timestamp | null;
+  role: Generated<string>;
+  useCount: Generated<number>;
+  workspaceId: string;
+}
+
 export interface DB {
+  lt4JoinCodes: Lt4JoinCodes;
   aiChats: AiChats;
   aiChatMessages: AiChatMessages;
   announcements: Announcements;

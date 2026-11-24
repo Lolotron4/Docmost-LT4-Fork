@@ -6,6 +6,7 @@ import { CustomAvatar } from "@/components/ui/custom-avatar";
 import { useUserProfileQuery } from "@/features/user/queries/user-query";
 import { getUserProfileUrl } from "@/lib/config";
 import classes from "./user-card.module.css";
+import { displayEmail } from "@/lt4/accounts/username";
 
 type UserCardContentProps = {
   userId: string;
@@ -75,7 +76,7 @@ export function UserCardContent({ userId }: UserCardContentProps) {
           <div className={classes.metaItem}>
             <IconMail size={16} aria-hidden style={{ flex: "none" }} />
             <Text span fz="sm" c="dimmed" className={classes.metaText}>
-              {profile.email}
+              {displayEmail(profile.email)}
             </Text>
           </div>
         </div>

@@ -115,6 +115,14 @@ export class MfaController {
     return this.mfaService.regenerateBackupCodes(user, workspace, dto.code);
   }
 
+  @SkipThrottle({ [AUTH_THROTTLER]: true })
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('members')
+  members(@AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
+    return this.mfaService.listEnabledUserIds(user, workspace);
+  }
+
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('reset-user')

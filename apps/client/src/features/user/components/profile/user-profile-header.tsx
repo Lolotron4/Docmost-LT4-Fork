@@ -13,6 +13,7 @@ import { useClipboard } from "@/hooks/use-clipboard";
 import APP_ROUTE from "@/lib/app-route";
 import { getAppUrl, getUserProfileUrl } from "@/lib/config";
 import classes from "@/features/user/components/profile/user-profile.module.css";
+import { displayEmail } from "@/lt4/accounts/username";
 
 type UserProfileHeaderProps = {
   profile: IUserProfile;
@@ -64,7 +65,7 @@ export function UserProfileHeader({ profile, actions }: UserProfileHeaderProps) 
               <span className={classes.metaItem}>
                 <IconMail size={16} aria-hidden />
                 <Text span fz="sm" c="dimmed">
-                  {profile.email}
+                  {displayEmail(profile.email)}
                 </Text>
               </span>
             </div>
