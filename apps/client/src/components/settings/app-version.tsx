@@ -5,6 +5,7 @@ import { Indicator, Text, Tooltip } from "@mantine/core";
 import React from "react";
 import semverGt from "semver/functions/gt";
 import { useTranslation } from "react-i18next";
+import { LT4_REPO_URL, LT4_VERSION } from "@/lt4/version";
 
 export default function AppVersion() {
   const { t } = useTranslation();
@@ -50,10 +51,21 @@ export default function AppVersion() {
             href="https://github.com/docmost/docmost/releases"
             target="_blank"
           >
-            {appVersion?.currentVersion && <>v{appVersion?.currentVersion}</>}
+            {appVersion?.currentVersion && <>Docmost v{appVersion?.currentVersion}</>}
           </Text>
         </Indicator>
       </Tooltip>
+      {/* LT4-Fork: eigene Versionsnummer unter der Docmost-Version */}
+      <Text
+        size="xs"
+        c="dimmed"
+        component="a"
+        href={LT4_REPO_URL}
+        target="_blank"
+        display="block"
+      >
+        LT4-Docs v{LT4_VERSION}
+      </Text>
     </div>
   );
 }
