@@ -157,9 +157,10 @@ export class SpaceService {
 
       if (
         typeof updateSpaceDto.disablePublicSharing !== 'undefined' &&
+        // LT4-Fork: Teilen pro Bereich hängt an den (eigenen) Freigabe-Kontrollen
         !this.licenseCheckService.hasFeature(
           workspace.licenseKey,
-          Feature.SECURITY_SETTINGS,
+          Feature.SHARING_CONTROLS,
           workspace.plan,
         )
       ) {

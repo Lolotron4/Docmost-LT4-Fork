@@ -2660,5 +2660,11 @@
   "e.g. Date, Group, Topic": "z. B. Datum, Gruppe, Thema",
   "e.g. Describe your results here": "z. B. Beschreibe hier eure Ergebnisse",
   "Your personal space is only visible to you. Use it for notes and drafts. You can move pages into shared spaces later.": "Dein persönlicher Bereich ist nur für dich sichtbar. Nutze ihn für Notizen und Entwürfe. Seiten kannst du später in gemeinsame Bereiche verschieben.",
-  "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off.": "Jedes Mitglied kann einen privaten Bereich anlegen, den nur es selbst sieht. Beim Ausschalten bleiben vorhandene persönliche Bereiche bestehen."
+  "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off.": "Jedes Mitglied kann einen privaten Bereich anlegen, den nur es selbst sieht. Beim Ausschalten bleiben vorhandene persönliche Bereiche bestehen.",
+  "Pages in this space cannot be shared publicly. Existing public links are removed when you turn this on.": "Seiten in diesem Bereich können nicht öffentlich geteilt werden. Beim Einschalten werden vorhandene öffentliche Links entfernt.",
+  "Public sharing is already disabled for the whole workspace.": "Öffentliches Teilen ist bereits für den ganzen Workspace gesperrt.",
+  "Nobody can export or print pages from this space.": "Niemand kann Seiten aus diesem Bereich exportieren oder drucken.",
+  "Export is already disabled for the whole workspace.": "Export ist bereits für den ganzen Workspace gesperrt.",
+  "Members who can only read pages in this space may still write comments.": "Mitglieder, die Seiten in diesem Bereich nur lesen dürfen, können trotzdem Kommentare schreiben.",
+  "Export is disabled in this space": "Export ist in diesem Bereich gesperrt"
 }
