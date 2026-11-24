@@ -27,6 +27,7 @@ export const LT4_FEATURES: ReadonlySet<string> = new Set<string>([
   Feature.PDF_IMPORT,
   Feature.ATTACHMENT_INDEXING,
   Feature.INTEGRATIONS,
+  Feature.MCP,
 ]);
 
 export const LT4_TIER = 'lt4';

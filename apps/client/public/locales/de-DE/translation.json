@@ -3012,5 +3012,15 @@
   "This integration only works with an OAuth app. Create one at the provider and set these environment variables in the stack, then restart it:": "Diese Integration funktioniert nur mit einer OAuth-App. Lege sie beim Anbieter an, setze diese Umgebungsvariablen im Stack und starte ihn neu:",
   "Callback URL of the OAuth app:": "Callback-URL der OAuth-App:",
   "{{name}} needs an OAuth app": "{{name}} braucht eine OAuth-App",
-  "{{name}} installed": "{{name}} installiert"
+  "{{name}} installed": "{{name}} installiert",
+  "MCP interface": "MCP-Schnittstelle",
+  "AI tools like Claude, Cursor or VS Code can search, read and write pages via the Model Context Protocol. They use an API key and get exactly the rights of its owner. Read-only keys can only search and read.": "KI-Werkzeuge wie Claude, Cursor oder VS Code können über das Model Context Protocol Seiten suchen, lesen und schreiben. Sie nutzen einen API-Schlüssel und haben genau die Rechte seines Besitzers. Nur-Lese-Schlüssel können nur suchen und lesen.",
+  "Enable MCP interface": "MCP-Schnittstelle einschalten",
+  "Off by default. Members can connect their own AI tools while this is on.": "Standardmäßig aus. Solange sie an ist, können Mitglieder ihre eigenen KI-Werkzeuge anbinden.",
+  "The MCP interface is turned off. An administrator can turn it on here.": "Die MCP-Schnittstelle ist ausgeschaltet. Ein Admin kann sie hier einschalten.",
+  "Server address": "Serveradresse",
+  "Create an API key above and replace <API-Schlüssel> with it.": "Lege oben einen API-Schlüssel an und setze ihn statt <API-Schlüssel> ein.",
+  "Add this to the MCP configuration file (e.g. .cursor/mcp.json or .vscode/mcp.json):": "In die MCP-Konfigurationsdatei eintragen (z. B. .cursor/mcp.json oder .vscode/mcp.json):",
+  "In claude_desktop_config.json (needs Node.js; uses the mcp-remote bridge):": "In claude_desktop_config.json (braucht Node.js, nutzt die Brücke mcp-remote):",
+  "Available tools: list_spaces, search_pages, list_pages, get_page, create_page, update_page.": "Verfügbare Werkzeuge: list_spaces, search_pages, list_pages, get_page, create_page, update_page."
 }

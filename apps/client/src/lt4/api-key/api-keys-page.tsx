@@ -32,6 +32,7 @@ import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
 import { updateWorkspace } from "@/features/workspace/services/workspace-service.ts";
 import { IApiKey } from "./index";
 import { createApiKey, listApiKeys, revokeApiKey } from "./api-key-service";
+import McpSection from "@/lt4/mcp/mcp-section";
 
 const errorMessage = (err: any) => {
   const msg = err?.response?.data?.message ?? err?.message;
@@ -236,6 +237,8 @@ export default function ApiKeysPage() {
           </Table>
         </Table.ScrollContainer>
       )}
+
+      <McpSection />
 
       <Modal opened={createOpen} onClose={() => setCreateOpen(false)} title={t("Create API key")}>
         <Stack gap="sm">
