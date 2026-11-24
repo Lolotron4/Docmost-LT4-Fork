@@ -1,3 +1,4 @@
+import { assertPasswordPolicy } from '../../../lt4/security/password-policy';
 import {
   BadRequestException,
   Inject,
@@ -141,6 +142,8 @@ export class AuthService {
       throw new BadRequestException('Current password is incorrect');
     }
 
+    // LT4-Fork: Passwortregeln des Workspace
+    await assertPasswordPolicy(this.db, workspaceId, dto.newPassword);
     const newPasswordHash = await hashPassword(dto.newPassword);
     await this.userRepo.updateUser(
       {
@@ -256,6 +259,8 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    // LT4-Fork: Passwortregeln des Workspace
+    await assertPasswordPolicy(this.db, workspace.id, passwordResetDto.newPassword);
     const newPasswordHash = await hashPassword(passwordResetDto.newPassword);
 
     await executeTx(this.db, async (trx) => {

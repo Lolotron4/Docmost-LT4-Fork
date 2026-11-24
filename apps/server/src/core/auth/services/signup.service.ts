@@ -20,6 +20,7 @@ import {
   AUDIT_SERVICE,
   IAuditService,
 } from '../../../integrations/audit/audit.service';
+import { assertPasswordPolicy } from '../../../lt4/security/password-policy';
 
 @Injectable()
 export class SignupService {
@@ -37,6 +38,9 @@ export class SignupService {
     workspaceId: string,
     trx?: KyselyTransaction,
   ): Promise<User> {
+    // LT4-Fork: Passwortregeln des Workspace
+    await assertPasswordPolicy(trx ?? this.db, workspaceId, createUserDto.password);
+
     const userCheck = await this.userRepo.findByEmail(
       createUserDto.email,
       workspaceId,

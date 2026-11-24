@@ -39,6 +39,7 @@ import {
   SetMemberPasswordDto,
 } from './accounts.dto';
 import { isUsernameEmail, usernameToEmail } from './username';
+import { assertPasswordPolicy } from '../security/password-policy';
 
 // Ohne verwechselbare Zeichen (0/O, 1/I/L).
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -258,6 +259,7 @@ export class JoinCodeService {
       throw new ForbiddenException('Only an owner can change the password of an owner');
     }
 
+    await assertPasswordPolicy(this.db, workspace.id, dto.password);
     await this.userRepo.updateUser(
       { password: await hashPassword(dto.password), hasGeneratedPassword: true },
       target.id,

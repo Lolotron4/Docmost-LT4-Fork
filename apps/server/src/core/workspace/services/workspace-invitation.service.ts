@@ -49,6 +49,7 @@ import {
 } from '../workspace.util';
 import { INVITATION_EXPIRY_DAYS } from '../workspace.constants';
 import { addDays } from 'date-fns';
+import { assertPasswordPolicy } from '../../../lt4/security/password-policy';
 
 @Injectable()
 export class WorkspaceInvitationService {
@@ -275,6 +276,8 @@ export class WorkspaceInvitationService {
 
     validateSsoEnforcement(workspace);
     validateAllowedEmail(invitation.email, workspace);
+    // LT4-Fork: Passwortregeln des Workspace
+    await assertPasswordPolicy(this.db, workspace.id, dto.password);
 
     let newUser: User;
 
