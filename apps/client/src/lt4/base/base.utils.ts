@@ -2,6 +2,7 @@
 import dayjs from "dayjs";
 import {
   CellValue,
+  IDateValue,
   IBaseProperty,
   IBaseRow,
   ISelectOption,
@@ -14,20 +15,48 @@ export function optionsOf(prop: IBaseProperty): ISelectOption[] {
   return prop.typeOptions?.options ?? [];
 }
 
-export function dateOf(value: CellValue): string | null {
+export function dateValueOf(value: CellValue): IDateValue | null {
   if (value && typeof value === "object" && !Array.isArray(value) && "start" in value) {
-    return value.start;
+    return value;
   }
   return null;
 }
 
+/** Nur der Tag ("YYYY-MM-DD") des Beginns. */
+export function dateOf(value: CellValue): string | null {
+  return dateValueOf(value)?.start.slice(0, 10) ?? null;
+}
+
+export function timeOf(iso: string | undefined | null): string | null {
+  return iso && iso.length > 10 ? iso.slice(11, 16) : null;
+}
+
 export function formatDate(iso: string | null, locale?: string) {
   if (!iso) return "";
-  return new Date(`${iso}T00:00:00`).toLocaleDateString(locale || undefined, {
+  return new Date(`${iso.slice(0, 10)}T00:00:00`).toLocaleDateString(locale || undefined, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
+}
+
+/** "24.11.2026, 14:30–16:00" bzw. mit Enddatum an einem anderen Tag. */
+export function formatDateValue(value: CellValue, locale?: string): string {
+  const d = dateValueOf(value);
+  if (!d) return "";
+  let out = formatDate(d.start, locale);
+  const t1 = timeOf(d.start);
+  if (t1) out += `, ${t1}`;
+  if (d.end) {
+    const sameDay = d.end.slice(0, 10) === d.start.slice(0, 10);
+    const t2 = timeOf(d.end);
+    out += sameDay && t2 ? `–${t2}` : ` – ${formatDate(d.end, locale)}${t2 ? `, ${t2}` : ""}`;
+  }
+  return out;
+}
+
+export function isFormulaError(value: CellValue): value is { formulaError: string } {
+  return !!value && typeof value === "object" && !Array.isArray(value) && "formulaError" in value;
 }
 
 /** Zellwert als Text für Suche, Filter und Sortierung. */
@@ -42,15 +71,20 @@ export function cellText(prop: IBaseProperty, value: CellValue): string {
         ? value.map((id) => opts.find((o) => o.id === id)?.name ?? "").filter(Boolean).join(", ")
         : "";
     case "date":
-      return dateOf(value) ?? "";
+      return dateValueOf(value)?.start ?? "";
     case "checkbox":
       return value === true ? "✓" : "";
+    case "formula":
+      if (isFormulaError(value)) return "";
+      if (typeof value === "boolean") return value ? "✓" : "";
+      return String(value);
     default:
       return String(value);
   }
 }
 
 function isEmpty(value: CellValue) {
+  if (isFormulaError(value)) return true;
   return value === undefined || value === null || value === "" || (Array.isArray(value) && !value.length);
 }
 
@@ -84,6 +118,7 @@ function compare(prop: IBaseProperty, a: CellValue, b: CellValue) {
   if (isEmpty(a)) return 1; // Leere Zellen immer ans Ende
   if (isEmpty(b)) return -1;
   if (prop.type === "number") return (a as number) - (b as number);
+  if (prop.type === "formula" && typeof a === "number" && typeof b === "number") return a - b;
   if (prop.type === "checkbox") return (a === true ? 0 : 1) - (b === true ? 0 : 1);
   if (prop.type === "select") {
     const order = optionsOf(prop).map((o) => o.id);

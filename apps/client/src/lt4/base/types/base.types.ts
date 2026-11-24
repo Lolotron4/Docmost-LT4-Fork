@@ -8,7 +8,8 @@ export type PropertyType =
   | "multiSelect"
   | "date"
   | "checkbox"
-  | "url";
+  | "url"
+  | "formula";
 
 export const PROPERTY_TYPES: PropertyType[] = [
   "text",
@@ -18,6 +19,7 @@ export const PROPERTY_TYPES: PropertyType[] = [
   "date",
   "checkbox",
   "url",
+  "formula",
 ];
 
 export type ViewType = "table" | "kanban" | "calendar";
@@ -45,7 +47,13 @@ export interface IBaseProperty {
   name: string;
   type: PropertyType;
   position: string;
-  typeOptions: { options?: ISelectOption[] } | null;
+  typeOptions: {
+    options?: ISelectOption[];
+    /** Datum: auch Uhrzeit (und Ende) erfassen */
+    includeTime?: boolean;
+    /** Formel, z. B. "{Punkte} / {Max} * 100" */
+    expression?: string;
+  } | null;
   isPrimary: boolean;
 }
 
@@ -103,8 +111,15 @@ export type CellValue =
   | number
   | boolean
   | string[]
-  | { start: string }
+  | IDateValue
+  | { formulaError: string }
   | undefined;
+
+/** "YYYY-MM-DD" oder mit Uhrzeit "YYYY-MM-DDTHH:mm" (Ortszeit) */
+export interface IDateValue {
+  start: string;
+  end?: string;
+}
 
 export interface IBaseRow {
   id: string;

@@ -3,8 +3,11 @@ import { ReactNode, useEffect, useState } from "react";
 import {
   ActionIcon,
   Button,
+  Code,
   ColorSwatch,
   Group,
+  Switch,
+  Textarea,
   Menu,
   Modal,
   Stack,
@@ -16,6 +19,8 @@ import {
   IconArrowRight,
   IconEyeOff,
   IconList,
+  IconMathFunction,
+  IconClock,
   IconSortAscending,
   IconSortDescending,
   IconTrash,
@@ -32,10 +37,13 @@ import {
 } from "../types/base.types";
 import { BaseActions } from "../queries/base-query";
 import { newOptionId, nextOptionColor, optionsOf } from "../base.utils";
+import { FormulaError, parseFormula } from "../formula";
 import { PROPERTY_LABELS, PropertyIcon } from "./cells/property-icon";
 
 interface Props {
   prop: IBaseProperty;
+  /** alle Eigenschaften (für den Formel-Editor) */
+  allProperties?: IBaseProperty[];
   actions: BaseActions;
   editable: boolean;
   children: ReactNode;
@@ -44,11 +52,12 @@ interface Props {
   onMove?: (direction: -1 | 1) => void;
 }
 
-export function PropertyMenu({ prop, actions, editable, children, onSort, onHide, onMove }: Props) {
+export function PropertyMenu({ prop, allProperties = [], actions, editable, children, onSort, onHide, onMove }: Props) {
   const { t } = useTranslation();
   const [opened, setOpened] = useState(false);
   const [name, setName] = useState(prop.name);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [formulaOpen, setFormulaOpen] = useState(false);
   useEffect(() => setName(prop.name), [prop.name, opened]);
 
   const rename = () => {
@@ -140,6 +149,25 @@ export function PropertyMenu({ prop, actions, editable, children, onSort, onHide
                   </Menu.Sub.Dropdown>
                 </Menu.Sub>
               )}
+              {prop.type === "formula" && (
+                <Menu.Item leftSection={<IconMathFunction size={14} />} onClick={() => setFormulaOpen(true)}>
+                  {t("Edit formula")}
+                </Menu.Item>
+              )}
+              {prop.type === "date" && (
+                <Menu.Item
+                  leftSection={<IconClock size={14} />}
+                  closeMenuOnClick={false}
+                  rightSection={<Switch size="xs" checked={!!prop.typeOptions?.includeTime} readOnly tabIndex={-1} />}
+                  onClick={() =>
+                    actions.updateProperty(prop.id, {
+                      typeOptions: { includeTime: !prop.typeOptions?.includeTime },
+                    })
+                  }
+                >
+                  {t("Include time")}
+                </Menu.Item>
+              )}
               {(prop.type === "select" || prop.type === "multiSelect") && (
                 <Menu.Item leftSection={<IconList size={14} />} onClick={() => setOptionsOpen(true)}>
                   {t("Edit options")}
@@ -179,6 +207,15 @@ export function PropertyMenu({ prop, actions, editable, children, onSort, onHide
           )}
         </Menu.Dropdown>
       </Menu>
+      {prop.type === "formula" && (
+        <FormulaModal
+          opened={formulaOpen}
+          onClose={() => setFormulaOpen(false)}
+          prop={prop}
+          properties={allProperties}
+          actions={actions}
+        />
+      )}
       <OptionsModal
         opened={optionsOpen}
         onClose={() => setOptionsOpen(false)}
@@ -272,6 +309,110 @@ function OptionsModal({
             {t("Cancel")}
           </Button>
           <Button onClick={save}>{t("Save")}</Button>
+        </Group>
+      </Stack>
+    </Modal>
+  );
+}
+
+const FORMULA_EXAMPLES: { code: string; text: string }[] = [
+  { code: "{Punkte} / {Max} * 100", text: "Percent" },
+  { code: "round({Preis} * 1.19, 2)", text: "Round to 2 decimals" },
+  { code: 'if({Punkte} >= 50, "bestanden", "nicht bestanden")', text: "Condition" },
+  { code: "days(today(), {Fällig})", text: "Days until a date" },
+  { code: "sum({A}, {B}, {C})", text: "Sum" },
+];
+
+function FormulaModal({
+  opened,
+  onClose,
+  prop,
+  properties,
+  actions,
+}: {
+  opened: boolean;
+  onClose: () => void;
+  prop: IBaseProperty;
+  properties: IBaseProperty[];
+  actions: BaseActions;
+}) {
+  const { t } = useTranslation();
+  const [expression, setExpression] = useState("");
+  useEffect(() => {
+    if (opened) setExpression(prop.typeOptions?.expression ?? "");
+  }, [opened, prop]);
+
+  let error: string | null = null;
+  if (expression.trim()) {
+    try {
+      parseFormula(expression);
+    } catch (e) {
+      error = e instanceof FormulaError ? e.message : String(e);
+    }
+  }
+
+  const insert = (text: string) => setExpression((x) => (x && !x.endsWith(" ") ? `${x} ${text}` : x + text));
+
+  return (
+    <Modal opened={opened} onClose={onClose} title={t("Formula for {{name}}", { name: prop.name })} size="lg" centered>
+      <Stack gap="sm">
+        <Textarea
+          autosize
+          minRows={2}
+          data-autofocus
+          value={expression}
+          onChange={(e) => setExpression(e.currentTarget.value)}
+          error={error ? t(error) : undefined}
+          styles={{ input: { fontFamily: "var(--mantine-font-family-monospace)" } }}
+          placeholder="{Punkte} / {Max} * 100"
+        />
+        <div>
+          <Text size="xs" fw={600} mb={4}>
+            {t("Properties")}
+          </Text>
+          <Group gap={4}>
+            {properties
+              .filter((p) => p.id !== prop.id)
+              .map((p) => (
+                <Button key={p.id} size="compact-xs" variant="light" color="gray" onClick={() => insert(`{${p.name}}`)}>
+                  {p.name}
+                </Button>
+              ))}
+          </Group>
+        </div>
+        <div>
+          <Text size="xs" fw={600} mb={4}>
+            {t("Examples")}
+          </Text>
+          <Stack gap={2}>
+            {FORMULA_EXAMPLES.map((ex) => (
+              <Group key={ex.code} gap={6} wrap="nowrap">
+                <Code style={{ cursor: "pointer" }} onClick={() => setExpression(ex.code)}>
+                  {ex.code}
+                </Code>
+                <Text size="xs" c="dimmed">
+                  {t(ex.text)}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+          <Text size="xs" c="dimmed" mt={6}>
+            {t("Operators: + - * / ^ % and comparisons. Functions: round, floor, ceil, abs, sqrt, min, max, sum, avg, if, and, or, not, concat, len, today, now, days, hours, adddays, year, month, day.")}
+          </Text>
+        </div>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={onClose}>
+            {t("Cancel")}
+          </Button>
+          <Button
+            disabled={!!error}
+            onClick={async () => {
+              await actions.updateProperty(prop.id, { typeOptions: { expression } });
+              onClose();
+            }}
+          >
+            {t("Save")}
+          </Button>
         </Group>
       </Stack>
     </Modal>

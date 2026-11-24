@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useBaseActions, useBaseQuery, useBaseRowsQuery } from "../queries/base-query";
 import { IBaseView, IViewConfig } from "../types/base.types";
 import { applyView } from "../base.utils";
+import { computeFormulas } from "../formula";
 import { BaseTableSkeleton } from "./base-table-skeleton";
 import { ViewToolbar } from "./view-toolbar";
 import { BaseTable } from "./table/base-table";
@@ -78,9 +79,28 @@ export function BaseView({
     return base.properties.filter((p) => p.isPrimary || !hidden.has(p.id));
   }, [base, view]);
 
+  // Formel-Spalten werden hier berechnet und wie normale Zellen behandelt.
+  const computedRows = useMemo(() => {
+    if (!base || !rows) return rows;
+    const results = computeFormulas(rows, base.properties);
+    if (!results.size) return rows;
+    return rows.map((row) => {
+      const r = results.get(row.id);
+      if (!r) return row;
+      const cells = { ...row.cells };
+      for (const [id, res] of Object.entries(r)) {
+        cells[id] = "error" in res ? { formulaError: res.error } : (res.value ?? undefined);
+      }
+      return { ...row, cells };
+    });
+  }, [base, rows]);
+
   const shownRows = useMemo(
-    () => (base && view && rows ? applyView(rows, base.properties, view.config, search) : []),
-    [base, view, rows, search],
+    () =>
+      base && view && computedRows
+        ? applyView(computedRows, base.properties, view.config, search)
+        : [],
+    [base, view, computedRows, search],
   );
 
   if (isError) {
@@ -92,7 +112,7 @@ export function BaseView({
   }
   if (isLoading || !base || !view || !rows) return <BaseTableSkeleton rows={3} />;
 
-  const openRow = rows.find((r) => r.id === openRowId) ?? null;
+  const openRow = (computedRows ?? rows).find((r) => r.id === openRowId) ?? null;
   const filtered = (view.config.filters?.length ?? 0) > 0 || !!search.trim();
   const sorted = (view.config.sorts?.length ?? 0) > 0;
 

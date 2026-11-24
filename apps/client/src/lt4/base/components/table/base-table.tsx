@@ -87,6 +87,7 @@ export function BaseTable({ base, view, properties, rows, editable, actions, onO
           <PropertyMenu
             key={prop.id}
             prop={prop}
+            allProperties={base.properties}
             actions={actions}
             editable={editable}
             onSort={(direction) => setConfig({ sorts: [{ propertyId: prop.id, direction }] })}

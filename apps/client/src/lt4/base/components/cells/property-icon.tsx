@@ -6,6 +6,7 @@ import {
   IconHash,
   IconLink,
   IconList,
+  IconMathFunction,
   IconSquareCheck,
 } from "@tabler/icons-react";
 import { PropertyType } from "../../types/base.types";
@@ -18,6 +19,7 @@ export const PROPERTY_LABELS: Record<PropertyType, string> = {
   date: "Date",
   checkbox: "Checkbox",
   url: "URL",
+  formula: "Formula",
 };
 
 export function PropertyIcon({ type, size = 14 }: { type: PropertyType; size?: number }) {
@@ -35,6 +37,8 @@ export function PropertyIcon({ type, size = 14 }: { type: PropertyType; size?: n
       return <IconSquareCheck {...props} />;
     case "url":
       return <IconLink {...props} />;
+    case "formula":
+      return <IconMathFunction {...props} />;
     default:
       return <IconAlignLeft {...props} />;
   }

@@ -1,9 +1,10 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 import { useEffect, useRef, useState } from "react";
-import { Anchor, Checkbox, Group, Popover, Text, TextInput, UnstyledButton } from "@mantine/core";
+import { Anchor, Checkbox, Group, Popover, Text, TextInput, Tooltip, UnstyledButton } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { CellValue, IBaseProperty } from "../../types/base.types";
-import { dateOf, formatDate, optionsOf } from "../../base.utils";
+import { dateValueOf, formatDateValue, isFormulaError, optionsOf } from "../../base.utils";
+import { formatFormulaValue } from "../../formula";
 import { BaseActions } from "../../queries/base-query";
 import { OptionBadge } from "./option-badge";
 import { SelectPicker } from "./select-picker";
@@ -39,6 +40,28 @@ export function BaseCell({
   const [opened, setOpened] = useState(false);
   const cls = variant === "table" ? classes.cell : classes.field;
 
+  if (prop.type === "formula") {
+    if (isFormulaError(value)) {
+      return (
+        <div className={cls}>
+          <Tooltip label={t(value.formulaError)} withArrow multiline maw={300}>
+            <Text size="sm" c="red" fw={500}>
+              {t("Error")}
+            </Text>
+          </Tooltip>
+        </div>
+      );
+    }
+    const shown = formatFormulaValue((value ?? null) as any, i18n.language);
+    return (
+      <div className={cls} data-type={typeof value === "number" ? "number" : undefined}>
+        <Text size="sm" truncate={variant === "table"} c={shown ? undefined : "dimmed"}>
+          {shown || (variant === "field" ? "–" : "")}
+        </Text>
+      </div>
+    );
+  }
+
   if (prop.type === "checkbox") {
     return (
       <div className={cls} data-type="checkbox">
@@ -59,7 +82,7 @@ export function BaseCell({
     const display =
       prop.type === "date" ? (
         <Text size="sm" truncate>
-          {formatDate(dateOf(value), i18n.language)}
+          {formatDateValue(value, i18n.language)}
         </Text>
       ) : (
         <Group gap={4} wrap={variant === "table" ? "nowrap" : "wrap"} style={{ overflow: "hidden" }}>
@@ -71,7 +94,7 @@ export function BaseCell({
             ))}
         </Group>
       );
-    const empty = prop.type === "date" ? !dateOf(value) : ids.length === 0;
+    const empty = prop.type === "date" ? !dateValueOf(value) : ids.length === 0;
 
     if (!editable) return <div className={cls}>{display}</div>;
     return (
@@ -90,10 +113,11 @@ export function BaseCell({
         <Popover.Dropdown p="xs" onKeyDownCapture={(e) => e.key === "Escape" && setOpened(false)}>
           {prop.type === "date" ? (
             <BaseDatePicker
-              value={dateOf(value)}
-              onChange={(v) => {
-                onChange(v ? { start: v } : null);
-                setOpened(false);
+              value={dateValueOf(value)}
+              includeTime={!!prop.typeOptions?.includeTime}
+              onChange={(v, close) => {
+                onChange(v);
+                if (close) setOpened(false);
               }}
             />
           ) : (

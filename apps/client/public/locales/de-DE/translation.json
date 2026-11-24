@@ -2555,5 +2555,21 @@
   "Too many rows": "Zu viele Zeilen (höchstens 5000)",
   "Too many properties": "Zu viele Eigenschaften",
   "Too many views": "Zu viele Ansichten",
-  "Database not found": "Datenbank nicht gefunden"
+  "Database not found": "Datenbank nicht gefunden",
+  "Until": "Bis",
+  "Formula for {{name}}": "Formel für {{name}}",
+  "Examples": "Beispiele",
+  "Round to 2 decimals": "Auf 2 Stellen runden",
+  "Condition": "Bedingung",
+  "Days until a date": "Tage bis zu einem Datum",
+  "Sum": "Summe",
+  "Operators: + - * / ^ % and comparisons. Functions: round, floor, ceil, abs, sqrt, min, max, sum, avg, if, and, or, not, concat, len, today, now, days, hours, adddays, year, month, day.": "Rechenzeichen: + - * / ^ % und Vergleiche (=, <, >, <=, >=, !=). Text verbinden mit &. Funktionen: round (runden), floor, ceil, abs, sqrt (wurzel), min, max, sum (summe), avg (mittelwert), if (wenn), and, or, not, concat, len, today (heute), now, days (tage), hours (stunden), adddays, year, month, day. Argumente mit Komma oder Semikolon trennen.",
+  "Division by zero": "Division durch 0",
+  "Circular reference": "Zirkelbezug: Die Formel verweist auf sich selbst",
+  "Missing closing quote": "Anführungszeichen nicht geschlossen",
+  "Missing \")\"": "„)“ fehlt",
+  "Unexpected end of formula": "Die Formel ist unvollständig",
+  "Unexpected symbol": "Unerwartetes Zeichen",
+  "Unexpected symbol after the formula": "Unerwartetes Zeichen am Ende der Formel",
+  "Square root of a negative number": "Wurzel aus einer negativen Zahl"
 }

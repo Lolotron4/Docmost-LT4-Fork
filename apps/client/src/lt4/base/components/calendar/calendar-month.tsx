@@ -6,7 +6,7 @@ import { IconChevronLeft, IconChevronRight, IconPlus } from "@tabler/icons-react
 import { useTranslation } from "react-i18next";
 import { IBase, IBaseRow, IBaseView } from "../../types/base.types";
 import { BaseActions } from "../../queries/base-query";
-import { dateOf, todayIso } from "../../base.utils";
+import { dateOf, dateValueOf, timeOf, todayIso } from "../../base.utils";
 import classes from "../base.module.css";
 
 interface Props {
@@ -75,6 +75,21 @@ export function CalendarMonth({ base, view, rows, editable, actions, onOpenRow }
     if (!d) continue;
     byDay.set(d, [...(byDay.get(d) ?? []), row]);
   }
+  // Ganztägige zuerst, dann nach Uhrzeit.
+  for (const list of byDay.values()) {
+    list.sort((a, b) => {
+      const sa = dateValueOf(a.cells[dateProp.id])!.start;
+      const sb = dateValueOf(b.cells[dateProp.id])!.start;
+      return (sa.length - sb.length) || sa.localeCompare(sb);
+    });
+  }
+  const timeLabel = (row: IBaseRow) => {
+    const v = dateValueOf(row.cells[dateProp.id]);
+    const t1 = timeOf(v?.start);
+    if (!t1) return "";
+    const t2 = v?.end?.slice(0, 10) === v?.start.slice(0, 10) ? timeOf(v?.end) : null;
+    return t2 ? `${t1}–${t2} ` : `${t1} `;
+  };
   const undated = rows.filter((r) => !dateOf(r.cells[dateProp.id])).length;
 
   const title = (row: IBaseRow) => (primary && String(row.cells[primary.id] ?? "")) || t("Untitled");
@@ -128,7 +143,16 @@ export function CalendarMonth({ base, view, rows, editable, actions, onOpenRow }
                 const id = dragId;
                 setDragId(null);
                 setDropDay(null);
-                if (id) actions.updateCells(id, { [dateProp.id]: { start: iso } });
+                if (!id) return;
+                // Uhrzeit und Dauer bleiben beim Verschieben auf einen anderen Tag erhalten.
+                const old = dateValueOf(rows.find((r) => r.id === id)?.cells[dateProp.id]);
+                const keep = (v?: string) => (v && v.length > 10 ? `${iso}${v.slice(10)}` : iso);
+                const next = old?.end
+                  ? old.end.slice(0, 10) === old.start.slice(0, 10)
+                    ? { start: keep(old.start), end: keep(old.end) }
+                    : { start: keep(old.start) }
+                  : { start: keep(old?.start) };
+                actions.updateCells(id, { [dateProp.id]: next });
               }}
             >
               <Group justify="flex-start">
@@ -166,8 +190,13 @@ export function CalendarMonth({ base, view, rows, editable, actions, onOpenRow }
                     setDropDay(null);
                   }}
                   onClick={() => onOpenRow(row.id)}
-                  title={title(row)}
+                  title={timeLabel(row) + title(row)}
                 >
+                  {timeLabel(row) && (
+                    <Text span size="xs" fw={600} mr={4}>
+                      {timeLabel(row).trim()}
+                    </Text>
+                  )}
                   {title(row)}
                 </UnstyledButton>
               ))}

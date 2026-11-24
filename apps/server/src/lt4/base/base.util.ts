@@ -9,6 +9,7 @@ export const PROPERTY_TYPES = [
   'date',
   'checkbox',
   'url',
+  'formula',
 ] as const;
 export type PropertyType = (typeof PROPERTY_TYPES)[number];
 
@@ -29,7 +30,7 @@ export const OPTION_COLORS = [
 
 export type SelectOption = { id: string; name: string; color: string };
 export type TypeOptions = { options?: SelectOption[] } & Record<string, unknown>;
-export type DateValue = { start: string };
+export type DateValue = { start: string; end?: string };
 
 const ALNUM = 'abcdefghijklmnopqrstuvwxyz0123456789';
 export function shortId(prefix = ''): string {
@@ -56,6 +57,18 @@ export function getOptions(typeOptions: unknown): SelectOption[] {
 
 /** Bereinigt Typ-Optionen aus Benutzereingaben. */
 export function sanitizeTypeOptions(type: PropertyType, input: unknown): TypeOptions | null {
+  const raw = (input ?? {}) as Record<string, unknown>;
+  if (type === 'date') {
+    return { includeTime: raw.includeTime === true };
+  }
+  if (type === 'formula') {
+    const expression = typeof raw.expression === 'string' ? raw.expression.slice(0, 2000) : '';
+    return { expression };
+  }
+  if (type === 'number') {
+    const decimals = Number.isInteger(raw.decimals) ? Math.min(Math.max(raw.decimals as number, 0), 6) : null;
+    return decimals === null ? null : { decimals };
+  }
   if (type === 'select' || type === 'multiSelect') {
     const seen = new Set<string>();
     const options = getOptions(input).filter((o) => {
@@ -76,13 +89,38 @@ export function parseDate(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const v = value.trim();
   if (ISO_DATE.test(v)) return validDate(v);
-  const iso = v.match(/^(\d{4}-\d{2}-\d{2})T/);
+  const iso = v.match(/^(\d{4}-\d{2}-\d{2})[T ]/);
   if (iso) return validDate(iso[1]);
   const de = v.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
   if (de) {
     return validDate(`${de[3]}-${de[2].padStart(2, '0')}-${de[1].padStart(2, '0')}`);
   }
   return null;
+}
+
+const DATE_TIME = /^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})/;
+
+/**
+ * Datum oder Datum mit Uhrzeit: "YYYY-MM-DD" bzw. "YYYY-MM-DDTHH:mm"
+ * (Ortszeit ohne Zeitzone, wie ein Termin im Kalender).
+ */
+export function parseDateTime(value: unknown): string | null {
+  if (typeof value !== 'string') return parseDate(value);
+  const m = value.trim().match(DATE_TIME);
+  if (m) {
+    const day = validDate(m[1]);
+    const h = Number(m[2]);
+    const min = Number(m[3]);
+    if (!day || h > 23 || min > 59) return null;
+    return `${day}T${m[2]}:${m[3]}`;
+  }
+  const de = value.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4}),?\s+(\d{1,2}):(\d{2})$/);
+  if (de) {
+    return parseDateTime(
+      `${de[3]}-${de[2].padStart(2, '0')}-${de[1].padStart(2, '0')}T${de[4].padStart(2, '0')}:${de[5]}`,
+    );
+  }
+  return parseDate(value);
 }
 
 function validDate(v: string): string | null {
@@ -121,9 +159,17 @@ export function sanitizeCell(
       return out.length ? out : undefined;
     }
     case 'date': {
-      const start = parseDate(value);
-      return start ? { start } : undefined;
+      const obj = value && typeof value === 'object' ? (value as Record<string, unknown>) : { start: value };
+      const withTime = (typeOptions as any)?.includeTime === true;
+      const parse = (v: unknown) => (withTime ? parseDateTime(v) : parseDate(v));
+      const start = parse(obj.start);
+      if (!start) return undefined;
+      const end = obj.end !== undefined && obj.end !== null && obj.end !== '' ? parse(obj.end) : null;
+      return end && end > start ? { start, end } : { start };
     }
+    case 'formula':
+      // Wird im Browser aus den anderen Spalten berechnet, nicht gespeichert.
+      return undefined;
   }
   return undefined;
 }
@@ -139,9 +185,11 @@ export function cellToText(type: PropertyType, typeOptions: unknown, value: unkn
     case 'multiSelect':
       return Array.isArray(value) ? value.map(name).filter(Boolean).join(', ') : '';
     case 'date':
-      return parseDate(value) ?? '';
+      return parseDateTime((value as any)?.start ?? value) ?? '';
     case 'checkbox':
       return value === true ? 'true' : '';
+    case 'formula':
+      return '';
     default:
       return String(value);
   }
@@ -202,15 +250,19 @@ export function convertCells(
         return ids.length ? [...new Set(ids)] : undefined;
       }
       case 'date': {
-        const start = parseDate(text);
+        const start = (to.typeOptions as any)?.includeTime ? parseDateTime(text) : parseDate(text);
         return start ? { start } : undefined;
       }
+      case 'formula':
+        return undefined;
     }
     return undefined;
   });
 
   const typeOptions =
-    to.type === 'select' || to.type === 'multiSelect' ? { options } : null;
+    to.type === 'select' || to.type === 'multiSelect'
+      ? { options }
+      : sanitizeTypeOptions(to.type, to.typeOptions);
   return { values: out, typeOptions };
 }
 

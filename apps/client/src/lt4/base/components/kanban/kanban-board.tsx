@@ -5,7 +5,8 @@ import { IconPlus } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { IBase, IBaseProperty, IBaseRow, IBaseView, ISelectOption } from "../../types/base.types";
 import { BaseActions } from "../../queries/base-query";
-import { cellText, optionsOf } from "../../base.utils";
+import { cellText, formatDateValue, isFormulaError, optionsOf } from "../../base.utils";
+import { formatFormulaValue } from "../../formula";
 import { OptionBadge } from "../cells/option-badge";
 import { PropertyIcon } from "../cells/property-icon";
 import classes from "../base.module.css";
@@ -212,7 +213,7 @@ export function KanbanBoard({ base, view, properties, rows, editable, actions, o
 
 function CardValue({ prop, row }: { prop: IBaseProperty; row: IBaseRow }) {
   const value = row.cells[prop.id];
-  if (value === undefined || value === null || value === "") return null;
+  if (value === undefined || value === null || value === "" || isFormulaError(value)) return null;
   if (prop.type === "select" || prop.type === "multiSelect") {
     const ids = Array.isArray(value) ? value : [value as string];
     const opts = optionsOf(prop);
@@ -236,7 +237,11 @@ function CardValue({ prop, row }: { prop: IBaseProperty; row: IBaseRow }) {
     <Group gap={4} wrap="nowrap" c="dimmed">
       <PropertyIcon type={prop.type} size={12} />
       <Text size="xs" truncate>
-        {prop.type === "date" ? new Date(`${cellText(prop, value)}T00:00:00`).toLocaleDateString() : cellText(prop, value)}
+        {prop.type === "date"
+          ? formatDateValue(value)
+          : prop.type === "formula"
+            ? formatFormulaValue(value as any)
+            : cellText(prop, value)}
       </Text>
     </Group>
   );

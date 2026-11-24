@@ -2555,5 +2555,21 @@
   "Too many rows": "Too many rows",
   "Too many properties": "Too many properties",
   "Too many views": "Too many views",
-  "Database not found": "Database not found"
+  "Database not found": "Database not found",
+  "Until": "Until",
+  "Formula for {{name}}": "Formula for {{name}}",
+  "Examples": "Examples",
+  "Round to 2 decimals": "Round to 2 decimals",
+  "Condition": "Condition",
+  "Days until a date": "Days until a date",
+  "Sum": "Sum",
+  "Operators: + - * / ^ % and comparisons. Functions: round, floor, ceil, abs, sqrt, min, max, sum, avg, if, and, or, not, concat, len, today, now, days, hours, adddays, year, month, day.": "Operators: + - * / ^ % and comparisons. Functions: round, floor, ceil, abs, sqrt, min, max, sum, avg, if, and, or, not, concat, len, today, now, days, hours, adddays, year, month, day.",
+  "Division by zero": "Division by zero",
+  "Circular reference": "Circular reference",
+  "Missing closing quote": "Missing closing quote",
+  "Missing \")\"": "Missing \")\"",
+  "Unexpected end of formula": "Unexpected end of formula",
+  "Unexpected symbol": "Unexpected symbol",
+  "Unexpected symbol after the formula": "Unexpected symbol after the formula",
+  "Square root of a negative number": "Square root of a negative number"
 }

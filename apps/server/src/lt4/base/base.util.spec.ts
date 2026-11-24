@@ -1,4 +1,4 @@
-import { convertCells, parseDate, sanitizeCell, sanitizeViewConfig } from './base.util';
+import { convertCells, parseDate, sanitizeCell, sanitizeTypeOptions, sanitizeViewConfig } from './base.util';
 
 const opts = { options: [{ id: 'o1', name: 'Offen', color: 'red' }, { id: 'o2', name: 'Fertig', color: 'green' }] };
 
@@ -14,6 +14,22 @@ describe('base.util', () => {
     expect(sanitizeCell('date', null, '24.11.2026')).toEqual({ start: '2026-11-24' });
     expect(sanitizeCell('date', null, '2026-02-30')).toBeUndefined();
     expect(sanitizeCell('text', null, '')).toBeUndefined();
+  });
+
+  it('speichert Termine mit Uhrzeit und Ende', () => {
+    const withTime = { includeTime: true };
+    expect(sanitizeCell('date', withTime, { start: '2026-11-24T14:30', end: '2026-11-24T16:00' })).toEqual({ start: '2026-11-24T14:30', end: '2026-11-24T16:00' });
+    expect(sanitizeCell('date', withTime, { start: '24.11.2026 9:05' })).toEqual({ start: '2026-11-24T09:05' });
+    expect(sanitizeCell('date', withTime, { start: '2026-11-24T25:00' })).toBeUndefined();
+    expect(sanitizeCell('date', withTime, { start: '2026-11-24T14:30', end: '2026-11-24T10:00' })).toEqual({ start: '2026-11-24T14:30' });
+    // Ohne Uhrzeit-Option wird die Zeit abgeschnitten.
+    expect(sanitizeCell('date', null, { start: '2026-11-24T14:30' })).toEqual({ start: '2026-11-24' });
+  });
+
+  it('speichert keine Formelwerte, nur den Ausdruck', () => {
+    expect(sanitizeCell('formula', { expression: '1+1' }, 2)).toBeUndefined();
+    expect(sanitizeTypeOptions('formula', { expression: '{A} * 2', evil: 1 })).toEqual({ expression: '{A} * 2' });
+    expect(sanitizeTypeOptions('date', { includeTime: 'ja' })).toEqual({ includeTime: false });
   });
 
   it('liest Datumsformate', () => {
