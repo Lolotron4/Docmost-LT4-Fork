@@ -87,6 +87,11 @@ export type RefetchRootTreeNodeEvent = {
   spaceId: string;
 };
 
+export type Lt4ReadConfirmationUpdatedEvent = {
+  operation: "lt4ReadConfirmationUpdated";
+  pageId: string;
+};
+
 export type VerificationUpdatedEvent = {
   operation: "verificationUpdated";
   pageId: string;
@@ -112,4 +117,5 @@ export type WebSocketEvent =
   | DeleteTreeNodeEvent
   | RefetchRootTreeNodeEvent
   | VerificationUpdatedEvent
+  | Lt4ReadConfirmationUpdatedEvent
   | SpaceArchiveUpdatedEvent;

@@ -66,6 +66,8 @@ export function NotificationItem({
             : "<bold>{{name}}</bold> changed an approved page";
         }
         return "<bold>{{name}}</bold> changed a verified page";
+      case "lt4.read_requested":
+        return "<bold>{{name}}</bold> asked you to confirm that you have read a page";
       case "page.verification_expiring":
         return "Page verification expires soon";
       case "page.verification_expired":

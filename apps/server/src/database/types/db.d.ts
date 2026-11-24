@@ -826,6 +826,26 @@ export interface Lt4JoinCodes {
 }
 
 // LT4-Fork: KI-Schreibassistent
+export interface Lt4ReadRequests {
+  id: Generated<string>;
+  pageId: string;
+  spaceId: string;
+  workspaceId: string;
+  requestedById: string | null;
+  message: string | null;
+  dueAt: Timestamp | null;
+  roundStartedAt: Generated<Timestamp>;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface Lt4ReadConfirmations {
+  id: Generated<string>;
+  requestId: string;
+  userId: string;
+  confirmedAt: Generated<Timestamp>;
+}
+
 export interface Lt4AiSettings {
   access: Generated<string>;
   allowedGroupIds: Generated<Json>;
@@ -840,6 +860,8 @@ export interface Lt4AiSettings {
 export interface DB {
   lt4JoinCodes: Lt4JoinCodes;
   lt4AiSettings: Lt4AiSettings;
+  lt4ReadRequests: Lt4ReadRequests;
+  lt4ReadConfirmations: Lt4ReadConfirmations;
   aiChats: AiChats;
   aiChatMessages: AiChatMessages;
   announcements: Announcements;

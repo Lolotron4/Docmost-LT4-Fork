@@ -54,6 +54,7 @@ import {
   PageVerificationMenuItem,
   PageVerificationModal,
 } from "@/lt4/page-verification";
+import { ReadConfirmationMenuItem } from "@/lt4/read-confirmation/read-confirmation";
 import {
   useFavoriteIds,
   useAddFavoriteMutation,
@@ -368,6 +369,8 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
               onClick={openVerificationModal}
             />
           )}
+
+          {!readOnly && !page?.isBase && <ReadConfirmationMenuItem pageId={page?.id} />}
 
           <Menu.Divider />
 
