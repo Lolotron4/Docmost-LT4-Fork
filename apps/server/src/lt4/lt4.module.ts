@@ -34,11 +34,14 @@ import { PersonalSpaceService } from './personal-space/personal-space.service';
 import { PageVerificationController } from './page-verification/page-verification.controller';
 import { PageVerificationService } from './page-verification/page-verification.service';
 import { PageVerificationSchedulerService } from './page-verification/page-verification-scheduler.service';
+import { ReadConfirmationController } from './read-confirmation/read-confirmation.controller';
+import { ReadConfirmationService } from './read-confirmation/read-confirmation.service';
+import { NotificationModule } from '../core/notification/notification.module';
 
 @Module({
-  imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService],
+  imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule, NotificationModule],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

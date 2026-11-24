@@ -11,6 +11,7 @@ export type NotificationType =
   | "page.verification_invalidated"
   | "page.approval_requested"
   | "page.approval_rejected"
+  | "lt4.read_requested"
   | "siem_destination.failing"
   | "siem_destination.disabled"
   | "siem_destination.recovered"

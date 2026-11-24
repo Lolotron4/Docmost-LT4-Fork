@@ -1,3 +1,4 @@
+import { invalidateReadConfirmation } from "@/lt4/read-confirmation/read-confirmation";
 import React from "react";
 import { socketAtom } from "@/features/websocket/atoms/socket-atom.ts";
 import { useAtom } from "jotai";
@@ -149,6 +150,9 @@ export const useQuerySubscription = () => {
           });
           break;
         }
+        case "lt4ReadConfirmationUpdated":
+          invalidateReadConfirmation(data.pageId);
+          break;
         case "verificationUpdated":
           queryClient.invalidateQueries({
             queryKey: ["page-verification-info", data.pageId],

@@ -15,7 +15,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { IconFileText, IconRosetteDiscountCheck } from "@tabler/icons-react";
+import { IconChecks, IconFileText, IconRosetteDiscountCheck } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { DocumentTitle } from "@/components/ui/document-title.tsx";
 import { CustomAvatar } from "@/components/ui/custom-avatar";
@@ -23,6 +23,7 @@ import { buildPageUrl } from "@/features/page/page.utils.ts";
 import { timeAgo } from "@/lib/time.ts";
 import "@/lt4/template/pages/template.css";
 import { useVerificationList } from "../queries";
+import { usePendingReads } from "@/lt4/read-confirmation/read-confirmation";
 import { STATE_META, VerificationStateBadge } from "../components/verification-state";
 import {
   IVerificationListItem,
@@ -35,7 +36,9 @@ const needsAction = (i: IVerificationListItem) =>
 
 export default function ReviewsPage() {
   const { t } = useTranslation();
-  const [view, setView] = useState<"todo" | "mine" | "all">("todo");
+  const [view, setView] = useState<"todo" | "read" | "mine" | "all">("todo");
+  const { data: pendingReads, isLoading: readsLoading } = usePendingReads();
+  const readCount = pendingReads?.items.length ?? 0;
   const [state, setState] = useState<string>("any");
   const { data, isLoading } = useVerificationList({
     filter: view === "all" ? "all" : "mine",
@@ -72,14 +75,66 @@ export default function ReviewsPage() {
           onChange={(v) => setView(v as typeof view)}
           data={[
             { value: "todo", label: t("Waiting for me") },
+            { value: "read", label: readCount ? `${t("To read")} (${readCount})` : t("To read") },
             { value: "mine", label: t("My reviews") },
             { value: "all", label: t("All") },
           ]}
         />
-        <Select w={220} data={stateOptions} value={state} onChange={(v) => setState(v ?? "any")} allowDeselect={false} />
+        {view !== "read" && <Select w={220} data={stateOptions} value={state} onChange={(v) => setState(v ?? "any")} allowDeselect={false} />}
       </Group>
 
-      {isLoading ? (
+      {view === "read" ? (
+        readsLoading ? (
+          <Group justify="center" p="xl">
+            <Loader size="sm" />
+          </Group>
+        ) : readCount === 0 ? (
+          <Stack align="center" py="xl" gap="xs">
+            <IconChecks size={40} stroke={1.2} color="var(--mantine-color-dimmed)" />
+            <Text c="dimmed">{t("You have confirmed everything.")}</Text>
+          </Stack>
+        ) : (
+          <Stack gap="xs">
+            {pendingReads!.items.map((i) => {
+              const overdue = i.dueAt && new Date(i.dueAt).getTime() < Date.now();
+              return (
+                <Card
+                  key={i.id}
+                  withBorder
+                  padding="sm"
+                  radius="md"
+                  component={Link}
+                  to={buildPageUrl(i.spaceSlug, i.slugId, i.title ?? undefined)}
+                  className="lt4-template-card"
+                >
+                  <Group justify="space-between" wrap="nowrap">
+                    <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
+                      <Text size="lg" lh={1}>
+                        {i.icon || <IconFileText size={20} stroke={1.5} />}
+                      </Text>
+                      <div style={{ minWidth: 0 }}>
+                        <Text fw={500} truncate>
+                          {i.title || t("Untitled")}
+                        </Text>
+                        <Text size="xs" c="dimmed" truncate>
+                          {i.spaceName}
+                          {i.requestedByName ? ` · ${i.requestedByName}` : ""}
+                          {i.message ? ` · ${i.message}` : ""}
+                        </Text>
+                      </div>
+                    </Group>
+                    {i.dueAt && (
+                      <Text size="xs" c={overdue ? "orange" : "dimmed"} style={{ whiteSpace: "nowrap" }}>
+                        {t("Confirm by {{date}}", { date: new Date(i.dueAt).toLocaleDateString() })}
+                      </Text>
+                    )}
+                  </Group>
+                </Card>
+              );
+            })}
+          </Stack>
+        )
+      ) : isLoading ? (
         <Group justify="center" p="xl">
           <Loader size="sm" />
         </Group>
