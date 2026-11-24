@@ -2660,5 +2660,11 @@
   "e.g. Date, Group, Topic": "e.g. Date, Group, Topic",
   "e.g. Describe your results here": "e.g. Describe your results here",
   "Your personal space is only visible to you. Use it for notes and drafts. You can move pages into shared spaces later.": "Your personal space is only visible to you. Use it for notes and drafts. You can move pages into shared spaces later.",
-  "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off.": "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off."
+  "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off.": "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off.",
+  "Pages in this space cannot be shared publicly. Existing public links are removed when you turn this on.": "Pages in this space cannot be shared publicly. Existing public links are removed when you turn this on.",
+  "Public sharing is already disabled for the whole workspace.": "Public sharing is already disabled for the whole workspace.",
+  "Nobody can export or print pages from this space.": "Nobody can export or print pages from this space.",
+  "Export is already disabled for the whole workspace.": "Export is already disabled for the whole workspace.",
+  "Members who can only read pages in this space may still write comments.": "Members who can only read pages in this space may still write comments.",
+  "Export is disabled in this space": "Export is disabled in this space"
 }
