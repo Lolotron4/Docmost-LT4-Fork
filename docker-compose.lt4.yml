@@ -3,7 +3,7 @@
 #
 # Variablen (in Portainer unter "Environment variables"):
 #   APP_SECRET     Pflicht, mindestens 32 Zeichen
-#   DB_PASSWORD    Pflicht
+#   DB_PASSWORD    Pflicht. Nur Buchstaben und Ziffern (steht in einer URL; / + = @ : brechen sie)
 #   APP_URL        Öffentliche Adresse, z. B. https://docs.example.de
 #   DATA_DIR       Ordner auf dem Host für alle Daten (Standard: ./lt4-data)
 #                  ACHTUNG: Für einen Test nie den Ordner einer laufenden Instanz verwenden!
@@ -22,8 +22,10 @@ services:
     image: docmost-lt4:local
     container_name: ${CONTAINER_APP_NAME:-docmost-lt4-test1}
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       APP_URL: ${APP_URL:?APP_URL fehlt}
       APP_SECRET: ${APP_SECRET:?APP_SECRET fehlt}
@@ -47,6 +49,11 @@ services:
       POSTGRES_DB: docmost
       POSTGRES_USER: docmost
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD fehlt}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docmost -d docmost"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
     restart: unless-stopped
     volumes:
       - ${DATA_DIR:-./lt4-data}/db_data:/var/lib/postgresql
