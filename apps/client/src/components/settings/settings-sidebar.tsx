@@ -10,6 +10,7 @@ import {
   IconBrush,
   IconWorld,
   IconPlug,
+  IconShieldLock,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
@@ -78,6 +79,12 @@ const groupedData: DataGroup[] = [
         role: "admin",
       },
       { label: "Public sharing", icon: IconWorld, path: "/settings/sharing" },
+      {
+        label: "Security",
+        icon: IconShieldLock,
+        path: "/settings/security",
+        role: "admin",
+      },
       {
         label: "Integrations",
         icon: IconPlug,

@@ -7,6 +7,7 @@ import { Feature } from '../common/features';
  */
 export const LT4_FEATURES: ReadonlySet<string> = new Set<string>([
   Feature.PAGE_PERMISSIONS,
+  Feature.MFA,
 ]);
 
 export const LT4_TIER = 'lt4';

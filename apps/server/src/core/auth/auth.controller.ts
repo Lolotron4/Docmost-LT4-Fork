@@ -32,6 +32,7 @@ import { VerifyUserTokenDto } from './dto/verify-user-token.dto';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { validateSsoEnforcement } from './auth.util';
 import { ModuleRef } from '@nestjs/core';
+import { MfaService } from '../../lt4/mfa/mfa.service';
 import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 import {
   AUDIT_SERVICE,
@@ -61,47 +62,18 @@ export class AuthController {
   ) {
     validateSsoEnforcement(workspace);
 
-    let MfaModule: any;
-    let isMfaModuleReady = false;
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      MfaModule = require('./../../ee/mfa/services/mfa.service');
-      isMfaModuleReady = true;
-    } catch (err) {
-      this.logger.debug(
-        'MFA module requested but EE module not bundled in this build',
-      );
-      isMfaModuleReady = false;
+    // LT4-Fork: 2FA-Prüfung über das eigene MFA-Modul (apps/server/src/lt4/mfa).
+    const mfaService = this.moduleRef.get(MfaService, { strict: false });
+    const mfaResult = await mfaService.checkMfaRequirements(
+      loginInput,
+      workspace,
+      res,
+    );
+    if ('authToken' in mfaResult) {
+      this.setAuthCookie(res, mfaResult.authToken);
+      return;
     }
-    if (isMfaModuleReady) {
-      const mfaService = this.moduleRef.get(MfaModule.MfaService, {
-        strict: false,
-      });
-
-      const mfaResult = await mfaService.checkMfaRequirements(
-        loginInput,
-        workspace,
-        res,
-      );
-
-      if (mfaResult) {
-        // If user has MFA enabled OR workspace enforces MFA, require MFA verification
-        if (mfaResult.userHasMfa || mfaResult.requiresMfaSetup) {
-          return {
-            userHasMfa: mfaResult.userHasMfa,
-            requiresMfaSetup: mfaResult.requiresMfaSetup,
-            isMfaEnforced: mfaResult.isMfaEnforced,
-          };
-        } else if (mfaResult.authToken) {
-          // User doesn't have MFA and workspace doesn't require it
-          this.setAuthCookie(res, mfaResult.authToken);
-          return;
-        }
-      }
-    }
-
-    const authToken = await this.authService.login(loginInput, workspace.id);
-    this.setAuthCookie(res, authToken);
+    return mfaResult;
   }
 
   @UseGuards(SetupGuard)

@@ -14,6 +14,19 @@ import AnnouncementBanners from "@/lt4/announcement/components/announcement-bann
 
 const SetupWorkspace = lazyWithPrefetch(() => import("@/pages/auth/setup-workspace.tsx"));
 const LoginPage = lazyWithPrefetch(() => import("@/pages/auth/login"));
+const MfaChallengePage = lazyWithPrefetch(() =>
+  import("@/lt4/mfa/pages/mfa-login-pages").then((m) => ({
+    default: m.MfaChallengePage,
+  })),
+);
+const MfaSetupRequiredPage = lazyWithPrefetch(() =>
+  import("@/lt4/mfa/pages/mfa-login-pages").then((m) => ({
+    default: m.MfaSetupRequiredPage,
+  })),
+);
+const SecuritySettings = lazyWithPrefetch(
+  () => import("@/lt4/security/pages/security-settings"),
+);
 const Home = lazyWithPrefetch(() => import("@/pages/dashboard/home"));
 const AccountSettings = lazyWithPrefetch(
   () => import("@/pages/settings/account/account-settings"),
@@ -82,6 +95,11 @@ export default function App() {
 
         <Route element={<WorkspaceLocaleLayout />}>
           <Route path={"/login"} element={<LoginPage />} />
+          <Route path={"/login/mfa"} element={<MfaChallengePage />} />
+          <Route
+            path={"/login/mfa/setup"}
+            element={<MfaSetupRequiredPage />}
+          />
           <Route path={"/invites/:invitationId"} element={<InviteSignup />} />
           <Route path={"/forgot-password"} element={<ForgotPassword />} />
           <Route path={"/password-reset"} element={<PasswordReset />} />
@@ -155,6 +173,7 @@ export default function App() {
             <Route path={"spaces"} element={<Spaces />} />
             <Route path={"sharing"} element={<Shares />} />
             <Route path={"integrations"} element={<Integrations />} />
+            <Route path={"security"} element={<SecuritySettings />} />
           </Route>
         </Route>
       </Routes>
