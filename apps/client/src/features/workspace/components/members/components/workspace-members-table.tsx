@@ -11,6 +11,8 @@ import {
   userRoleData,
 } from "@/features/workspace/types/user-role-data.ts";
 import useUserRole from "@/hooks/use-user-role.tsx";
+import { useMfaMembers } from "@/lt4/mfa/use-mfa-members";
+import { MfaMemberBadge } from "@/lt4/mfa/components/mfa-member-badge";
 import { UserRole } from "@/lib/types.ts";
 import { useTranslation } from "react-i18next";
 import Paginate from "@/components/common/paginate.tsx";
@@ -40,6 +42,7 @@ export default function WorkspaceMembersTable() {
   });
   const changeMemberRoleMutation = useChangeMemberRoleMutation();
   const { isAdmin, isOwner } = useUserRole();
+  const mfaUserIds = useMfaMembers(isAdmin);
 
   const handleStatusChange = (value: MemberListStatus) => {
     setStatus(value);
@@ -140,7 +143,10 @@ export default function WorkspaceMembersTable() {
                         {t("Deactivated")}
                       </Badge>
                     ) : (
-                      <Badge variant="light">{t("Active")}</Badge>
+                      <Group gap={6} wrap="nowrap">
+                        <Badge variant="light">{t("Active")}</Badge>
+                        {mfaUserIds.has(user.id) && <MfaMemberBadge />}
+                      </Group>
                     )}
                   </Table.Td>
                   <Table.Td>

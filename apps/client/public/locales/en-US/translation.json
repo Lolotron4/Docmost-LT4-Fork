@@ -2459,5 +2459,9 @@
   "Email or username is required": "Email or username is required",
   "Username must be 3-32 characters: letters, digits, dot, dash or underscore": "Username must be 3-32 characters: letters, digits, dot, dash or underscore",
   "Join link not found": "Join link not found",
-  "Only an owner can change the password of an owner": "Only an owner can change the password of an owner"
+  "Only an owner can change the password of an owner": "Only an owner can change the password of an owner",
+  "e.g. School laptop": "e.g. School laptop",
+  "Rename device": "Rename device",
+  "Two-factor authentication is enabled": "Two-factor authentication is enabled",
+  "Session not found": "Session not found"
 }

@@ -28,8 +28,10 @@ export function MfaSettings() {
   const [dialog, setDialog] = useState<Dialog>(null);
   const [newCodes, setNewCodes] = useState<string[] | null>(null);
 
-  const refresh = () =>
+  const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ["lt4-mfa-status"] });
+    queryClient.invalidateQueries({ queryKey: ["lt4-mfa-members"] });
+  };
   const close = () => {
     setDialog(null);
     setNewCodes(null);

@@ -5,6 +5,8 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useTranslation } from "react-i18next";
 import { errorMessage, resetMemberMfa } from "../mfa-service";
+import { useQueryClient } from "@tanstack/react-query";
+import { MFA_MEMBERS_KEY } from "../use-mfa-members";
 
 interface Props {
   userId: string;
@@ -15,6 +17,7 @@ interface Props {
 /** Menüpunkt für Admins: 2FA eines Mitglieds zurücksetzen (z. B. Handy verloren). */
 export function ResetMemberMfaItem({ userId, name, disabled }: Props) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const open = () =>
     modals.openConfirmModal({
@@ -33,6 +36,7 @@ export function ResetMemberMfaItem({ userId, name, disabled }: Props) {
       onConfirm: async () => {
         try {
           await resetMemberMfa(userId);
+          queryClient.invalidateQueries({ queryKey: MFA_MEMBERS_KEY });
           notifications.show({ message: t("Two-factor authentication has been reset") });
         } catch (err) {
           notifications.show({

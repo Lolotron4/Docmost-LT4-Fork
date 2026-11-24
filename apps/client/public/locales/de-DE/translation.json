@@ -2459,5 +2459,9 @@
   "Email or username is required": "E-Mail oder Benutzername ist erforderlich",
   "Username must be 3-32 characters: letters, digits, dot, dash or underscore": "Der Benutzername muss 3 bis 32 Zeichen lang sein: Kleinbuchstaben, Ziffern, Punkt, Bindestrich oder Unterstrich",
   "Join link not found": "Beitrittslink nicht gefunden",
-  "Only an owner can change the password of an owner": "Nur ein Eigentümer kann das Passwort eines Eigentümers ändern"
+  "Only an owner can change the password of an owner": "Nur ein Eigentümer kann das Passwort eines Eigentümers ändern",
+  "e.g. School laptop": "z. B. Laptop Schule",
+  "Rename device": "Gerät umbenennen",
+  "Two-factor authentication is enabled": "Zwei-Faktor-Authentifizierung ist aktiviert",
+  "Session not found": "Sitzung nicht gefunden"
 }

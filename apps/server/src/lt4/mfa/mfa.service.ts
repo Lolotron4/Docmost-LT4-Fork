@@ -320,6 +320,21 @@ export class MfaService {
     return { backupCodes };
   }
 
+  /** Für die Mitgliederliste: wer hat 2FA aktiviert (nur Admins). */
+  async listEnabledUserIds(actor: User, workspace: Workspace) {
+    const ability = this.workspaceAbility.createForUser(actor, workspace);
+    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member)) {
+      throw new ForbiddenException();
+    }
+    const rows = await this.db
+      .selectFrom('userMfa')
+      .select('userId')
+      .where('workspaceId', '=', workspace.id)
+      .where('isEnabled', '=', true)
+      .execute();
+    return { userIds: rows.map((r) => r.userId) };
+  }
+
   /** Admins können 2FA eines Mitglieds zurücksetzen (z. B. Handy verloren). */
   async resetForUser(actor: User, workspace: Workspace, userId: string) {
     const ability = this.workspaceAbility.createForUser(actor, workspace);

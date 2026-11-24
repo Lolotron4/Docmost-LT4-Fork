@@ -17,6 +17,7 @@ import {
   useRevokeAllSessionsMutation,
 } from "@/features/session/queries/session-query";
 import { formattedDate } from "@/lib/time";
+import { EditableDeviceName } from "@/lt4/sessions/editable-device-name";
 
 const PAGE_SIZE = 5;
 
@@ -117,9 +118,10 @@ export default function SessionList() {
                 <Group gap="xs">
                   <IconDevices size={18} stroke={1.5} />
                   <div>
-                    <Text size="sm">
-                      {session.deviceName || t("Unknown device")}
-                    </Text>
+                    <EditableDeviceName
+                      sessionId={session.id}
+                      deviceName={session.deviceName}
+                    />
                     {session?.isCurrentDevice && (
                       <Text size="xs" c="blue">
                         {t("This Device")}
