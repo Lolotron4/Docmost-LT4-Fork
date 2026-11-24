@@ -92,6 +92,8 @@ export class ImportService {
         );
       }
     } catch (err) {
+      // LT4: verständliche Fehler des Word-/PDF-Imports durchreichen
+      if (err instanceof BadRequestException) throw err;
       const message = 'Error processing file content';
       this.logger.error(message, err);
       throw new BadRequestException(message);
@@ -170,7 +172,7 @@ export class ImportService {
     let DocxImportModule: any;
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      DocxImportModule = require('./../../../ee/document-import/docx-import.service');
+      DocxImportModule = require('./../../../lt4/document-import/docx-import.service');
     } catch (err) {
       this.logger.error(
         'DOCX import requested but EE module not bundled in this build',
@@ -206,7 +208,7 @@ export class ImportService {
     let PdfImportModule: any;
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      PdfImportModule = require('./../../../ee/document-import/pdf-import.service');
+      PdfImportModule = require('./../../../lt4/document-import/pdf-import.service');
     } catch (err) {
       this.logger.error(
         'PDF import requested but EE module not bundled in this build',

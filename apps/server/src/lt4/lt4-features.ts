@@ -23,6 +23,8 @@ export const LT4_FEATURES: ReadonlySet<string> = new Set<string>([
   Feature.AUDIT_LOGS,
   Feature.SECURITY_SETTINGS,
   Feature.RETENTION,
+  Feature.DOCX_IMPORT,
+  Feature.PDF_IMPORT,
 ]);
 
 export const LT4_TIER = 'lt4';
