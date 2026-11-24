@@ -18,7 +18,7 @@ services:
   docmost:
     build: .
     image: docmost-lt4:local
-    container_name: ${CONTAINER_NAME:-docmost-lt4}
+    container_name: ${CONTAINER_APP_NAME:-docmost-lt4-test1-db}
     depends_on:
       - db
       - redis
@@ -40,6 +40,7 @@ services:
 
   db:
     image: ${POSTGRES_IMAGE:-postgres:18}
+    container_name: ${CONTAINER_DB_NAME:-docmost-lt4-test1}
     environment:
       POSTGRES_DB: docmost
       POSTGRES_USER: docmost
@@ -52,6 +53,7 @@ services:
 
   redis:
     image: redis:8
+    container_name: ${CONTAINER_REDIS_NAME:-docmost-lt4-test1-redis}
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     restart: unless-stopped
     volumes:
@@ -61,6 +63,7 @@ services:
 
 networks:
   lt4-internal:
+    name: ${DOCMOST_INTERNAL_NETWORK:-lt4-dm-test}
     internal: true
   proxy:
     name: ${PROXY_NETWORK:-npm-proxy-network}
