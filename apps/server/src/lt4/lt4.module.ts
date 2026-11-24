@@ -16,12 +16,16 @@ import { BaseController } from './base/base.controller';
 import { BaseService } from './base/base.service';
 import { AiController } from './ai/ai.controller';
 import { AiService } from './ai/ai.service';
+import { TemplateController } from './template/template.controller';
+import { TemplateService } from './template/template.service';
+import { TemplateAccessService } from './template/template-access.service';
+import { AttachmentModule } from '../core/attachment/attachment.module';
 import { PageModule } from '../core/page/page.module';
 
 @Module({
-  imports: [TokenModule, AuthModule, PageModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService],
-  exports: [MfaService],
+  imports: [TokenModule, AuthModule, PageModule, AttachmentModule],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService],
+  exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}
