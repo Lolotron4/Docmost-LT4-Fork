@@ -9,16 +9,18 @@
 #                  ACHTUNG: Für einen Test nie den Ordner einer laufenden Instanz verwenden!
 #   PROXY_NETWORK  Externes Netzwerk des Reverse-Proxys (Standard: npm-proxy-network)
 #   POSTGRES_IMAGE Postgres-Image (Standard: postgres:18)
+#   CONTAINER_APP_NAME / CONTAINER_DB_NAME / CONTAINER_REDIS_NAME  Containernamen
+#   DOCMOST_INTERNAL_NETWORK  Name des internen Netzes (Standard: lt4-dm-test)
 #   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
 #
 # Datenbank und Redis hängen nur im internen Netz "lt4-internal" (ohne Internetzugang).
 # Docmost ist nur über den Reverse-Proxy erreichbar (Port 3000 im Proxy-Netzwerk,
-# kein Port auf dem Host). Im Nginx Proxy Manager als Ziel "docmost-lt4" Port 3000 eintragen.
+# kein Port auf dem Host). Im Nginx Proxy Manager als Ziel den App-Container (Standard: "docmost-lt4-test1") Port 3000 eintragen.
 services:
   docmost:
     build: .
     image: docmost-lt4:local
-    container_name: ${CONTAINER_APP_NAME:-docmost-lt4-test1-db}
+    container_name: ${CONTAINER_APP_NAME:-docmost-lt4-test1}
     depends_on:
       - db
       - redis
@@ -40,7 +42,7 @@ services:
 
   db:
     image: ${POSTGRES_IMAGE:-postgres:18}
-    container_name: ${CONTAINER_DB_NAME:-docmost-lt4-test1}
+    container_name: ${CONTAINER_DB_NAME:-docmost-lt4-test1-db}
     environment:
       POSTGRES_DB: docmost
       POSTGRES_USER: docmost
