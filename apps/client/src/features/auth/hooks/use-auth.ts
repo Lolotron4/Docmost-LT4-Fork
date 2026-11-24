@@ -28,7 +28,7 @@ import { RESET } from "jotai/utils";
 import { useTranslation } from "react-i18next";
 import { isCloud } from "@/lib/config.ts";
 import { deleteLocalPageData } from "@/lib/local-page-data.ts";
-import { exchangeTokenRedirectUrl, getHostnameUrl } from "@/ee/utils.ts";
+import { exchangeTokenRedirectUrl, getHostnameUrl } from "@/lt4/utils.ts";
 
 export default function useAuth() {
   const { t } = useTranslation();

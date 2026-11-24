@@ -23,15 +23,15 @@ import {
   prefetchSpace,
   prefetchSpacesPage,
 } from "@/features/space/queries/space-query";
-import { prefetchTemplates } from "@/ee/template/queries/template-query";
+import { prefetchTemplates } from "@/lt4/template/queries/template-query";
 import { getSpaceUrl } from "@/lib/config";
 import { useDisclosure } from "@mantine/hooks";
 import { WorkspaceInviteForm } from "@/features/workspace/components/members/components/workspace-invite-form";
 import { CustomAvatar } from "@/components/ui/custom-avatar";
 import { AvatarIconType } from "@/features/attachments/types/attachment.types";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
+import { useHasFeature } from "@/lt4/hooks/use-feature";
+import { Feature } from "@/lt4/features";
+import { useUpgradeLabel } from "@/lt4/hooks/use-upgrade-label";
 
 export default function GlobalSidebar() {
   const { t } = useTranslation();

@@ -8,15 +8,8 @@ import {
   IconUsersGroup,
   IconSpaces,
   IconBrush,
-  IconCoin,
-  IconLock,
-  IconKey,
   IconWorld,
-  IconSparkles,
   IconPlug,
-  IconHistory,
-  IconShieldCheck,
-  IconSpeakerphone,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
@@ -24,23 +17,14 @@ import { useTranslation } from "react-i18next";
 import { isCloud } from "@/lib/config.ts";
 import useUserRole from "@/hooks/use-user-role.tsx";
 import { useAtom } from "jotai";
-import { entitlementAtom } from "@/ee/entitlement/entitlement-atom";
+import { entitlementAtom } from "@/lt4/entitlement/entitlement-atom";
 import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { Feature } from "@/ee/features";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
+import { useUpgradeLabel } from "@/lt4/hooks/use-upgrade-label";
 import {
-  prefetchApiKeyManagement,
-  prefetchApiKeys,
-  prefetchBilling,
   prefetchGroups,
-  prefetchLicense,
-  prefetchScimTokens,
   prefetchShares,
   prefetchSpaces,
-  prefetchSsoProviders,
   prefetchWorkspaceMembers,
-  prefetchAuditLogs,
-  prefetchVerifiedPages,
 } from "@/components/settings/settings-queries.tsx";
 import AppVersion from "@/components/settings/app-version.tsx";
 import { mobileSidebarAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom.ts";
@@ -74,12 +58,6 @@ const groupedData: DataGroup[] = [
         path: "/settings/account/preferences",
       },
       {
-        label: "API keys",
-        icon: IconKey,
-        path: "/settings/account/api-keys",
-        feature: Feature.API_KEYS,
-      },
-      {
         label: "Connections",
         icon: IconPlug,
         path: "/settings/account/connections",
@@ -92,20 +70,6 @@ const groupedData: DataGroup[] = [
     items: [
       { label: "General", icon: IconSettings, path: "/settings/workspace" },
       { label: "Members", icon: IconUsers, path: "/settings/members" },
-      {
-        label: "Billing",
-        icon: IconCoin,
-        path: "/settings/billing",
-        role: "admin",
-        env: "cloud",
-      },
-      {
-        label: "Security & SSO",
-        icon: IconLock,
-        path: "/settings/security",
-        feature: Feature.SECURITY_SETTINGS,
-        role: "admin",
-      },
       { label: "Groups", icon: IconUsersGroup, path: "/settings/groups" },
       {
         label: "Spaces",
@@ -114,54 +78,11 @@ const groupedData: DataGroup[] = [
         role: "admin",
       },
       { label: "Public sharing", icon: IconWorld, path: "/settings/sharing" },
-      // No feature gate: without a license the page lists read-only, with archive and delete
-      {
-        label: "Announcements",
-        icon: IconSpeakerphone,
-        path: "/settings/announcements",
-        role: "admin",
-      },
-      {
-        label: "Verified pages",
-        icon: IconShieldCheck,
-        path: "/settings/verifications",
-        feature: Feature.PAGE_VERIFICATION,
-      },
-      {
-        label: "API management",
-        icon: IconKey,
-        path: "/settings/api-keys",
-        feature: Feature.API_KEYS,
-        role: "admin",
-      },
-      {
-        label: "AI settings",
-        icon: IconSparkles,
-        path: "/settings/ai",
-        role: "admin",
-      },
       {
         label: "Integrations",
         icon: IconPlug,
         path: "/settings/integrations",
         role: "admin",
-      },
-      {
-        label: "Audit logs & SIEM",
-        icon: IconHistory,
-        path: "/settings/audit",
-        feature: Feature.AUDIT_LOGS,
-        role: "owner",
-      },
-    ],
-  },
-  {
-    heading: "System",
-    items: [
-      {
-        label: "License & Edition",
-        icon: IconKey,
-        path: "/settings/license",
       },
     ],
   },
@@ -237,34 +158,8 @@ export default function SettingsSidebar() {
             case "Groups":
               prefetchHandler = prefetchGroups;
               break;
-            case "Billing":
-              prefetchHandler = prefetchBilling;
-              break;
-            case "License & Edition":
-              if (entitlements?.tier !== "free") {
-                prefetchHandler = prefetchLicense;
-              }
-              break;
-            case "Security & SSO":
-              prefetchHandler = () => {
-                prefetchSsoProviders();
-                prefetchScimTokens();
-              };
-              break;
             case "Public sharing":
               prefetchHandler = prefetchShares;
-              break;
-            case "API keys":
-              prefetchHandler = prefetchApiKeys;
-              break;
-            case "API management":
-              prefetchHandler = prefetchApiKeyManagement;
-              break;
-            case "Audit logs & SIEM":
-              prefetchHandler = prefetchAuditLogs;
-              break;
-            case "Verified pages":
-              prefetchHandler = prefetchVerifiedPages;
               break;
             default:
               break;

@@ -1,0 +1,81 @@
+# LT4-Fork: Stack, der das Image aus diesem Repository baut.
+# In Portainer: Stacks -> Add stack -> Repository, Compose-Pfad "docker-compose.lt4.yml".
+#
+# Variablen (in Portainer unter "Environment variables"):
+#   APP_SECRET     Pflicht, mindestens 32 Zeichen
+#   DB_PASSWORD    Pflicht. Nur Buchstaben und Ziffern (steht in einer URL; / + = @ : brechen sie)
+#   APP_URL        Öffentliche Adresse, z. B. https://docs.example.de
+#   DATA_DIR       Ordner auf dem Host für alle Daten (Standard: ./lt4-data)
+#                  ACHTUNG: Für einen Test nie den Ordner einer laufenden Instanz verwenden!
+#   PROXY_NETWORK  Externes Netzwerk des Reverse-Proxys (Standard: npm-proxy-network)
+#   POSTGRES_IMAGE Postgres-Image (Standard: postgres:18)
+#   CONTAINER_APP_NAME / CONTAINER_DB_NAME / CONTAINER_REDIS_NAME  Containernamen
+#   DOCMOST_INTERNAL_NETWORK  Name des internen Netzes (Standard: lt4-dm-test)
+#   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
+#
+# Datenbank und Redis hängen nur im internen Netz "lt4-internal" (ohne Internetzugang).
+# Docmost ist nur über den Reverse-Proxy erreichbar (Port 3000 im Proxy-Netzwerk,
+# kein Port auf dem Host). Im Nginx Proxy Manager als Ziel den App-Container (Standard: "docmost-lt4-test1") Port 3000 eintragen.
+services:
+  docmost:
+    build: .
+    image: docmost-lt4:local
+    container_name: ${CONTAINER_APP_NAME:-docmost-lt4-test1}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      APP_URL: ${APP_URL:?APP_URL fehlt}
+      APP_SECRET: ${APP_SECRET:?APP_SECRET fehlt}
+      # Eindeutige Containernamen statt "db"/"redis": Im Proxy-Netz kann ein anderer Stack
+      # ebenfalls "db" oder "redis" heißen, dann landet Docmost beim falschen Container.
+      DATABASE_URL: postgresql://docmost:${DB_PASSWORD:?DB_PASSWORD fehlt}@${CONTAINER_DB_NAME:-docmost-lt4-test1-db}:5432/docmost
+      REDIS_URL: redis://${CONTAINER_REDIS_NAME:-docmost-lt4-test1-redis}:6379
+      FILE_UPLOAD_SIZE_LIMIT: ${FILE_UPLOAD_SIZE_LIMIT:-50mb}
+      FILE_IMPORT_SIZE_LIMIT: ${FILE_IMPORT_SIZE_LIMIT:-200mb}
+    expose:
+      - "3000"
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR:-./lt4-data}/docmost:/app/data/storage
+    networks:
+      - lt4-internal
+      - proxy
+
+  db:
+    image: ${POSTGRES_IMAGE:-postgres:18}
+    container_name: ${CONTAINER_DB_NAME:-docmost-lt4-test1-db}
+    environment:
+      POSTGRES_DB: docmost
+      POSTGRES_USER: docmost
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD fehlt}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docmost -d docmost"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR:-./lt4-data}/db_data:/var/lib/postgresql
+    networks:
+      - lt4-internal
+
+  redis:
+    image: redis:8
+    container_name: ${CONTAINER_REDIS_NAME:-docmost-lt4-test1-redis}
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    restart: unless-stopped
+    volumes:
+      - ${DATA_DIR:-./lt4-data}/redis_data:/data
+    networks:
+      - lt4-internal
+
+networks:
+  lt4-internal:
+    name: ${DOCMOST_INTERNAL_NETWORK:-lt4-dm-test}
+    internal: true
+  proxy:
+    name: ${PROXY_NETWORK:-npm-proxy-network}
+    external: true

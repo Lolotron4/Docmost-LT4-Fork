@@ -12,10 +12,10 @@ import {
   Integration,
 } from "../types/integration.types";
 import { getIntegrationIcon } from "./integration-icons";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label";
-import { Feature } from "@/ee/features";
-import { UpgradeBadge } from "@/ee/components/upgrade-badge";
+import { useHasFeature } from "@/lt4/hooks/use-feature";
+import { useUpgradeLabel } from "@/lt4/hooks/use-upgrade-label";
+import { Feature } from "@/lt4/features";
+import { UpgradeBadge } from "@/lt4/components/upgrade-badge";
 import { isCloud } from "@/lib/config.ts";
 
 // Keep in sync with apps/server/src/ee/licence/feature-registry.ts.

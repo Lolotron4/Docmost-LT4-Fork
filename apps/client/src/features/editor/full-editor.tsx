@@ -26,7 +26,7 @@ import {
   PageVerificationBadge,
   usePageEditLockSync,
   usePageEditMode,
-} from "@/ee/page-verification";
+} from "@/lt4/page-verification";
 import { useTranslation } from "react-i18next";
 import { IContributor } from "@/features/page/types/page.types.ts";
 import { PageEditMode } from "@/features/user/types/user.types.ts";

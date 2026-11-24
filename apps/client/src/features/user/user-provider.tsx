@@ -14,8 +14,8 @@ import { Error404 } from "@/components/ui/error-404.tsx";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@mantine/core";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { useEntitlements } from "@/ee/entitlement/use-entitlements";
-import { entitlementAtom } from "@/ee/entitlement/entitlement-atom";
+import { useEntitlements } from "@/lt4/entitlement/use-entitlements";
+import { entitlementAtom } from "@/lt4/entitlement/entitlement-atom";
 import { useSyncUserTimezone } from "@/features/user/hooks/use-sync-user-timezone";
 
 export function UserProvider({

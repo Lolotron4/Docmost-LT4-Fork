@@ -1,5 +1,5 @@
 import { markInputRule, type Editor } from "@tiptap/core";
-import { EditableTemplateVariable } from "@/ee/template/components/template-variable-node";
+import { EditableTemplateVariable } from "@/lt4/template/components/template-variable-node";
 import { StarterKit } from "@tiptap/starter-kit";
 import { TiptapDocument } from "@/features/editor/extensions/document";
 import { Code } from "@tiptap/extension-code";
@@ -122,7 +122,7 @@ import TabsView from "@/features/editor/components/tabs/tabs-view.tsx";
 import TransclusionView from "@/features/editor/components/transclusion/transclusion-view.tsx";
 import TransclusionReferenceView from "@/features/editor/components/transclusion/transclusion-reference-view.tsx";
 import { BaseEmbedView } from "@/features/editor/components/base-embed/base-embed-view.tsx";
-import { isCalendarEventDrag } from "@/ee/base/components/calendar/calendar-frame";
+import { isCalendarEventDrag } from "@/lt4/base/components/calendar/calendar-frame";
 import MicrosoftFileView from "@/features/editor/components/microsoft/microsoft-file-view.tsx";
 import MicrosoftFolderView from "@/features/editor/components/microsoft/microsoft-folder-view.tsx";
 import { common, createLowlight } from "lowlight";

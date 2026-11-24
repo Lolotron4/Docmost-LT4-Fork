@@ -14,13 +14,13 @@ import { SpaceSidebar } from "@/features/space/components/sidebar/space-sidebar.
 import { lazyWithPrefetch } from "@/lib/lazy-prefetch.ts";
 
 const AiChatSidebar = lazyWithPrefetch(
-  () => import("@/ee/ai-chat/components/ai-chat-sidebar.tsx"),
+  () => import("@/lt4/ai-chat/components/ai-chat-sidebar.tsx"),
 );
 import { AppHeader } from "@/components/layouts/global/app-header.tsx";
 import Aside from "@/components/layouts/global/aside.tsx";
 import classes from "./app-shell.module.css";
-import { useTrialEndAction } from "@/ee/hooks/use-trial-end-action.tsx";
-import AnnouncementBanners from "@/ee/announcement/components/announcement-banners.tsx";
+import { useTrialEndAction } from "@/lt4/hooks/use-trial-end-action.tsx";
+import AnnouncementBanners from "@/lt4/announcement/components/announcement-banners.tsx";
 import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-toggle-sidebar.ts";
 import GlobalSidebar from "@/components/layouts/global/global-sidebar.tsx";
 import { ASIDE_PANEL_ID } from "@/hooks/use-toggle-aside.tsx";

@@ -4,7 +4,7 @@ import { notifications } from "@mantine/notifications";
 import api from "@/lib/api-client";
 import i18n from "@/i18n.ts";
 import { getApiErrorMessage } from "@/lib/api-error";
-import type { BaseTemplate } from "@/ee/base/types/base.types";
+import type { BaseTemplate } from "@/lt4/base/types/base.types";
 
 function findBaseEmbedPlaceholderPos(
   editor: Editor,

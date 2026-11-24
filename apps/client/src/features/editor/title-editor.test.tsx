@@ -12,7 +12,7 @@ vi.mock("@/features/page/queries/page-query", () => ({
 vi.mock("@/features/websocket/use-query-emit.ts", () => ({
   useQueryEmit: () => vi.fn(),
 }));
-vi.mock("@/ee/page-verification/hooks/use-page-edit-mode", () => ({
+vi.mock("@/lt4/page-verification/hooks/use-page-edit-mode", () => ({
   usePageEditMode: () => ({ editMode: "edit", isCheckingLock: false }),
 }));
 vi.mock("react-i18next", () => ({

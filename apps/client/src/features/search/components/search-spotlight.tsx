@@ -8,14 +8,14 @@ import { notifications } from "@mantine/notifications";
 import { searchSpotlightStore } from "../constants.ts";
 import { SearchSpotlightFilters } from "./search-spotlight-filters.tsx";
 import { useUnifiedSearch } from "../hooks/use-unified-search.ts";
-import { useAiSearch } from "../../../ee/ai/hooks/use-ai-search.ts";
+import { useAiSearch } from "@/lt4/ai/hooks/use-ai-search.ts";
 import { SearchResultItem } from "./search-result-item.tsx";
-import { AiSearchResult } from "../../../ee/ai/components/ai-search-result.tsx";
-import { useHasFeature } from "@/ee/hooks/use-feature";
-import { Feature } from "@/ee/features";
+import { AiSearchResult } from "@/lt4/ai/components/ai-search-result.tsx";
+import { useHasFeature } from "@/lt4/hooks/use-feature";
+import { Feature } from "@/lt4/features";
 import { useAtomValue } from "jotai";
 import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { hintVectorCache } from "@/ee/ai/services/ai-search-service.ts";
+import { hintVectorCache } from "@/lt4/ai/services/ai-search-service.ts";
 import { getAiVectorDriver } from "@/lib/config.ts";
 
 interface SearchSpotlightProps {
