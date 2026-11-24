@@ -8,6 +8,7 @@ import {
   IconSettings,
   IconUserPlus,
   IconTemplate,
+  IconRosetteDiscountCheck,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./global-sidebar.module.css";
@@ -40,6 +41,7 @@ export default function GlobalSidebar() {
   const [mobileSidebarOpened] = useAtom(mobileSidebarAtom);
   const toggleMobileSidebar = useToggleSidebar(mobileSidebarAtom);
   const hasTemplates = useHasFeature(Feature.TEMPLATES);
+  const hasReviews = useHasFeature(Feature.PAGE_VERIFICATION);
   const upgradeLabel = useUpgradeLabel();
   const mainNavItems = [
     { label: "Home", icon: IconHome, path: "/home" },
@@ -62,6 +64,9 @@ export default function GlobalSidebar() {
       disabled: !hasTemplates,
       prefetch: () => prefetchTemplates(),
     },
+    ...(hasReviews
+      ? [{ label: "Reviews", icon: IconRosetteDiscountCheck, path: "/reviews" }]
+      : []),
   ];
   const { data: favoriteSpacesData, isPending: isFavoritesPending } = useFavoritesQuery("space");
   const favoriteSpaces = favoriteSpacesData?.pages.flatMap((p) => p.items) ?? [];
