@@ -29,6 +29,9 @@ const SecuritySettings = lazyWithPrefetch(
   () => import("@/lt4/security/pages/security-settings"),
 );
 const AiSettings = lazyWithPrefetch(() => import("@/lt4/ai/pages/ai-settings"));
+const AnnouncementSettings = lazyWithPrefetch(
+  () => import("@/lt4/announcement/pages/announcement-settings"),
+);
 const TemplatesPage = lazyWithPrefetch(() => import("@/lt4/template/pages/templates-page"));
 const TemplateEditorPage = lazyWithPrefetch(
   () => import("@/lt4/template/pages/template-editor-page"),
@@ -184,6 +187,7 @@ export default function App() {
             <Route path={"integrations"} element={<Integrations />} />
             <Route path={"security"} element={<SecuritySettings />} />
             <Route path={"ai"} element={<AiSettings />} />
+            <Route path={"announcements"} element={<AnnouncementSettings />} />
           </Route>
         </Route>
       </Routes>
