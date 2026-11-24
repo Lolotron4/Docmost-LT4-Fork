@@ -1,46 +1,62 @@
-# LT4-Fork: Test-/Betriebsstack, der das Image aus diesem Repository baut.
+# LT4-Fork: Stack, der das Image aus diesem Repository baut.
 # In Portainer: Stacks -> Add stack -> Repository, Compose-Pfad "docker-compose.lt4.yml".
-# Variablen (in Portainer unter "Environment variables" setzen):
-#   APP_SECRET   Pflicht, mindestens 32 Zeichen
-#   DB_PASSWORD  Pflicht
-#   APP_URL      Adresse, unter der Docmost erreichbar ist (Standard: http://localhost:3000)
-#   LT4_PORT     Port auf dem Host (Standard: 3000)
+#
+# Variablen (in Portainer unter "Environment variables"):
+#   APP_SECRET     Pflicht, mindestens 32 Zeichen
+#   DB_PASSWORD    Pflicht
+#   APP_URL        Öffentliche Adresse, z. B. https://docs.example.de
+#   DATA_DIR       Ordner auf dem Host für alle Daten (Standard: ./lt4-data)
+#                  ACHTUNG: Für einen Test nie den Ordner einer laufenden Instanz verwenden!
+#   PROXY_NETWORK  Externes Netzwerk des Reverse-Proxys (Standard: npm-proxy-network)
+#   POSTGRES_IMAGE Postgres-Image (Standard: postgres:18)
+#
+# Docmost ist nur über den Reverse-Proxy erreichbar (Port 3000 im Proxy-Netzwerk,
+# kein Port auf dem Host). Im Nginx Proxy Manager als Ziel "docmost-lt4" Port 3000 eintragen.
 services:
   docmost:
     build: .
     image: docmost-lt4:local
+    container_name: ${CONTAINER_NAME:-docmost-lt4}
     depends_on:
       - db
       - redis
     environment:
-      APP_URL: ${APP_URL:-http://localhost:3000}
+      APP_URL: ${APP_URL:?APP_URL fehlt}
       APP_SECRET: ${APP_SECRET:?APP_SECRET fehlt}
       DATABASE_URL: postgresql://docmost:${DB_PASSWORD:?DB_PASSWORD fehlt}@db:5432/docmost
       REDIS_URL: redis://redis:6379
-    ports:
-      - "${LT4_PORT:-3000}:3000"
+    expose:
+      - "3000"
     restart: unless-stopped
     volumes:
-      - lt4_storage:/app/data/storage
+      - ${DATA_DIR:-./lt4-data}/docmost:/app/data/storage
+    networks:
+      - docmost-network
+      - proxy
 
   db:
-    image: postgres:18
+    image: ${POSTGRES_IMAGE:-postgres:18}
     environment:
       POSTGRES_DB: docmost
       POSTGRES_USER: docmost
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD fehlt}
     restart: unless-stopped
     volumes:
-      - lt4_db:/var/lib/postgresql
+      - ${DATA_DIR:-./lt4-data}/db_data:/var/lib/postgresql
+    networks:
+      - docmost-network
 
   redis:
     image: redis:8
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     restart: unless-stopped
     volumes:
-      - lt4_redis:/data
+      - ${DATA_DIR:-./lt4-data}/redis_data:/data
+    networks:
+      - docmost-network
 
-volumes:
-  lt4_storage:
-  lt4_db:
-  lt4_redis:
+networks:
+  docmost-network:
+  proxy:
+    name: ${PROXY_NETWORK:-npm-proxy-network}
+    external: true
