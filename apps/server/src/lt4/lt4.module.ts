@@ -39,11 +39,14 @@ import { ReadConfirmationService } from './read-confirmation/read-confirmation.s
 import { NotificationModule } from '../core/notification/notification.module';
 import { AuditLogController } from './audit/audit-log.controller';
 import { SecuritySettingsController } from './security/security-settings.controller';
+import { ImportImageStoreService } from './document-import/import-image-store.service';
+import { DocxImportService } from './document-import/docx-import.service';
+import { PdfImportService } from './document-import/pdf-import.service';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule, NotificationModule],
   controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}
