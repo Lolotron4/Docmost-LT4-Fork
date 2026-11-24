@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useWorkspacePublicDataQuery } from "@/features/workspace/queries/workspace-query.ts";
 import { ssoLoginUrl } from "@/lt4/sso/sso-service";
 import { ProviderIcon } from "@/lt4/sso/provider-icon";
+import { LdapLoginButton } from "@/lt4/ldap/ldap-login";
 
 interface Props {
   mode?: "login" | "join";
@@ -19,6 +20,9 @@ export default function SsoLogin({ mode = "login", joinCode }: Props) {
   const [params] = useSearchParams();
   const { data } = useWorkspacePublicDataQuery();
   const providers = (data?.authProviders ?? []).filter((p) => p.type === "oidc");
+  // LDAP nur bei der normalen Anmeldung (nicht beim Beitreten per Link)
+  const ldapProviders =
+    mode === "login" ? (data?.authProviders ?? []).filter((p) => p.type === "ldap") : [];
   const ssoError = params.get("ssoError");
 
   useEffect(() => {
@@ -29,7 +33,7 @@ export default function SsoLogin({ mode = "login", joinCode }: Props) {
     window.history.replaceState(null, "", url.pathname + url.search);
   }, [ssoError]);
 
-  if (!providers.length && !ssoError) return null;
+  if (!providers.length && !ldapProviders.length && !ssoError) return null;
 
   return (
     <Stack gap="sm" mb="md">
@@ -54,7 +58,10 @@ export default function SsoLogin({ mode = "login", joinCode }: Props) {
           {t("Continue with {{name}}", { name: provider.name })}
         </Button>
       ))}
-      {providers.length > 0 && !data?.enforceSso && (
+      {ldapProviders.map((provider) => (
+        <LdapLoginButton key={provider.id} provider={provider} />
+      ))}
+      {providers.length + ldapProviders.length > 0 && !data?.enforceSso && (
         <Divider label={t("or")} labelPosition="center" my={4} />
       )}
     </Stack>
