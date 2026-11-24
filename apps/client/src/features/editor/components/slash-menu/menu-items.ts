@@ -39,6 +39,7 @@ import {
   IconMoodSmile,
   IconRotate2,
   IconSuperscript,
+  IconSparkles,
 } from "@tabler/icons-react";
 import {
   CommandProps,
@@ -74,9 +75,21 @@ import { notifications } from "@mantine/notifications";
 import { isIntegrationInstalled } from "@/features/integration/utils/installed-integrations";
 import { requestMicrosoftPicker } from "@/features/microsoft/atoms/microsoft-atoms";
 import { isCloud } from "@/lib/config";
+import { isAiAssistantEnabled, openAiMenu } from "@/lt4/ai/ai-open";
 
 const CommandGroups: SlashMenuGroupedItemsType = {
   basic: [
+    {
+      title: "AI assistant",
+      description: "Write, summarize or translate with AI",
+      searchTerms: ["ai", "ki", "claude", "chatgpt", "gemini", "assistant", "write"],
+      icon: IconSparkles,
+      disable: () => !isAiAssistantEnabled(),
+      command: ({ editor, range }: CommandProps) => {
+        editor.chain().focus().deleteRange(range).run();
+        openAiMenu();
+      },
+    },
     {
       title: "Text",
       description: "Just start typing with plain text.",

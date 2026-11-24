@@ -825,8 +825,18 @@ export interface Lt4JoinCodes {
   workspaceId: string;
 }
 
+// LT4-Fork: KI-Schreibassistent
+export interface Lt4AiSettings {
+  apiKeys: Generated<Json>;
+  models: Generated<Json>;
+  provider: Generated<string>;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
 export interface DB {
   lt4JoinCodes: Lt4JoinCodes;
+  lt4AiSettings: Lt4AiSettings;
   aiChats: AiChats;
   aiChatMessages: AiChatMessages;
   announcements: Announcements;
