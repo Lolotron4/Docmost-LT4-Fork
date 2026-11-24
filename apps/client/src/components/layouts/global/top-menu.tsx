@@ -33,6 +33,7 @@ import useAuth from "@/features/auth/hooks/use-auth.ts";
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import { useTranslation } from "react-i18next";
 import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
+import { displayEmail } from "@/lt4/accounts/username";
 
 export default function TopMenu() {
   const { t } = useTranslation();
@@ -110,7 +111,7 @@ export default function TopMenu() {
                 {user.name}
               </Text>
               <Text size="xs" c="dimmed" truncate="end">
-                {user.email}
+                {displayEmail(user.email)}
               </Text>
             </div>
           </Group>

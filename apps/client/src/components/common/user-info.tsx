@@ -2,6 +2,7 @@ import { Group, Text } from "@mantine/core";
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import React from "react";
 import { IUser } from '@/features/user/types/user.types.ts';
+import { displayEmail } from "@/lt4/accounts/username";
 
 interface UserInfoProps {
   user: Partial<IUser>;
@@ -16,7 +17,7 @@ export function UserInfo({ user, size }: UserInfoProps) {
           {user?.name}
         </Text>
         <Text fz="xs" c="dimmed">
-          {user?.email}
+          {displayEmail(user?.email)}
         </Text>
       </div>
     </Group>

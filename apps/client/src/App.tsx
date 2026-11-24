@@ -24,6 +24,7 @@ const MfaSetupRequiredPage = lazyWithPrefetch(() =>
     default: m.MfaSetupRequiredPage,
   })),
 );
+const JoinPage = lazyWithPrefetch(() => import("@/lt4/accounts/pages/join-page"));
 const SecuritySettings = lazyWithPrefetch(
   () => import("@/lt4/security/pages/security-settings"),
 );
@@ -101,6 +102,7 @@ export default function App() {
             element={<MfaSetupRequiredPage />}
           />
           <Route path={"/invites/:invitationId"} element={<InviteSignup />} />
+          <Route path={"/join"} element={<JoinPage />} />
           <Route path={"/forgot-password"} element={<ForgotPassword />} />
           <Route path={"/password-reset"} element={<PasswordReset />} />
 

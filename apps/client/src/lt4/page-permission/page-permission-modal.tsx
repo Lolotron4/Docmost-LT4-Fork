@@ -33,6 +33,7 @@ import {
   IPagePermissionMember,
   PagePermissionRole,
 } from "./page-permission.types";
+import { displayEmail } from "@/lt4/accounts/username";
 
 interface PagePermissionModalProps {
   page: IPage;
@@ -214,7 +215,7 @@ export function PagePermissionModal({
                               </Text>
                               <Text size="xs" c="dimmed" lineClamp={1}>
                                 {member.type === "user"
-                                  ? member.email
+                                  ? displayEmail(member.email)
                                   : t("{{count}} members", {
                                       count: member.memberCount,
                                     })}

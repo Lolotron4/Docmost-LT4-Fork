@@ -25,6 +25,7 @@ import { SearchInput } from "@/components/common/search-input.tsx";
 import NoTableResults from "@/components/common/no-table-results.tsx";
 import { usePaginateAndSearch } from "@/hooks/use-paginate-and-search.tsx";
 import rowClasses from "@/components/ui/clickable-table-row.module.css";
+import { displayEmail } from "@/lt4/accounts/username";
 
 export default function GroupMembersList() {
   const { t } = useTranslation();
@@ -105,7 +106,7 @@ export default function GroupMembersList() {
                           </Anchor>
                         )}
                         <Text fz="xs" c="dimmed">
-                          {user.email}
+                          {displayEmail(user.email)}
                         </Text>
                       </div>
                     </Group>

@@ -15,6 +15,7 @@ import * as React from "react";
 import { useForm } from "@mantine/form";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useTranslation } from "react-i18next";
+import { displayEmail } from "@/lt4/accounts/username";
 
 export default function ChangeEmail() {
   const { t } = useTranslation();
@@ -26,7 +27,7 @@ export default function ChangeEmail() {
       <div style={{ minWidth: 0, flex: 1 }}>
         <Text size="md">{t("Email")}</Text>
         <Text size="sm" c="dimmed">
-          {currentUser?.user.email}
+          {displayEmail(currentUser?.user.email)}
         </Text>
       </div>
 

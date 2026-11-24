@@ -24,9 +24,8 @@ import React from "react";
 import { AuthLayout } from "./auth-layout.tsx";
 
 const formSchema = z.object({
-  email: z
-    .email()
-    .min(1, { message: "email is required" }),
+  // LT4-Fork: E-Mail oder Benutzername
+  email: z.string().trim().min(1, { message: "Email or username is required" }),
   password: z.string().min(1, { message: "Password is required" }),
 });
 type FormValues = z.infer<typeof formSchema>;
@@ -84,11 +83,12 @@ export function LoginForm() {
               <form onSubmit={form.onSubmit(onSubmit, handleValidationFailure)}>
                 <TextInput
                   id="email"
-                  type="email"
-                  label={t("Email")}
+                  type="text"
+                  label={t("Email or username")}
                   placeholder="email@example.com"
                   variant="filled"
-                  autoComplete="email"
+                  autoComplete="username"
+                  autoCapitalize="none"
                   errorProps={{ role: "alert" }}
                   {...form.getInputProps("email")}
                 />

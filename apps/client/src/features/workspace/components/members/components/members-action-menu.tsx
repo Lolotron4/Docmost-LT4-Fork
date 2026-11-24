@@ -2,6 +2,7 @@ import { Menu, ActionIcon } from "@mantine/core";
 import React from "react";
 import { IconDots, IconTrash, IconUserOff, IconUserCheck } from "@tabler/icons-react";
 import { ResetMemberMfaItem } from "@/lt4/mfa/components/reset-member-mfa-item";
+import { SetMemberPasswordItem } from "@/lt4/accounts/components/set-member-password-item";
 import { useTranslation } from "react-i18next";
 import useUserRole from "@/hooks/use-user-role.tsx";
 import { useMemberActions } from "@/features/workspace/hooks/use-member-actions.tsx";
@@ -60,6 +61,8 @@ export default function MemberActionMenu({
           >
             {isDeactivated ? t("Activate member") : t("Deactivate member")}
           </Menu.Item>
+
+          <SetMemberPasswordItem userId={userId} name={name} disabled={!isAdmin} />
 
           <ResetMemberMfaItem userId={userId} name={name} disabled={!isAdmin} />
 

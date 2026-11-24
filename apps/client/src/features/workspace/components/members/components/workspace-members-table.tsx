@@ -24,6 +24,7 @@ import { Link } from "react-router-dom";
 import { getUserProfileUrl } from "@/lib/config.ts";
 import { formatLocalized, useDateFnsLocale } from "@/lib/date-locale.ts";
 import rowClasses from "@/components/ui/clickable-table-row.module.css";
+import { displayEmail } from "@/lt4/accounts/username";
 
 export default function WorkspaceMembersTable() {
   const { t } = useTranslation();
@@ -124,7 +125,7 @@ export default function WorkspaceMembersTable() {
                                   locale,
                                 ),
                               })
-                            : user.email}
+                            : displayEmail(user.email)}
                         </Text>
                       </div>
                     </Group>

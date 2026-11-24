@@ -9,6 +9,7 @@ import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import { IUser } from "@/features/user/types/user.types.ts";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/features/user/atoms/current-user-atom.ts";
+import { displayEmail } from "@/lt4/accounts/username";
 
 type CreatorFilterMenuProps = {
   value: string | null;
@@ -138,7 +139,7 @@ export function CreatorFilterMenu({
                   </Text>
                   {user.email && (
                     <Text size="xs" c="dimmed" truncate>
-                      {user.email}
+                      {displayEmail(user.email)}
                     </Text>
                   )}
                 </div>

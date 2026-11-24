@@ -57,6 +57,8 @@ export class MailService {
   }
 
   private isRecipientBlocked(to: string): boolean {
+    // LT4-Fork: Konten mit Benutzername haben eine Platzhalter-Adresse ohne Postfach.
+    if (to?.toLowerCase().endsWith('.invalid')) return true;
     const blocked = this.environmentService.getMailBlockedRecipientDomains();
     if (blocked.length === 0) return false;
     const domain = to?.split('@')[1]?.toLowerCase();
