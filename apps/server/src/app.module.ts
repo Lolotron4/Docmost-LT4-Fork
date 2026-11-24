@@ -27,7 +27,7 @@ import KeyvRedis, { defaultReconnectStrategy } from '@keyv/redis';
 import { parseRedisUrl } from './common/helpers';
 import { LoggerModule } from './common/logger/logger.module';
 import { ClsModule } from 'nestjs-cls';
-import { NoopAuditModule } from './integrations/audit/audit.module';
+import { Lt4AuditModule } from './lt4/audit/lt4-audit.module';
 import { ThrottleModule } from './integrations/throttle/throttle.module';
 import { OutboundModule } from './integrations/outbound/outbound.module';
 import { EncryptionModule } from './integrations/encryption/encryption.module';
@@ -54,7 +54,8 @@ try {
       middleware: { mount: true },
     }),
     LoggerModule,
-    ...(enterpriseModules.length > 0 ? [] : [NoopAuditModule]),
+    // LT4-Fork: eigener Audit-Dienst statt No-op
+    ...(enterpriseModules.length > 0 ? [] : [Lt4AuditModule]),
     CoreModule,
     DatabaseModule,
     EnvironmentModule,

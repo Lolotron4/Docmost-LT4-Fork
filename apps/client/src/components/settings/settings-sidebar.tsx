@@ -14,6 +14,7 @@ import {
   IconSparkles,
   IconSpeakerphone,
   IconKey,
+  IconHistory,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
@@ -97,6 +98,12 @@ const groupedData: DataGroup[] = [
         label: "Announcements",
         icon: IconSpeakerphone,
         path: "/settings/announcements",
+        role: "admin",
+      },
+      {
+        label: "Audit log",
+        icon: IconHistory,
+        path: "/settings/audit-log",
         role: "admin",
       },
       {
