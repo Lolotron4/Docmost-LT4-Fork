@@ -29,8 +29,10 @@ services:
     environment:
       APP_URL: ${APP_URL:?APP_URL fehlt}
       APP_SECRET: ${APP_SECRET:?APP_SECRET fehlt}
-      DATABASE_URL: postgresql://docmost:${DB_PASSWORD:?DB_PASSWORD fehlt}@db:5432/docmost
-      REDIS_URL: redis://redis:6379
+      # Eindeutige Containernamen statt "db"/"redis": Im Proxy-Netz kann ein anderer Stack
+      # ebenfalls "db" oder "redis" heißen, dann landet Docmost beim falschen Container.
+      DATABASE_URL: postgresql://docmost:${DB_PASSWORD:?DB_PASSWORD fehlt}@${CONTAINER_DB_NAME:-docmost-lt4-test1-db}:5432/docmost
+      REDIS_URL: redis://${CONTAINER_REDIS_NAME:-docmost-lt4-test1-redis}:6379
       FILE_UPLOAD_SIZE_LIMIT: ${FILE_UPLOAD_SIZE_LIMIT:-50mb}
       FILE_IMPORT_SIZE_LIMIT: ${FILE_IMPORT_SIZE_LIMIT:-200mb}
     expose:
