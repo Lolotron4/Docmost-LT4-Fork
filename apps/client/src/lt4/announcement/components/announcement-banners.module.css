@@ -1,0 +1,51 @@
+/* LT4-Fork: eigenständige Implementierung (AGPL-3.0). */
+.stack {
+  width: 100%;
+}
+
+.bar {
+  position: relative;
+  padding: 6px 40px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  color: var(--mantine-color-dark-9);
+  background: var(--mantine-color-blue-1);
+
+  &[data-color="green"] { background: var(--mantine-color-green-1); }
+  &[data-color="yellow"] { background: var(--mantine-color-yellow-2); }
+  &[data-color="red"] { background: var(--mantine-color-red-1); }
+  &[data-color="gray"] { background: var(--mantine-color-gray-2); }
+
+  @mixin dark {
+    color: var(--mantine-color-gray-0);
+    background: var(--mantine-color-blue-9);
+
+    &[data-color="green"] { background: var(--mantine-color-green-9); }
+    &[data-color="yellow"] { background: var(--mantine-color-yellow-9); }
+    &[data-color="red"] { background: var(--mantine-color-red-9); }
+    &[data-color="gray"] { background: var(--mantine-color-dark-5); }
+  }
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.icon {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.text {
+  text-align: center;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.close {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
