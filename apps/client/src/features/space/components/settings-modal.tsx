@@ -87,7 +87,7 @@ export default function SpaceSettingsModal({
           </Modal.Header>
           <Modal.Body>
             <div style={{ height: rem(600) }}>
-              <Tabs color="dark" defaultValue="members">
+              <Tabs color="dark" defaultValue={space?.isPersonal ? "general" : "members"}>
                 <Tabs.List>
                   <Tabs.Tab fw={500} value="general">
                     {t("Settings")}
@@ -123,10 +123,12 @@ export default function SpaceSettingsModal({
 
                 <Tabs.Panel value="members">
                   <Group my="md" justify="flex-end">
-                    {spaceAbility.can(
-                      SpaceCaslAction.Manage,
-                      SpaceCaslSubject.Member,
-                    ) && <AddSpaceMembersModal spaceId={space?.id} />}
+                    {/* LT4-Fork: persönliche Bereiche haben nur ihren Besitzer */}
+                    {!space?.isPersonal &&
+                      spaceAbility.can(
+                        SpaceCaslAction.Manage,
+                        SpaceCaslSubject.Member,
+                      ) && <AddSpaceMembersModal spaceId={space?.id} />}
                   </Group>
 
                   <SpaceMembersList

@@ -2658,5 +2658,7 @@
   "Whole workspace": "Whole workspace",
   "You can use this template, but not change it.": "You can use this template, but not change it.",
   "e.g. Date, Group, Topic": "e.g. Date, Group, Topic",
-  "e.g. Describe your results here": "e.g. Describe your results here"
+  "e.g. Describe your results here": "e.g. Describe your results here",
+  "Your personal space is only visible to you. Use it for notes and drafts. You can move pages into shared spaces later.": "Your personal space is only visible to you. Use it for notes and drafts. You can move pages into shared spaces later.",
+  "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off.": "Every member can create one private space that only they can see. Existing personal spaces stay when you turn this off."
 }
