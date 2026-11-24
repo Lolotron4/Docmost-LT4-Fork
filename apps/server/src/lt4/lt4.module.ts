@@ -42,11 +42,13 @@ import { SecuritySettingsController } from './security/security-settings.control
 import { ImportImageStoreService } from './document-import/import-image-store.service';
 import { DocxImportService } from './document-import/docx-import.service';
 import { PdfImportService } from './document-import/pdf-import.service';
+import { AttachmentIndexService } from './attachment-search/attachment-index.service';
+import { AttachmentSearchController } from './attachment-search/attachment-search.controller';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule, NotificationModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController, AttachmentSearchController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService, AttachmentIndexService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

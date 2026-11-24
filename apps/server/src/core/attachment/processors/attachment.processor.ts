@@ -48,7 +48,7 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
         let AttachmentEeModule: any;
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          AttachmentEeModule = require('./../../../ee/attachments-ee/attachment-ee.service');
+          AttachmentEeModule = require('./../../../lt4/attachment-search/attachment-index.service');
         } catch (err) {
           this.logger.debug(
             'Attachment enterprise module requested but EE module not bundled in this build',
@@ -56,7 +56,7 @@ export class AttachmentProcessor extends WorkerHost implements OnModuleDestroy {
           return;
         }
         const attachmentEeService = this.moduleRef.get(
-          AttachmentEeModule.AttachmentEeService,
+          AttachmentEeModule.AttachmentIndexService,
           { strict: false },
         );
 
