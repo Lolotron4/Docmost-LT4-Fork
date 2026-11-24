@@ -28,6 +28,7 @@ const JoinPage = lazyWithPrefetch(() => import("@/lt4/accounts/pages/join-page")
 const SecuritySettings = lazyWithPrefetch(
   () => import("@/lt4/security/pages/security-settings"),
 );
+const AiSettings = lazyWithPrefetch(() => import("@/lt4/ai/pages/ai-settings"));
 const Home = lazyWithPrefetch(() => import("@/pages/dashboard/home"));
 const AccountSettings = lazyWithPrefetch(
   () => import("@/pages/settings/account/account-settings"),
@@ -176,6 +177,7 @@ export default function App() {
             <Route path={"sharing"} element={<Shares />} />
             <Route path={"integrations"} element={<Integrations />} />
             <Route path={"security"} element={<SecuritySettings />} />
+            <Route path={"ai"} element={<AiSettings />} />
           </Route>
         </Route>
       </Routes>

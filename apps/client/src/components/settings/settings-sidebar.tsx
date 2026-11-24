@@ -11,6 +11,7 @@ import {
   IconWorld,
   IconPlug,
   IconShieldLock,
+  IconSparkles,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
@@ -83,6 +84,12 @@ const groupedData: DataGroup[] = [
         label: "Security",
         icon: IconShieldLock,
         path: "/settings/security",
+        role: "admin",
+      },
+      {
+        label: "AI assistant",
+        icon: IconSparkles,
+        path: "/settings/ai",
         role: "admin",
       },
       {

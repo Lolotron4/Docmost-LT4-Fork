@@ -1,0 +1,35 @@
+/* LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code. */
+.panel {
+  position: fixed;
+  z-index: 300;
+  padding: 8px;
+}
+
+.result {
+  padding: 4px;
+}
+
+.resultText {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--mantine-radius-sm);
+  font-size: var(--mantine-font-size-sm);
+  color: var(--mantine-color-text);
+}
+
+.item:hover:not(:disabled) {
+  background-color: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+}
+
+.item:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

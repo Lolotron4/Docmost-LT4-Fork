@@ -31,6 +31,7 @@ import {
 } from "@docmost/editor-ext";
 import { LinkSelector } from "@/features/editor/components/bubble-menu/link-selector.tsx";
 import { useTranslation } from "react-i18next";
+import { useAiAssistantAllowed } from "@/lt4/ai/hooks/use-ai-allowed";
 import {
   showAiMenuAtom,
   showLinkMenuAtom,
@@ -58,7 +59,8 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
   const [showAiMenu, setShowAiMenu] = useAtom(showAiMenuAtom);
   const [showCommentPopup, setShowCommentPopup] = useAtom(showCommentPopupAtom);
   const workspace = useAtomValue(workspaceAtom);
-  const isGenerativeAiEnabled = workspace?.settings?.ai?.generative === true;
+  // LT4-Fork: nur für freigegebene Personen
+  const isGenerativeAiEnabled = useAiAssistantAllowed();
   const user = useAtomValue(userAtom);
   const editorToolbarEnabled =
     user?.settings?.preferences?.editorToolbar ?? false;

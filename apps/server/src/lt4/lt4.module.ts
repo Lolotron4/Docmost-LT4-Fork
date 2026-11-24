@@ -14,12 +14,14 @@ import { MfaController } from './mfa/mfa.controller';
 import { MfaService } from './mfa/mfa.service';
 import { BaseController } from './base/base.controller';
 import { BaseService } from './base/base.service';
+import { AiController } from './ai/ai.controller';
+import { AiService } from './ai/ai.service';
 import { PageModule } from '../core/page/page.module';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService],
   exports: [MfaService],
 })
 export class Lt4Module {}
