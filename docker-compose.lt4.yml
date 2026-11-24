@@ -11,6 +11,7 @@
 #   POSTGRES_IMAGE Postgres-Image (Standard: postgres:18)
 #   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
 #
+# Datenbank und Redis hängen nur im internen Netz "lt4-internal" (ohne Internetzugang).
 # Docmost ist nur über den Reverse-Proxy erreichbar (Port 3000 im Proxy-Netzwerk,
 # kein Port auf dem Host). Im Nginx Proxy Manager als Ziel "docmost-lt4" Port 3000 eintragen.
 services:
@@ -34,7 +35,7 @@ services:
     volumes:
       - ${DATA_DIR:-./lt4-data}/docmost:/app/data/storage
     networks:
-      - docmost-network
+      - lt4-internal
       - proxy
 
   db:
@@ -47,7 +48,7 @@ services:
     volumes:
       - ${DATA_DIR:-./lt4-data}/db_data:/var/lib/postgresql
     networks:
-      - docmost-network
+      - lt4-internal
 
   redis:
     image: redis:8
@@ -56,10 +57,11 @@ services:
     volumes:
       - ${DATA_DIR:-./lt4-data}/redis_data:/data
     networks:
-      - docmost-network
+      - lt4-internal
 
 networks:
-  docmost-network:
+  lt4-internal:
+    internal: true
   proxy:
     name: ${PROXY_NETWORK:-npm-proxy-network}
     external: true
