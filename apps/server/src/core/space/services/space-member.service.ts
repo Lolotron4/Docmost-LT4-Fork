@@ -111,6 +111,10 @@ export class SpaceMemberService {
     if (!space) {
       throw new NotFoundException('Space not found');
     }
+    // LT4-Fork: persönliche Bereiche gehören nur ihrem Besitzer
+    if (space.isPersonal) {
+      throw new BadRequestException('Members cannot be added to a personal space');
+    }
 
     // make sure we have valid workspace users
     const validUsersQuery = this.db

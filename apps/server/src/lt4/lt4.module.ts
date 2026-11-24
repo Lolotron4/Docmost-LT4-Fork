@@ -21,11 +21,14 @@ import { TemplateService } from './template/template.service';
 import { TemplateAccessService } from './template/template-access.service';
 import { AttachmentModule } from '../core/attachment/attachment.module';
 import { PageModule } from '../core/page/page.module';
+import { SpaceModule } from '../core/space/space.module';
+import { PersonalSpaceController } from './personal-space/personal-space.controller';
+import { PersonalSpaceService } from './personal-space/personal-space.service';
 
 @Module({
-  imports: [TokenModule, AuthModule, PageModule, AttachmentModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService],
+  imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

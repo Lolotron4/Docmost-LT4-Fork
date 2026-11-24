@@ -12,6 +12,7 @@ export const LT4_FEATURES: ReadonlySet<string> = new Set<string>([
   Feature.SSO_GOOGLE,
   Feature.BASES,
   Feature.TEMPLATES,
+  Feature.PERSONAL_SPACES,
 ]);
 
 export const LT4_TIER = 'lt4';
