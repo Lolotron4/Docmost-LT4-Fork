@@ -15,6 +15,7 @@ import { updateWorkspace } from "@/features/workspace/services/workspace-service
 import useUserRole from "@/hooks/use-user-role.tsx";
 import { getMfaStatus } from "@/lt4/mfa/mfa-service";
 import { SsoProvidersSection } from "@/lt4/sso/sso-providers-section";
+import { LdapProvidersSection } from "@/lt4/ldap/ldap-providers-section";
 import { WorkspaceSecuritySections } from "../components/workspace-security-sections";
 
 export default function SecuritySettings() {
@@ -95,6 +96,10 @@ export default function SecuritySettings() {
       <Divider my="xl" />
 
       <SsoProvidersSection />
+
+      <Divider my="xl" />
+
+      <LdapProvidersSection />
     </>
   );
 }
