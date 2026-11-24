@@ -29,6 +29,7 @@ const SecuritySettings = lazyWithPrefetch(
   () => import("@/lt4/security/pages/security-settings"),
 );
 const AiSettings = lazyWithPrefetch(() => import("@/lt4/ai/pages/ai-settings"));
+const ApiKeysPage = lazyWithPrefetch(() => import("@/lt4/api-key/api-keys-page"));
 const AnnouncementSettings = lazyWithPrefetch(
   () => import("@/lt4/announcement/pages/announcement-settings"),
 );
@@ -178,6 +179,7 @@ export default function App() {
               element={<AccountPreferences />}
             />
             <Route path={"account/connections"} element={<Connections />} />
+            <Route path={"account/api-keys"} element={<ApiKeysPage />} />
             <Route path={"workspace"} element={<WorkspaceSettings />} />
             <Route path={"members"} element={<WorkspaceMembers />} />
             <Route path={"groups"} element={<Groups />} />

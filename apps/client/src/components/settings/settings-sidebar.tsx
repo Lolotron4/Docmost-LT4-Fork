@@ -13,6 +13,7 @@ import {
   IconShieldLock,
   IconSparkles,
   IconSpeakerphone,
+  IconKey,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
@@ -65,6 +66,11 @@ const groupedData: DataGroup[] = [
         icon: IconPlug,
         path: "/settings/account/connections",
         requiresInstalledIntegration: true,
+      },
+      {
+        label: "API keys",
+        icon: IconKey,
+        path: "/settings/account/api-keys",
       },
     ],
   },

@@ -24,13 +24,15 @@ import { PageModule } from '../core/page/page.module';
 import { SpaceModule } from '../core/space/space.module';
 import { AnnouncementController } from './announcement/announcement.controller';
 import { AnnouncementService } from './announcement/announcement.service';
+import { ApiKeyController } from './api-key/api-key.controller';
+import { ApiKeyService } from './api-key/api-key.service';
 import { PersonalSpaceController } from './personal-space/personal-space.controller';
 import { PersonalSpaceService } from './personal-space/personal-space.service';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

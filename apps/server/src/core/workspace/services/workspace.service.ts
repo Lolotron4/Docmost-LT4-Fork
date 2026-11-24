@@ -461,14 +461,21 @@ export class WorkspaceService {
 
       if (
         typeof updateWorkspaceDto.disablePublicSharing !== 'undefined' ||
-        typeof updateWorkspaceDto.trashRetentionDays !== 'undefined' ||
-        typeof updateWorkspaceDto.restrictApiToAdmins !== 'undefined'
+        typeof updateWorkspaceDto.trashRetentionDays !== 'undefined'
       ) {
         if (!this.licenseCheckService.hasFeature(ws.licenseKey, Feature.SECURITY_SETTINGS, ws.plan)) {
           throw new ForbiddenException(
             'This feature requires a valid license',
           );
         }
+      }
+
+      // LT4-Fork: API-Beschränkung hängt an den (eigenen) API-Schlüsseln
+      if (
+        typeof updateWorkspaceDto.restrictApiToAdmins !== 'undefined' &&
+        !this.licenseCheckService.hasFeature(ws.licenseKey, Feature.API_KEYS, ws.plan)
+      ) {
+        throw new ForbiddenException('This feature requires a valid license');
       }
 
       // LT4-Fork: Mitglieder-Vorlagen hängen an den (eigenen) Vorlagen, nicht an den Sicherheitseinstellungen
