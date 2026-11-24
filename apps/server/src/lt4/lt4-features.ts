@@ -21,6 +21,8 @@ export const LT4_FEATURES: ReadonlySet<string> = new Set<string>([
   Feature.DOCX_EXPORT,
   Feature.PAGE_VERIFICATION,
   Feature.AUDIT_LOGS,
+  Feature.SECURITY_SETTINGS,
+  Feature.RETENTION,
 ]);
 
 export const LT4_TIER = 'lt4';

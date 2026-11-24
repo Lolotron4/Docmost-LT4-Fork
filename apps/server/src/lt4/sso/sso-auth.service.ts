@@ -359,7 +359,8 @@ export class SsoAuthService {
         {
           name: (profile.name || email.split('@')[0]).slice(0, 50),
           email,
-          password: randomBytes(32).toString('base64url'),
+          // Zufallspasswort, das jede Passwortregel erfüllt
+          password: randomBytes(32).toString('base64url') + 'Aa1!',
         },
         workspace.id,
         trx,

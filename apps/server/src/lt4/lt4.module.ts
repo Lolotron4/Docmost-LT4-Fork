@@ -38,10 +38,11 @@ import { ReadConfirmationController } from './read-confirmation/read-confirmatio
 import { ReadConfirmationService } from './read-confirmation/read-confirmation.service';
 import { NotificationModule } from '../core/notification/notification.module';
 import { AuditLogController } from './audit/audit-log.controller';
+import { SecuritySettingsController } from './security/security-settings.controller';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule, NotificationModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController],
   providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService],
   exports: [MfaService, TemplateAccessService],
 })
