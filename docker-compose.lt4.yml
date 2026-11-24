@@ -20,6 +20,10 @@ services:
   docmost:
     build: .
     image: docmost-lt4:local
+    # Image wird bei jedem Deploy aus dem Repository neu gebaut und nie aus einer
+    # Registry gezogen. Ohne das bleibt nach "Pull and redeploy" das alte Image
+    # aktiv, und "Re-pull image" bricht mit "pull access denied" ab.
+    pull_policy: build
     container_name: ${CONTAINER_APP_NAME:-docmost-lt4-test1}
     depends_on:
       db:
