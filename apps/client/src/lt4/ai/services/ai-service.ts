@@ -32,6 +32,9 @@ export interface IAiSettings {
   models: Record<AiProvider, string>;
   defaultModels: Record<AiProvider, string>;
   keys: Record<AiProvider, string | null>;
+  access: "all" | "restricted";
+  allowedGroups: { id: string; name: string }[];
+  allowedUsers: { id: string; name: string; email: string | null; avatarUrl: string | null }[];
 }
 
 export interface IAiSettingsInput {
@@ -39,6 +42,9 @@ export interface IAiSettingsInput {
   provider?: AiProvider;
   models?: Partial<Record<AiProvider, string>>;
   apiKeys?: Partial<Record<AiProvider, string>>;
+  access?: "all" | "restricted";
+  allowedGroupIds?: string[];
+  allowedUserIds?: string[];
 }
 
 async function post<T>(url: string, body?: unknown): Promise<T> {
@@ -52,7 +58,9 @@ export const updateAiSettings = (data: IAiSettingsInput) =>
 export const listAiModels = (provider: AiProvider) =>
   post<{ models: string[] }>("/ai/models", { provider });
 export const getAiStatus = () =>
-  post<{ enabled: boolean; ready: boolean; provider: AiProvider }>("/ai/status");
+  post<{ enabled: boolean; allowed: boolean; ready: boolean; provider: AiProvider }>(
+    "/ai/status",
+  );
 
 const STREAM_ERROR = "\u0000LT4_AI_ERROR:";
 

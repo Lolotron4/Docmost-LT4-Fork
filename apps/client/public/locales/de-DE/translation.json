@@ -2622,5 +2622,12 @@
   "No API key configured for the AI assistant.": "Für den KI-Assistenten ist kein API-Schlüssel eingerichtet.",
   "Too many AI requests. Please wait a moment.": "Zu viele KI-Anfragen. Bitte kurz warten.",
   "The provider rejected the request. Please check the API key.": "Der Anbieter hat die Anfrage abgelehnt. Bitte den API-Schlüssel prüfen.",
-  "No API key saved for this provider": "Für diesen Anbieter ist kein API-Schlüssel gespeichert"
+  "No API key saved for this provider": "Für diesen Anbieter ist kein API-Schlüssel gespeichert",
+  "Who can use the AI assistant?": "Wer darf den KI-Assistenten nutzen?",
+  "All members": "Alle Mitglieder",
+  "Only selected groups and people": "Nur bestimmte Gruppen und Personen",
+  "Admins can always use it.": "Admins dürfen ihn immer nutzen.",
+  "Add people": "Personen hinzufügen",
+  "Nobody is approved yet. Only admins can use the AI assistant.": "Noch niemand freigegeben. Nur Admins können den KI-Assistenten nutzen.",
+  "You are not allowed to use the AI assistant.": "Du darfst den KI-Assistenten nicht nutzen."
 }

@@ -25,6 +25,7 @@ import SettingsTitle from "@/components/settings/settings-title.tsx";
 import { DocumentTitle } from "@/components/ui/document-title.tsx";
 import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
 import useUserRole from "@/hooks/use-user-role.tsx";
+import { AiAccessSection } from "@/lt4/ai/pages/ai-access-section";
 import {
   AI_KEY_URLS,
   AI_PROVIDER_LABELS,
@@ -167,6 +168,17 @@ export default function AiSettings() {
           "The selected text is sent to the chosen provider and processed there. Usage is billed to the API key you enter.",
         )}
       </Alert>
+
+      {data && (
+        <>
+          <Divider my="xl" />
+          <AiAccessSection
+            data={data}
+            busy={busy}
+            onUpdate={(input) => run(() => updateAiSettings(input))}
+          />
+        </>
+      )}
 
       <Divider my="xl" />
 

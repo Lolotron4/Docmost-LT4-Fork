@@ -9,6 +9,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
+import { sql } from 'kysely';
 import Anthropic from '@anthropic-ai/sdk';
 import { streamText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
@@ -22,6 +23,7 @@ import {
   WorkspaceCaslAction,
   WorkspaceCaslSubject,
 } from '../../core/casl/interfaces/workspace-ability.type';
+import { UserRole } from '../../common/helpers/types/permission';
 import { AiGenerateDto, UpdateAiSettingsDto } from './ai.dto';
 import {
   AI_PROVIDERS,
@@ -38,6 +40,9 @@ import {
 
 type StoredSettings = {
   provider: AiProvider;
+  access: 'all' | 'restricted';
+  allowedGroupIds: string[];
+  allowedUserIds: string[];
   models: Partial<Record<AiProvider, string>>;
   apiKeys: Partial<Record<AiProvider, string>>;
 };
@@ -81,6 +86,9 @@ export class AiService {
       .executeTakeFirst();
     return {
       provider: isProvider(row?.provider) ? row.provider : 'anthropic',
+      access: row?.access === 'restricted' ? 'restricted' : 'all',
+      allowedGroupIds: Array.isArray(row?.allowedGroupIds) ? (row.allowedGroupIds as string[]) : [],
+      allowedUserIds: Array.isArray(row?.allowedUserIds) ? (row.allowedUserIds as string[]) : [],
       models: ((row?.models as any) ?? {}) as StoredSettings['models'],
       apiKeys: ((row?.apiKeys as any) ?? {}) as StoredSettings['apiKeys'],
     };
@@ -100,7 +108,47 @@ export class AiService {
     }
   }
 
-  private present(workspace: Workspace, settings: StoredSettings) {
+  /** Darf diese Person den Assistenten nutzen? Admins und Owner immer. */
+  private async canUse(user: User, workspace: Workspace, settings: StoredSettings) {
+    if (settings.access === 'all') return true;
+    if (user.role === UserRole.ADMIN || user.role === UserRole.OWNER) return true;
+    if (settings.allowedUserIds.includes(user.id)) return true;
+    if (!settings.allowedGroupIds.length) return false;
+    const membership = await this.db
+      .selectFrom('groupUsers')
+      .innerJoin('groups', 'groups.id', 'groupUsers.groupId')
+      .select('groupUsers.groupId')
+      .where('groupUsers.userId', '=', user.id)
+      .where('groups.workspaceId', '=', workspace.id)
+      .where('groupUsers.groupId', 'in', settings.allowedGroupIds)
+      .executeTakeFirst();
+    return !!membership;
+  }
+
+  private async resolveAccessLists(workspaceId: string, settings: StoredSettings) {
+    const groups = settings.allowedGroupIds.length
+      ? await this.db
+          .selectFrom('groups')
+          .select(['id', 'name'])
+          .where('workspaceId', '=', workspaceId)
+          .where('id', 'in', settings.allowedGroupIds)
+          .orderBy('name')
+          .execute()
+      : [];
+    const users = settings.allowedUserIds.length
+      ? await this.db
+          .selectFrom('users')
+          .select(['id', 'name', 'email', 'avatarUrl'])
+          .where('workspaceId', '=', workspaceId)
+          .where('deletedAt', 'is', null)
+          .where('id', 'in', settings.allowedUserIds)
+          .orderBy('name')
+          .execute()
+      : [];
+    return { groups, users };
+  }
+
+  private async present(workspace: Workspace, settings: StoredSettings) {
     const keys = {} as Record<AiProvider, string | null>;
     const models = {} as Record<AiProvider, string>;
     for (const p of AI_PROVIDERS) {
@@ -108,9 +156,13 @@ export class AiService {
       keys[p] = key ? maskKey(key) : null;
       models[p] = this.modelFor(settings, p);
     }
+    const lists = await this.resolveAccessLists(workspace.id, settings);
     return {
       enabled: this.isEnabled(workspace),
       provider: settings.provider,
+      access: settings.access,
+      allowedGroups: lists.groups,
+      allowedUsers: lists.users,
       models,
       defaultModels: DEFAULT_MODELS,
       keys,
@@ -123,12 +175,14 @@ export class AiService {
   }
 
   /** Für alle Mitglieder: Ist der Assistent nutzbar? Keine Schlüssel. */
-  async status(workspace: Workspace) {
+  async status(user: User, workspace: Workspace) {
     const settings = await this.load(workspace.id);
     const enabled = this.isEnabled(workspace);
+    const allowed = enabled && (await this.canUse(user, workspace, settings));
     return {
       enabled,
-      ready: enabled && !!this.keyFor(settings, settings.provider),
+      allowed,
+      ready: allowed && !!this.keyFor(settings, settings.provider),
       provider: settings.provider,
     };
   }
@@ -159,15 +213,52 @@ export class AiService {
       }
     }
     const provider = dto.provider ?? current.provider;
+    const access = dto.access ?? current.access;
+    // Nur IDs aus diesem Workspace übernehmen
+    let allowedGroupIds = current.allowedGroupIds;
+    if (dto.allowedGroupIds) {
+      const ids = [...new Set(dto.allowedGroupIds)];
+      allowedGroupIds = ids.length
+        ? (
+            await this.db
+              .selectFrom('groups')
+              .select('id')
+              .where('workspaceId', '=', workspace.id)
+              .where('id', 'in', ids)
+              .execute()
+          ).map((g) => g.id)
+        : [];
+    }
+    let allowedUserIds = current.allowedUserIds;
+    if (dto.allowedUserIds) {
+      const ids = [...new Set(dto.allowedUserIds)];
+      allowedUserIds = ids.length
+        ? (
+            await this.db
+              .selectFrom('users')
+              .select('id')
+              .where('workspaceId', '=', workspace.id)
+              .where('id', 'in', ids)
+              .execute()
+          ).map((u) => u.id)
+        : [];
+    }
+    const accessValues = {
+      access,
+      // Als Text übergeben und in SQL nach jsonb wandeln (sonst doppelt kodiert bzw. Postgres-Array)
+      allowedGroupIds: sql`${JSON.stringify(allowedGroupIds)}::text::jsonb`,
+      allowedUserIds: sql`${JSON.stringify(allowedUserIds)}::text::jsonb`,
+    };
 
     await this.db
       .insertInto('lt4AiSettings')
-      .values({ workspaceId: workspace.id, provider, models, apiKeys } as any)
+      .values({ workspaceId: workspace.id, provider, models, apiKeys, ...accessValues } as any)
       .onConflict((oc) =>
         oc.column('workspaceId').doUpdateSet({
           provider,
           models: models as any,
           apiKeys: apiKeys as any,
+          ...(accessValues as any),
           updatedAt: new Date(),
         }),
       )
@@ -264,6 +355,9 @@ export class AiService {
     if (!content) throw new BadRequestException('Text or instruction missing');
 
     const settings = await this.load(workspace.id);
+    if (!(await this.canUse(user, workspace, settings))) {
+      throw new ForbiddenException('You are not allowed to use the AI assistant.');
+    }
     const provider = settings.provider;
     const key = this.keyFor(settings, provider);
     if (!key) {

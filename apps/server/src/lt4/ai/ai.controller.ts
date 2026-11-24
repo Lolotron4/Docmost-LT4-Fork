@@ -57,8 +57,8 @@ export class AiController {
 
   @HttpCode(HttpStatus.OK)
   @Post('status')
-  status(@AuthWorkspace() workspace: Workspace) {
-    return this.ai.status(workspace);
+  status(@AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
+    return this.ai.status(user, workspace);
   }
 
   @Post('generate')

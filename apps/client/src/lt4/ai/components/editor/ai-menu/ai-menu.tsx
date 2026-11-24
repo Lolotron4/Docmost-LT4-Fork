@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Editor } from "@tiptap/react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { useTranslation } from "react-i18next";
 import {
   ActionIcon,
@@ -40,7 +40,7 @@ import {
 } from "@tabler/icons-react";
 import { markdownToHtml } from "@docmost/editor-ext";
 import { showAiMenuAtom } from "@/features/editor/atoms/editor-atoms";
-import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
+import { useAiAssistantAllowed } from "@/lt4/ai/hooks/use-ai-allowed";
 import { AiAction, AiGenerateInput, streamAiText } from "@/lt4/ai/services/ai-service";
 import { AI_OPEN_EVENT, setAiAssistantEnabled } from "@/lt4/ai/ai-open";
 import classes from "./ai-menu.module.css";
@@ -84,8 +84,7 @@ async function toHtml(markdown: string) {
 export function EditorAiMenu({ editor }: { editor: Editor }) {
   const { t } = useTranslation();
   const [open, setOpen] = useAtom(showAiMenuAtom);
-  const workspace = useAtomValue(workspaceAtom);
-  const enabled = workspace?.settings?.ai?.generative === true;
+  const enabled = useAiAssistantAllowed();
 
   const [range, setRange] = useState<Range | null>(null);
   const [selectedText, setSelectedText] = useState("");

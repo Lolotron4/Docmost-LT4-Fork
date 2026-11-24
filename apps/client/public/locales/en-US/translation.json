@@ -2622,5 +2622,12 @@
   "No API key configured for the AI assistant.": "No API key configured for the AI assistant.",
   "Too many AI requests. Please wait a moment.": "Too many AI requests. Please wait a moment.",
   "The provider rejected the request. Please check the API key.": "The provider rejected the request. Please check the API key.",
-  "No API key saved for this provider": "No API key saved for this provider"
+  "No API key saved for this provider": "No API key saved for this provider",
+  "Who can use the AI assistant?": "Who can use the AI assistant?",
+  "All members": "All members",
+  "Only selected groups and people": "Only selected groups and people",
+  "Admins can always use it.": "Admins can always use it.",
+  "Add people": "Add people",
+  "Nobody is approved yet. Only admins can use the AI assistant.": "Nobody is approved yet. Only admins can use the AI assistant.",
+  "You are not allowed to use the AI assistant.": "You are not allowed to use the AI assistant."
 }

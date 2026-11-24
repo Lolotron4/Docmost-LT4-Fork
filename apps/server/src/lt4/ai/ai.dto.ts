@@ -1,6 +1,9 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 import {
+  ArrayMaxSize,
+  IsArray,
   IsBoolean,
+  IsUUID,
   IsIn,
   IsObject,
   IsOptional,
@@ -27,6 +30,23 @@ export class UpdateAiSettingsDto {
   @IsOptional()
   @IsObject()
   apiKeys?: Partial<Record<AiProvider, string>>;
+
+  /** 'all' = alle Mitglieder, 'restricted' = nur Admins sowie freigegebene Gruppen und Personen. */
+  @IsOptional()
+  @IsIn(['all', 'restricted'])
+  access?: 'all' | 'restricted';
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(500)
+  @IsUUID('all', { each: true })
+  allowedGroupIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(2000)
+  @IsUUID('all', { each: true })
+  allowedUserIds?: string[];
 }
 
 export class AiProviderDto {
