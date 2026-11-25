@@ -259,6 +259,7 @@ export const EditorBubbleMenu: FC<EditorBubbleMenuProps> = (props) => {
 
             <ColorSelector
               editor={props.editor}
+              inline
               isOpen={isColorSelectorOpen}
               setIsOpen={() => {
                 setIsColorSelectorOpen(!isColorSelectorOpen);

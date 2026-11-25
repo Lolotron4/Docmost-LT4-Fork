@@ -27,6 +27,9 @@ interface ColorSelectorProps {
   editor: Editor | null;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  /** LT4: Dropdown im Menü selbst rendern (Bubble-Menü), damit die Hex-Eingabe
+   *  das Menü nicht schließt. In der festen Symbolleiste bleibt das Portal. */
+  inline?: boolean;
 }
 
 const TEXT_COLORS: BubbleColorMenuItem[] = [
@@ -174,6 +177,7 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
   editor,
   isOpen,
   setIsOpen,
+  inline = false,
 }) => {
   const { t } = useTranslation();
 
@@ -263,7 +267,7 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
     <Popover
       width={240}
       opened={isOpen}
-      withinPortal={false}
+      withinPortal={!inline}
       onChange={setIsOpen}
       trapFocus
       withArrow
