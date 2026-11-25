@@ -7,7 +7,7 @@ import "@/styles/a11y-overrides.css";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { mantineCssResolver, theme } from "@/theme";
-import { MantineProvider } from "@mantine/core";
+import { Lt4MantineProvider } from "@/lt4/theme/lt4-mantine-provider";
 import { BrowserRouter } from "react-router-dom";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
@@ -53,7 +53,7 @@ const root = (container as any).__reactRoot ??= ReactDOM.createRoot(container);
 
 root.render(
   <BrowserRouter>
-    <MantineProvider theme={theme} cssVariablesResolver={mantineCssResolver}>
+    <Lt4MantineProvider theme={theme} cssVariablesResolver={mantineCssResolver}>
       <DatesLocaleProvider>
         <ModalsProvider>
           <QueryClientProvider client={queryClient}>
@@ -68,6 +68,6 @@ root.render(
           </QueryClientProvider>
         </ModalsProvider>
       </DatesLocaleProvider>
-    </MantineProvider>
+    </Lt4MantineProvider>
   </BrowserRouter>,
 );

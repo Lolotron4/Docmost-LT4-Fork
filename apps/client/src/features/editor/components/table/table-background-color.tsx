@@ -12,6 +12,7 @@ import {
 import type { Editor } from "@tiptap/react";
 import { useEditorState } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
+import { CustomColorSection } from "@/lt4/colors/custom-color-section";
 
 export interface TableColorItem {
   name: string;
@@ -85,7 +86,7 @@ export const TableBackgroundColor: FC<TableBackgroundColorProps> = ({
 
   return (
     <Popover
-      width={200}
+      width={220}
       position="bottom"
       opened={opened}
       onChange={setOpened}
@@ -152,6 +153,12 @@ export const TableBackgroundColor: FC<TableBackgroundColorProps> = ({
               </UnstyledButton>
             ))}
           </div>
+          <CustomColorSection
+            kind="table"
+            currentColor={editorState.currentColor}
+            presetColors={TABLE_COLORS.map((c) => c.color)}
+            onApply={(color) => setTableCellBackground(color, "custom")}
+          />
         </Stack>
       </Popover.Dropdown>
     </Popover>

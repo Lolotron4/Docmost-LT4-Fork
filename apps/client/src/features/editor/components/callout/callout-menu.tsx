@@ -6,7 +6,8 @@ import {
   EditorMenuProps,
   ShouldShowProps,
 } from "@/features/editor/components/table/types/types.ts";
-import { ActionIcon, Tooltip } from "@mantine/core";
+import { ActionIcon, Button, Popover, Stack, Tooltip } from "@mantine/core";
+import { CustomColorSection } from "@/lt4/colors/custom-color-section";
 import clsx from "clsx";
 import {
   IconAlertTriangleFilled,
@@ -15,6 +16,7 @@ import {
   IconInfoCircleFilled,
   IconMoodSmile,
   IconNotes,
+  IconPalette,
 } from "@tabler/icons-react";
 import { CalloutType, isEditorReady, isTextSelected } from "@docmost/editor-ext";
 import { useTranslation } from "react-i18next";
@@ -50,6 +52,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
         isSuccess: ctx.editor.isActive("callout", { type: "success" }),
         isWarning: ctx.editor.isActive("callout", { type: "warning" }),
         isDanger: ctx.editor.isActive("callout", { type: "danger" }),
+        customColor: ctx.editor.getAttributes("callout")?.color || "",
       };
     },
   });
@@ -82,7 +85,22 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
         .chain()
         .focus(undefined, { scrollIntoView: false })
         .updateCalloutType(calloutType)
+        .updateCalloutColor(null)
         .run();
+    },
+    [editor],
+  );
+
+  // LT4: eigene Farbe
+  const [colorOpen, setColorOpen] = React.useState(false);
+  const setCalloutColor = useCallback(
+    (color: string | null) => {
+      editor
+        .chain()
+        .focus(undefined, { scrollIntoView: false })
+        .updateCalloutColor(color)
+        .run();
+      setColorOpen(false);
     },
     [editor],
   );
@@ -140,7 +158,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             size="lg"
             aria-label={t("Info")}
             variant="subtle"
-            className={clsx({ [classes.active]: editorState?.isInfo })}
+            className={clsx({ [classes.active]: editorState?.isInfo && !editorState?.customColor })}
           >
             <IconInfoCircleFilled
               size={18}
@@ -155,7 +173,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             size="lg"
             aria-label={t("Note")}
             variant="subtle"
-            className={clsx({ [classes.active]: editorState?.isNote })}
+            className={clsx({ [classes.active]: editorState?.isNote && !editorState?.customColor })}
           >
             <IconNotes size={18} color="var(--mantine-color-grape-5)" />
           </ActionIcon>
@@ -167,7 +185,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             size="lg"
             aria-label={t("Success")}
             variant="subtle"
-            className={clsx({ [classes.active]: editorState?.isSuccess })}
+            className={clsx({ [classes.active]: editorState?.isSuccess && !editorState?.customColor })}
           >
             <IconCircleCheckFilled
               size={18}
@@ -182,7 +200,7 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             size="lg"
             aria-label={t("Warning")}
             variant="subtle"
-            className={clsx({ [classes.active]: editorState?.isWarning })}
+            className={clsx({ [classes.active]: editorState?.isWarning && !editorState?.customColor })}
           >
             <IconAlertTriangleFilled
               size={18}
@@ -197,11 +215,55 @@ export function CalloutMenu({ editor }: EditorMenuProps) {
             size="lg"
             aria-label={t("Danger")}
             variant="subtle"
-            className={clsx({ [classes.active]: editorState?.isDanger })}
+            className={clsx({ [classes.active]: editorState?.isDanger && !editorState?.customColor })}
           >
             <IconCircleXFilled size={18} color="var(--mantine-color-red-5)" />
           </ActionIcon>
         </Tooltip>
+
+        <Popover
+          opened={colorOpen}
+          onChange={setColorOpen}
+          width={220}
+          withinPortal={false}
+          position="bottom"
+          withArrow
+        >
+          <Popover.Target>
+            <Tooltip position="top" label={t("Custom color")} withinPortal={false}>
+              <ActionIcon
+                onClick={() => setColorOpen((o) => !o)}
+                size="lg"
+                aria-label={t("Custom color")}
+                variant="subtle"
+                className={clsx({ [classes.active]: !!editorState?.customColor })}
+              >
+                <IconPalette
+                  size={18}
+                  color={editorState?.customColor || undefined}
+                />
+              </ActionIcon>
+            </Tooltip>
+          </Popover.Target>
+          <Popover.Dropdown>
+            <Stack gap="xs">
+              <CustomColorSection
+                kind="callout"
+                currentColor={editorState?.customColor}
+                onApply={setCalloutColor}
+              />
+              {editorState?.customColor && (
+                <Button
+                  size="xs"
+                  variant="default"
+                  onClick={() => setCalloutColor(null)}
+                >
+                  {t("Remove color")}
+                </Button>
+              )}
+            </Stack>
+          </Popover.Dropdown>
+        </Popover>
 
         <EmojiPicker
           onEmojiSelect={setCalloutIcon}

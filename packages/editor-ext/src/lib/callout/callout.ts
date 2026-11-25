@@ -22,6 +22,10 @@ export interface CalloutAttributes {
    * The custom icon name for the callout.
    */
   icon?: string;
+  /**
+   * LT4: eigene Farbe (#rrggbb); überschreibt die Farbe des Typs.
+   */
+  color?: string | null;
 }
 
 declare module "@tiptap/core" {
@@ -32,6 +36,7 @@ declare module "@tiptap/core" {
       toggleCallout: (attributes?: CalloutAttributes) => ReturnType;
       updateCalloutType: (type: CalloutType) => ReturnType;
       updateCalloutIcon: (icon: string) => ReturnType;
+      updateCalloutColor: (color: string | null) => ReturnType;
     };
   }
 }
@@ -70,6 +75,16 @@ export const Callout = Node.create<CalloutOptions>({
         renderHTML: (attributes) => ({
           "data-callout-icon": attributes.icon,
         }),
+      },
+      // LT4: eigene Farbe
+      color: {
+        default: null,
+        parseHTML: (element) => {
+          const v = element.getAttribute("data-callout-color");
+          return v && /^#[0-9a-fA-F]{6}$/.test(v) ? v : null;
+        },
+        renderHTML: (attributes) =>
+          attributes.color ? { "data-callout-color": attributes.color } : {},
       },
     };
   },
@@ -126,6 +141,13 @@ export const Callout = Node.create<CalloutOptions>({
         ({ commands }) =>
           commands.updateAttributes("callout", {
             icon: icon || null,
+          }),
+
+      updateCalloutColor:
+        (color: string | null) =>
+        ({ commands }) =>
+          commands.updateAttributes("callout", {
+            color: color && /^#[0-9a-fA-F]{6}$/.test(color) ? color : null,
           }),
     };
   },

@@ -14,6 +14,7 @@ import {
   IconTableRow,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
+import { CustomColorSection } from "@/lt4/colors/custom-color-section";
 import { useTableClear } from "../hooks/use-table-clear";
 import { TABLE_COLORS } from "../../table-background-color";
 import { AlignmentSubmenu } from "./alignment-submenu";
@@ -92,6 +93,13 @@ export const CellChevronMenu = React.memo(function CellChevronMenu({
                 />
               </button>
             ))}
+          </div>
+          <div style={{ padding: "0 8px 8px", width: 200 }}>
+            <CustomColorSection
+              kind="table"
+              presetColors={TABLE_COLORS.map((c) => c.color)}
+              onApply={(color) => setBackground(color, "custom")}
+            />
           </div>
         </Menu.Sub.Dropdown>
       </Menu.Sub>

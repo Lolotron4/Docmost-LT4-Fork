@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next";
 import { isEditorReady } from "@docmost/editor-ext";
 import clsx from "clsx";
 import classes from "./bubble-menu.module.css";
+import { CustomColorSection } from "@/lt4/colors/custom-color-section";
 
 export interface BubbleColorMenuItem {
   name: string;
@@ -26,6 +27,9 @@ interface ColorSelectorProps {
   editor: Editor | null;
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
+  /** LT4: Dropdown im Menü selbst rendern (Bubble-Menü), damit die Hex-Eingabe
+   *  das Menü nicht schließt. In der festen Symbolleiste bleibt das Portal. */
+  inline?: boolean;
 }
 
 const TEXT_COLORS: BubbleColorMenuItem[] = [
@@ -173,6 +177,7 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
   editor,
   isOpen,
   setIsOpen,
+  inline = false,
 }) => {
   const { t } = useTranslation();
 
@@ -195,17 +200,43 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
         });
       });
 
-      return activeColors;
+      // LT4: aktuell gesetzte (auch eigene) Farben
+      activeColors.__textColor =
+        ctx.editor.getAttributes("textStyle")?.color || "";
+      activeColors.__highlightColor =
+        ctx.editor.getAttributes("highlight")?.color || "";
+
+      return activeColors as Record<string, any>;
     },
   });
 
   const activeColorItem = TEXT_COLORS.find(
     ({ color }) => editorState?.[`text_${color}`],
-  );
+  ) ?? (editorState?.__textColor
+    ? { name: "Custom", color: editorState.__textColor }
+    : undefined);
 
   const activeHighlightItem = HIGHLIGHT_COLORS.find(
     ({ color }) => editorState?.[`highlight_${color}`],
-  );
+  ) ?? (editorState?.__highlightColor
+    ? { name: "Custom", color: editorState.__highlightColor }
+    : undefined);
+
+  // LT4: eigene Farben per Farbwähler/Hex
+  const applyCustomTextColor = (color: string) => {
+    if (!isEditorReady(editor)) return;
+    editor.chain().focus().setColor(color).run();
+    setIsOpen(false);
+  };
+  const applyCustomHighlight = (color: string) => {
+    if (!isEditorReady(editor)) return;
+    editor
+      .chain()
+      .focus()
+      .setMark("highlight", { color, colorName: null })
+      .run();
+    setIsOpen(false);
+  };
 
   const trigger = (
     <Tooltip label={t("Text color")} withArrow withinPortal={false}>
@@ -234,8 +265,9 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
 
   return (
     <Popover
-      width={220}
+      width={240}
       opened={isOpen}
+      withinPortal={!inline}
       onChange={setIsOpen}
       trapFocus
       withArrow
@@ -306,6 +338,14 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
                 );
               })}
             </SimpleGrid>
+            <Box mt="xs">
+              <CustomColorSection
+                kind="text"
+                currentColor={editorState.__textColor}
+                presetColors={TEXT_COLORS.map((c) => c.color)}
+                onApply={applyCustomTextColor}
+              />
+            </Box>
           </Box>
 
           <Box>
@@ -378,6 +418,14 @@ export const ColorSelector: FC<ColorSelectorProps> = ({
                 );
               })}
             </SimpleGrid>
+            <Box mt="xs">
+              <CustomColorSection
+                kind="highlight"
+                currentColor={editorState.__highlightColor}
+                presetColors={HIGHLIGHT_COLORS.map((c) => c.color)}
+                onApply={applyCustomHighlight}
+              />
+            </Box>
           </Box>
 
           <Button

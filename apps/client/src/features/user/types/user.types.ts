@@ -20,6 +20,8 @@ export interface IUser {
   deletedAt: Date;
   fullPageWidth: boolean; // used for update
   pageEditMode: string; // used for update
+  lt4Theme?: string; // LT4, used for update
+  lt4Accent?: string; // LT4, used for update
   editorToolbar: boolean; // used for update
   notificationPageUpdates: boolean; // used for update
   notificationPageUserMention: boolean; // used for update
@@ -39,6 +41,8 @@ export interface IUserSettings {
     fullPageWidth: boolean;
     pageEditMode: string;
     editorToolbar: boolean;
+    lt4Theme?: string;
+    lt4Accent?: string;
   };
   notifications?: {
     "page.updated"?: boolean;

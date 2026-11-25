@@ -12,14 +12,14 @@ import { CalloutType } from "@docmost/editor-ext";
 
 export default function CalloutView(props: NodeViewProps) {
   const { node } = props;
-  const { type, icon } = node.attrs;
+  const { type, icon, color } = node.attrs;
 
   return (
     <NodeViewWrapper>
       <Alert
         variant="light"
         title=""
-        color={getCalloutColor(type)}
+        color={color || getCalloutColor(type)}
         icon={getCalloutIcon(type, icon)}
         p="xs"
         classNames={{

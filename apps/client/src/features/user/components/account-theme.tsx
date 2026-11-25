@@ -6,11 +6,13 @@ import {
   MantineColorScheme,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { Lt4ThemePicker } from "@/lt4/theme/lt4-theme-picker";
 
 export default function AccountTheme() {
   const { t } = useTranslation();
 
   return (
+    <>
     <Group justify="space-between" wrap="nowrap" gap="xl">
       <div>
         <Text size="md">{t("Theme")}</Text>
@@ -21,6 +23,9 @@ export default function AccountTheme() {
 
       <ThemeSwitcher />
     </Group>
+    {/* LT4: Farb-Themes und eigene Akzentfarbe */}
+    <Lt4ThemePicker />
+    </>
   );
 }
 
