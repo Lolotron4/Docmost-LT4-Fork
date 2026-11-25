@@ -81,7 +81,8 @@ export class GitHubProvider extends IntegrationProvider {
     const clientSecret =
       process.env[credentialEnvKey('CLIENT_SECRET', this.definition.type)];
     if (!clientId || !clientSecret) {
-      throw new Error('GitHub client ID or secret is not set');
+      // LT4-Fork: ohne OAuth-App anonym abfragen (öffentliche Repos, 60 Anfragen/h).
+      return this.unfurlWith('', opts);
     }
     const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
       'base64',

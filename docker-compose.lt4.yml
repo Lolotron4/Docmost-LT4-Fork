@@ -17,6 +17,13 @@
 #   DOCMOST_INTERNAL_NETWORK  Name des internen Netzes (Standard: lt4-dm-test)
 #   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
 #
+# Optional, Integrationen (Linkvorschauen, Anleitung: docs/lt4/integrationen.md):
+#   INTEGRATION_GITHUB_CLIENT_ID / INTEGRATION_GITHUB_CLIENT_SECRET  GitHub-OAuth-App (für private Repos)
+#   INTEGRATION_GITHUB_URL       Nur für GitHub Enterprise, z. B. https://github.firma.de
+#   INTEGRATION_GITLAB_CLIENT_ID / INTEGRATION_GITLAB_CLIENT_SECRET  GitLab-OAuth-App (für private Projekte)
+#   INTEGRATION_GITLAB_URL       Eigene GitLab-Instanz (Standard: https://gitlab.com)
+#   Ohne OAuth-App zeigen GitHub und GitLab Vorschauen für öffentliche Repos.
+#
 # Datenbank und Redis hängen nur im internen Netz "lt4-internal" (ohne Internetzugang).
 # Docmost ist nur über den Reverse-Proxy erreichbar (Port 3000 im Proxy-Netzwerk,
 # kein Port auf dem Host). Im Nginx Proxy Manager als Ziel den App-Container (Standard: "docmost-lt4-test1") Port 3000 eintragen.
@@ -43,6 +50,12 @@ services:
       REDIS_URL: redis://${CONTAINER_REDIS_NAME:-docmost-lt4-test1-redis}:6379
       FILE_UPLOAD_SIZE_LIMIT: ${FILE_UPLOAD_SIZE_LIMIT:-50mb}
       FILE_IMPORT_SIZE_LIMIT: ${FILE_IMPORT_SIZE_LIMIT:-200mb}
+      INTEGRATION_GITHUB_CLIENT_ID: ${INTEGRATION_GITHUB_CLIENT_ID:-}
+      INTEGRATION_GITHUB_CLIENT_SECRET: ${INTEGRATION_GITHUB_CLIENT_SECRET:-}
+      INTEGRATION_GITHUB_URL: ${INTEGRATION_GITHUB_URL:-}
+      INTEGRATION_GITLAB_CLIENT_ID: ${INTEGRATION_GITLAB_CLIENT_ID:-}
+      INTEGRATION_GITLAB_CLIENT_SECRET: ${INTEGRATION_GITLAB_CLIENT_SECRET:-}
+      INTEGRATION_GITLAB_URL: ${INTEGRATION_GITLAB_URL:-}
     expose:
       - "3000"
     restart: unless-stopped

@@ -8,6 +8,8 @@ import { notifications } from "@mantine/notifications";
 import { getAppName } from "@/lib/config";
 import SettingsTitle from "@/components/settings/settings-title";
 import ConnectionRow from "../components/connection-row";
+import { useQuery } from "@tanstack/react-query";
+import { getLt4IntegrationStatus } from "@/lt4/integrations/lt4-integration-service";
 import IntegrationListSkeleton from "../components/integration-list-skeleton";
 import {
   useAvailableIntegrations,
@@ -27,6 +29,10 @@ export default function Connections() {
     useInstalledIntegrations();
   const { data: myConnections, isLoading: loadingConnections } =
     useMyConnections();
+  const { data: lt4Status } = useQuery({
+    queryKey: ["lt4-integration-status"],
+    queryFn: getLt4IntegrationStatus,
+  });
   const disconnectMutation = useDisconnectIntegration();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -182,6 +188,9 @@ export default function Connections() {
           {available
             .filter((def) => {
               if (!def.capabilities.includes("oauth")) return false;
+              // LT4-Fork: ohne OAuth-App gibt es nichts zu verbinden
+              const status = lt4Status?.find((s) => s.type === def.type);
+              if (status && !status.oauthConfigured) return false;
               return installed?.some((i) => i.type === def.type);
             })
             .map((def) => {

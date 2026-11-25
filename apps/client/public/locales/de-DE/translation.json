@@ -3001,5 +3001,16 @@
   "The filter must contain {{username}}": "Der Filter muss {{username}} enthalten",
   "Invalid attribute name": "Ungültiger Attributname",
   "The PDF file could not be read.": "Die PDF-Datei konnte nicht gelesen werden.",
-  "No text found in this PDF. Scanned PDFs without a text layer cannot be imported.": "In dieser PDF wurde kein Text gefunden. Gescannte PDFs ohne Textebene können nicht importiert werden."
+  "No text found in this PDF. Scanned PDFs without a text layer cannot be imported.": "In dieser PDF wurde kein Text gefunden. Gescannte PDFs ohne Textebene können nicht importiert werden.",
+  "Link previews for repos, pull requests, issues, commits, and files": "Linkvorschauen für Repositories, Pull Requests, Issues, Commits und Dateien",
+  "Link previews for projects, merge requests, issues and commits": "Linkvorschauen für Projekte, Merge Requests, Issues und Commits",
+  "Link previews for Figma designs, prototypes, and FigJam boards": "Linkvorschauen für Figma-Designs, Prototypen und FigJam-Boards",
+  "Link previews for issues, projects, initiatives, and views": "Linkvorschauen für Issues, Projekte, Initiativen und Ansichten",
+  "Install {{name}} without OAuth app": "{{name}} ohne OAuth-App installieren",
+  "No OAuth app is configured. {{name}} will be installed with previews for public repositories only. Links to private repositories stay normal links.": "Es ist keine OAuth-App eingerichtet. {{name}} wird nur mit Vorschauen für öffentliche Repositories installiert. Links auf private Repositories bleiben normale Links.",
+  "For private repositories, create an OAuth app at the provider and set these environment variables in the stack:": "Für private Repositories legst du beim Anbieter eine OAuth-App an und setzt diese Umgebungsvariablen im Stack:",
+  "This integration only works with an OAuth app. Create one at the provider and set these environment variables in the stack, then restart it:": "Diese Integration funktioniert nur mit einer OAuth-App. Lege sie beim Anbieter an, setze diese Umgebungsvariablen im Stack und starte ihn neu:",
+  "Callback URL of the OAuth app:": "Callback-URL der OAuth-App:",
+  "{{name}} needs an OAuth app": "{{name}} braucht eine OAuth-App",
+  "{{name}} installed": "{{name}} installiert"
 }
