@@ -13,6 +13,11 @@
 #                  /var/lib/postgresql (passt zu postgres:18). Für postgres:17 und älter
 #                  /var/lib/postgresql/data setzen, sonst legt das Image ein anonymes
 #                  Volume an und startet mit einer leeren Datenbank.
+#   LT4_IMAGE      Fertiges Image statt Bau auf dem Server, z. B.
+#                  ghcr.io/lolotron4/docmost-lt4-fork:main (Tag = Branchname, "/" wird "-",
+#                  also lt4/themes -> :lt4-themes). Zusammen mit LT4_PULL_POLICY=always.
+#                  Anleitung: docs/lt4/schnelles-deployment.md
+#   LT4_PULL_POLICY  build (Standard: Image auf dem Server bauen) oder always (fertiges Image laden)
 #   CONTAINER_APP_NAME / CONTAINER_DB_NAME / CONTAINER_REDIS_NAME  Containernamen
 #   DOCMOST_INTERNAL_NETWORK  Name des internen Netzes (Standard: lt4-dm-test)
 #   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
@@ -30,11 +35,12 @@
 services:
   docmost:
     build: .
-    image: docmost-lt4:local
-    # Image wird bei jedem Deploy aus dem Repository neu gebaut und nie aus einer
-    # Registry gezogen. Ohne das bleibt nach "Pull and redeploy" das alte Image
+    image: ${LT4_IMAGE:-docmost-lt4:local}
+    # Standard: Image wird bei jedem Deploy aus dem Repository neu gebaut und nie aus
+    # einer Registry gezogen. Ohne das bleibt nach "Pull and redeploy" das alte Image
     # aktiv, und "Re-pull image" bricht mit "pull access denied" ab.
-    pull_policy: build
+    # Schneller: LT4_IMAGE auf das GitHub-Image setzen und LT4_PULL_POLICY=always.
+    pull_policy: ${LT4_PULL_POLICY:-build}
     container_name: ${CONTAINER_APP_NAME:-docmost-lt4-test1}
     depends_on:
       db:
