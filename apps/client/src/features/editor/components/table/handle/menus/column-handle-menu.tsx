@@ -15,6 +15,7 @@ import {
   IconSortDescendingLetters,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
+import { CustomColorSection } from "@/lt4/colors/custom-color-section";
 import { useTableMoveRowColumn } from "../hooks/use-table-move-row-column";
 import { useTableClear } from "../hooks/use-table-clear";
 import { useTableSort } from "../hooks/use-table-sort";
@@ -120,6 +121,13 @@ export const ColumnHandleMenu = React.memo(function ColumnHandleMenu({
                 />
               </button>
             ))}
+          </div>
+          <div style={{ padding: "0 8px 8px", width: 200 }}>
+            <CustomColorSection
+              kind="table"
+              presetColors={TABLE_COLORS.map((c) => c.color)}
+              onApply={(color) => setBackground(color, "custom")}
+            />
           </div>
         </Menu.Sub.Dropdown>
       </Menu.Sub>

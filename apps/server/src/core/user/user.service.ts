@@ -58,6 +58,29 @@ export class UserService {
       );
     }
 
+    // LT4: Theme-Auswahl (beide Werte können zusammen kommen)
+    if (
+      typeof updateUserDto.lt4Theme !== 'undefined' ||
+      typeof updateUserDto.lt4Accent !== 'undefined'
+    ) {
+      let updated;
+      if (typeof updateUserDto.lt4Theme !== 'undefined') {
+        updated = await this.userRepo.updatePreference(
+          userId,
+          'lt4Theme',
+          updateUserDto.lt4Theme,
+        );
+      }
+      if (typeof updateUserDto.lt4Accent !== 'undefined') {
+        updated = await this.userRepo.updatePreference(
+          userId,
+          'lt4Accent',
+          updateUserDto.lt4Accent.toLowerCase(),
+        );
+      }
+      return updated;
+    }
+
     if (typeof updateUserDto.editorToolbar !== 'undefined') {
       return this.userRepo.updatePreference(
         userId,

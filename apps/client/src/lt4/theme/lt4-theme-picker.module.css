@@ -1,0 +1,39 @@
+.card {
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-md);
+  padding: 8px;
+  transition: border-color 120ms ease;
+
+  &:hover {
+    border-color: var(--mantine-color-blue-filled);
+  }
+
+  &[data-active] {
+    border: 2px solid var(--mantine-color-blue-filled);
+    padding: 7px;
+  }
+}
+
+.preview {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 44px;
+  border-radius: var(--mantine-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--mantine-color-default-border);
+}
+
+.accent {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+}

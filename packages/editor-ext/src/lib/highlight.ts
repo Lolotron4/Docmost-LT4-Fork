@@ -18,7 +18,7 @@ export const Highlight = TiptapHighlight.extend<HighlightOptions>({
 
           return {
             "data-color": attributes.color,
-            style: `background-color: ${attributes.color}; color: inherit`,
+            style: `background-color: ${attributes.color}; color: inherit; --highlight-color: ${attributes.color}`,
           };
         },
       },

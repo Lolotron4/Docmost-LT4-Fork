@@ -3022,5 +3022,20 @@
   "Create an API key above and replace <API-Schlüssel> with it.": "Lege oben einen API-Schlüssel an und setze ihn statt <API-Schlüssel> ein.",
   "Add this to the MCP configuration file (e.g. .cursor/mcp.json or .vscode/mcp.json):": "In die MCP-Konfigurationsdatei eintragen (z. B. .cursor/mcp.json oder .vscode/mcp.json):",
   "In claude_desktop_config.json (needs Node.js; uses the mcp-remote bridge):": "In claude_desktop_config.json (braucht Node.js, nutzt die Brücke mcp-remote):",
-  "Available tools: list_spaces, search_pages, list_pages, get_page, create_page, update_page.": "Verfügbare Werkzeuge: list_spaces, search_pages, list_pages, get_page, create_page, update_page."
+  "Available tools: list_spaces, search_pages, list_pages, get_page, create_page, update_page.": "Verfügbare Werkzeuge: list_spaces, search_pages, list_pages, get_page, create_page, update_page.",
+  "Color theme": "Farb-Theme",
+  "Works in light and dark mode. Saved to your account.": "Gilt im hellen und dunklen Modus und wird an deinem Konto gespeichert.",
+  "Ocean": "Ozean",
+  "Lavender": "Lavendel",
+  "Cherry blossom": "Kirschblüte",
+  "Sepia": "Sepia",
+  "Nord": "Nord",
+  "Midnight": "Mitternacht",
+  "Custom accent color": "Eigene Akzentfarbe",
+  "Overrides the accent color of the theme.": "Ersetzt die Akzentfarbe des Themes.",
+  "Theme color": "Farbe des Themes",
+  "Use theme color": "Farbe des Themes nutzen",
+  "Custom color": "Eigene Farbe",
+  "Pick a custom color": "Eigene Farbe wählen",
+  "Hex color": "Hex-Farbe"
 }

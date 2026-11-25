@@ -19,6 +19,24 @@
         from var(--text-color, currentcolor) max(l, 0.72) min(c, 0.16) h
       ) !important;
     }
+
+    /* LT4: eigene Hervorhebungsfarben im dunklen Modus abdunkeln,
+       damit der helle Text lesbar bleibt. */
+    mark[data-color]:not(
+        [data-color="#98d8f2" i],
+        [data-color="#7edb6c" i],
+        [data-color="#e0d6ed" i],
+        [data-color="#ffc6c2" i],
+        [data-color="#faf594" i],
+        [data-color="#f5c8a9" i],
+        [data-color="#f5cfe0" i],
+        [data-color="#dfdfd7" i],
+        [data-color="#d7c4b7" i]
+      ) {
+      background-color: oklch(
+        from var(--highlight-color, currentcolor) min(l, 0.42) min(c, 0.12) h
+      ) !important;
+    }
   }
 
   /* Blue */
