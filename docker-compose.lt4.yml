@@ -9,6 +9,10 @@
 #                  ACHTUNG: Für einen Test nie den Ordner einer laufenden Instanz verwenden!
 #   PROXY_NETWORK  Externes Netzwerk des Reverse-Proxys (Standard: npm-proxy-network)
 #   POSTGRES_IMAGE Postgres-Image (Standard: postgres:18)
+#   POSTGRES_DATA_PATH  Einbindungspfad von DB_DATA im DB-Container. Standard
+#                  /var/lib/postgresql (passt zu postgres:18). Für postgres:17 und älter
+#                  /var/lib/postgresql/data setzen, sonst legt das Image ein anonymes
+#                  Volume an und startet mit einer leeren Datenbank.
 #   CONTAINER_APP_NAME / CONTAINER_DB_NAME / CONTAINER_REDIS_NAME  Containernamen
 #   DOCMOST_INTERNAL_NETWORK  Name des internen Netzes (Standard: lt4-dm-test)
 #   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
@@ -62,7 +66,7 @@ services:
       retries: 30
     restart: unless-stopped
     volumes:
-      - ${DATA_DIR:-./lt4-data}/db_data:/var/lib/postgresql
+      - ${DATA_DIR:-./lt4-data}/db_data:${POSTGRES_DATA_PATH:-/var/lib/postgresql}
     networks:
       - lt4-internal
 
