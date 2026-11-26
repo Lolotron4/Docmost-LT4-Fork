@@ -52,11 +52,13 @@ import { RoleController } from './roles/role.controller';
 import { RoleService } from './roles/role.service';
 import { AssignmentController } from './assignment/assignment.controller';
 import { AssignmentService } from './assignment/assignment.service';
+import { PageStatsController } from './page-stats/page-stats.controller';
+import { PageStatsService } from './page-stats/page-stats.service';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule, NotificationModule, Lt4IntegrationsModule, Lt4McpModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController, AttachmentSearchController, LdapController, RoleController, AssignmentController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService, AttachmentIndexService, LdapService, RoleService, AssignmentService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController, AttachmentSearchController, LdapController, RoleController, AssignmentController, PageStatsController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService, AttachmentIndexService, LdapService, RoleService, AssignmentService, PageStatsService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

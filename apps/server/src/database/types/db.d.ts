@@ -840,6 +840,16 @@ export interface Lt4ReadRequests {
   updatedAt: Generated<Timestamp>;
 }
 
+// LT4-Fork: Seitenstatistik
+export interface Lt4PageViews {
+  pageId: string;
+  userId: string;
+  workspaceId: string;
+  day: Timestamp;
+  views: Generated<number>;
+  lastViewedAt: Generated<Timestamp>;
+}
+
 export interface Lt4ReadConfirmations {
   id: Generated<string>;
   requestId: string;
@@ -919,6 +929,7 @@ export interface DB {
   lt4Roles: Lt4Roles;
   lt4AiSettings: Lt4AiSettings;
   lt4ReadRequests: Lt4ReadRequests;
+  lt4PageViews: Lt4PageViews;
   lt4ReadConfirmations: Lt4ReadConfirmations;
   aiChats: AiChats;
   aiChatMessages: AiChatMessages;
