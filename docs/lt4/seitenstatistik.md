@@ -1,4 +1,4 @@
-# Seitenstatistik und veraltete Seiten (LT4 v1.3.0)
+# Seitenstatistik und veraltete Seiten (LT4 v1.4.0)
 
 ## Seitenstatistik
 Seitenmenü (…) > **Seitenstatistik**. Zeigt für 7 Tage, 30 Tage, 90 Tage oder 1 Jahr:

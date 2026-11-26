@@ -889,7 +889,41 @@ export interface Lt4GroupRoles {
   workspaceId: string;
 }
 
+export interface Lt4Assignments {
+  id: Generated<string>;
+  workspaceId: string;
+  spaceId: string;
+  templateId: string | null;
+  parentPageId: string | null;
+  title: string;
+  description: string | null;
+  dueAt: Timestamp;
+  lockAfterDue: Generated<boolean>;
+  allowSubmit: Generated<boolean>;
+  creatorId: string | null;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+}
+
+export interface Lt4AssignmentSubmissions {
+  id: Generated<string>;
+  assignmentId: string;
+  workspaceId: string;
+  pageId: string;
+  groupId: string | null;
+  userId: string | null;
+  dueAt: Timestamp | null;
+  lockDisabled: Generated<boolean>;
+  submittedAt: Timestamp | null;
+  submittedById: string | null;
+  lockedAt: Timestamp | null;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface DB {
+  lt4Assignments: Lt4Assignments;
+  lt4AssignmentSubmissions: Lt4AssignmentSubmissions;
   lt4GroupRoles: Lt4GroupRoles;
   lt4JoinCodes: Lt4JoinCodes;
   lt4Roles: Lt4Roles;

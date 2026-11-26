@@ -10,6 +10,7 @@ import {
   IconTemplate,
   IconRosetteDiscountCheck,
   IconClockExclamation,
+  IconInbox,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./global-sidebar.module.css";
@@ -69,6 +70,7 @@ export default function GlobalSidebar() {
       ? [{ label: "Reviews", icon: IconRosetteDiscountCheck, path: "/reviews" }]
       : []),
     { label: "Outdated pages", icon: IconClockExclamation, path: "/outdated-pages" },
+    { label: "Assignments", icon: IconInbox, path: "/assignments" },
   ];
   const { data: favoriteSpacesData, isPending: isFavoritesPending } = useFavoritesQuery("space");
   const favoriteSpaces = favoriteSpacesData?.pages.flatMap((p) => p.items) ?? [];
