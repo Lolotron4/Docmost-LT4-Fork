@@ -16,6 +16,7 @@ import {
   IconKey,
   IconHistory,
   IconShieldCheck,
+  IconDatabaseExport,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
@@ -115,6 +116,12 @@ const groupedData: DataGroup[] = [
         icon: IconHistory,
         path: "/settings/audit-log",
         permission: "audit",
+      },
+      {
+        label: "Backups",
+        icon: IconDatabaseExport,
+        path: "/settings/backups",
+        permission: "backups",
       },
       {
         label: "AI assistant",
