@@ -3037,5 +3037,8 @@
   "Use theme color": "Farbe des Themes nutzen",
   "Custom color": "Eigene Farbe",
   "Pick a custom color": "Eigene Farbe wählen",
-  "Hex color": "Hex-Farbe"
+  "Hex color": "Hex-Farbe",
+  "Edit groups": "Gruppen bearbeiten",
+  "Applies to accounts created from now on. Existing accounts keep their groups.": "Gilt für Konten, die ab jetzt erstellt werden. Bestehende Konten behalten ihre Gruppen.",
+  "New accounts are added to these groups automatically.": "Neue Konten werden automatisch in diese Gruppen aufgenommen."
 }

@@ -817,6 +817,7 @@ export interface Lt4JoinCodes {
   createdAt: Generated<Timestamp>;
   creatorId: string | null;
   expiresAt: Timestamp | null;
+  groupIds: string[] | null;
   id: Generated<string>;
   maxUses: number | null;
   revokedAt: Timestamp | null;

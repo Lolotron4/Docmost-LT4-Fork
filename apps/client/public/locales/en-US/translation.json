@@ -2708,5 +2708,8 @@
   "Revoke API key": "Revoke API key",
   "Scripts using “{{name}}” will stop working immediately.": "Scripts using “{{name}}” will stop working immediately.",
   "Your new API key": "Your new API key",
-  "e.g. Backup script": "e.g. Backup script"
+  "e.g. Backup script": "e.g. Backup script",
+  "Edit groups": "Edit groups",
+  "Applies to accounts created from now on. Existing accounts keep their groups.": "Applies to accounts created from now on. Existing accounts keep their groups.",
+  "New accounts are added to these groups automatically.": "New accounts are added to these groups automatically."
 }

@@ -37,6 +37,7 @@ import {
   CreateJoinCodeDto,
   JoinRegisterDto,
   SetMemberPasswordDto,
+  UpdateJoinCodeGroupsDto,
 } from './accounts.dto';
 import { isUsernameEmail, usernameToEmail } from './username';
 import { assertPasswordPolicy } from '../security/password-policy';
@@ -68,6 +69,12 @@ type JoinCodeRow = {
   useCount: number;
   expiresAt: Date | null;
   revokedAt: Date | null;
+  groupIds: string[] | null;
+};
+
+export type ConsumedJoinCode = {
+  role: UserRole.ADMIN | UserRole.MEMBER;
+  groupIds: string[];
 };
 
 @Injectable()
@@ -105,15 +112,23 @@ export class JoinCodeService {
         'lt4JoinCodes.useCount',
         'lt4JoinCodes.expiresAt',
         'lt4JoinCodes.createdAt',
+        'lt4JoinCodes.groupIds',
         'users.name as creatorName',
       ])
       .where('lt4JoinCodes.workspaceId', '=', workspace.id)
       .where('lt4JoinCodes.revokedAt', 'is', null)
       .orderBy('lt4JoinCodes.createdAt', 'desc')
       .execute();
+    const groupNames = await this.groupNamesById(
+      workspace.id,
+      items.flatMap((item) => item.groupIds ?? []),
+    );
     return {
-      items: items.map((item) => ({
+      items: items.map(({ groupIds, ...item }) => ({
         ...item,
+        groups: (groupIds ?? [])
+          .filter((id) => groupNames.has(id))
+          .map((id) => ({ id, name: groupNames.get(id) })),
         isActive: this.problemOf(item as any) === null,
       })),
     };
@@ -128,6 +143,8 @@ export class JoinCodeService {
       ? new Date(Date.now() + dto.expiresInDays * 24 * 60 * 60 * 1000)
       : null;
 
+    const groupIds = await this.validGroupIds(workspace.id, dto.groupIds);
+
     return this.db
       .insertInto('lt4JoinCodes')
       .values({
@@ -137,9 +154,30 @@ export class JoinCodeService {
         maxUses: dto.maxUses ?? null,
         expiresAt,
         creatorId: user.id,
+        groupIds: groupIds.length ? groupIds : null,
       })
       .returning(['id', 'code', 'role', 'maxUses', 'useCount', 'expiresAt', 'createdAt'])
       .executeTakeFirst();
+  }
+
+  /** Gruppen eines bestehenden Links ändern (gilt nur für künftige Beitritte). */
+  async updateGroups(
+    user: User,
+    workspace: Workspace,
+    dto: UpdateJoinCodeGroupsDto,
+  ) {
+    this.assertCanManage(user, workspace);
+    const groupIds = await this.validGroupIds(workspace.id, dto.groupIds);
+    const result = await this.db
+      .updateTable('lt4JoinCodes')
+      .set({ groupIds: groupIds.length ? groupIds : null })
+      .where('id', '=', dto.id)
+      .where('workspaceId', '=', workspace.id)
+      .where('revokedAt', 'is', null)
+      .executeTakeFirst();
+    if (Number(result.numUpdatedRows ?? 0) === 0) {
+      throw new NotFoundException('Join link not found');
+    }
   }
 
   async revoke(user: User, workspace: Workspace, id: string) {
@@ -192,7 +230,7 @@ export class JoinCodeService {
     }
 
     const user = await executeTx(this.db, async (trx) => {
-      const codeRole = await this.consumeInTx(trx, workspace.id, dto.code);
+      const joinCode = await this.consumeInTx(trx, workspace.id, dto.code);
 
       const created = await this.signupService.signup(
         { name: dto.name, email, password: dto.password },
@@ -200,13 +238,14 @@ export class JoinCodeService {
         trx,
       );
 
-      const role = codeRole;
+      const role = joinCode.role;
       await trx
         .updateTable('users')
         .set({ role })
         .where('id', '=', created.id)
         .execute();
       created.role = role;
+      await this.addToGroupsInTx(trx, workspace.id, created.id, joinCode.groupIds);
       return created;
     });
 
@@ -220,13 +259,13 @@ export class JoinCodeService {
 
   /**
    * Prüft den Code und zählt eine Nutzung (in der Transaktion des Aufrufers,
-   * mit Zeilensperre). Gibt die Rolle für das neue Konto zurück.
+   * mit Zeilensperre). Gibt Rolle und Gruppen für das neue Konto zurück.
    */
   async consumeInTx(
     trx: KyselyTransaction,
     workspaceId: string,
     code: string,
-  ): Promise<UserRole.ADMIN | UserRole.MEMBER> {
+  ): Promise<ConsumedJoinCode> {
     const row = await trx
       .selectFrom('lt4JoinCodes')
       .selectAll()
@@ -242,7 +281,35 @@ export class JoinCodeService {
       .set({ useCount: sql`use_count + 1` })
       .where('id', '=', row.id)
       .execute();
-    return row.role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.MEMBER;
+    return {
+      role: row.role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.MEMBER,
+      groupIds: row.groupIds ?? [],
+    };
+  }
+
+  /**
+   * Nimmt ein neues Konto in die Gruppen des Beitrittslinks auf. Inzwischen
+   * gelöschte Gruppen werden still übersprungen.
+   */
+  async addToGroupsInTx(
+    trx: KyselyTransaction,
+    workspaceId: string,
+    userId: string,
+    groupIds: string[],
+  ) {
+    if (!groupIds?.length) return;
+    const groups = await trx
+      .selectFrom('groups')
+      .select('id')
+      .where('id', 'in', groupIds)
+      .where('workspaceId', '=', workspaceId)
+      .execute();
+    if (!groups.length) return;
+    await trx
+      .insertInto('groupUsers')
+      .values(groups.map((group) => ({ userId, groupId: group.id })))
+      .onConflict((oc) => oc.columns(['userId', 'groupId']).doNothing())
+      .execute();
   }
 
   // -------------------------------------------- Admin: Passwort setzen
@@ -279,6 +346,34 @@ export class JoinCodeService {
   }
 
   // ---------------------------------------------------------------- Intern
+
+  /** Nur Gruppen dieses Arbeitsbereichs, ohne Doppelte, Reihenfolge bleibt. */
+  private async validGroupIds(
+    workspaceId: string,
+    groupIds?: string[],
+  ): Promise<string[]> {
+    const wanted = [...new Set(groupIds ?? [])];
+    if (!wanted.length) return [];
+    const found = await this.groupNamesById(workspaceId, wanted);
+    const missing = wanted.filter((id) => !found.has(id));
+    if (missing.length) throw new BadRequestException('Group not found');
+    return wanted;
+  }
+
+  private async groupNamesById(
+    workspaceId: string,
+    groupIds: string[],
+  ): Promise<Map<string, string>> {
+    const ids = [...new Set(groupIds)];
+    if (!ids.length) return new Map();
+    const rows = await this.db
+      .selectFrom('groups')
+      .select(['id', 'name'])
+      .where('id', 'in', ids)
+      .where('workspaceId', '=', workspaceId)
+      .execute();
+    return new Map(rows.map((row) => [row.id, row.name]));
+  }
 
   private findByCode(workspaceId: string, code: string) {
     return this.db
