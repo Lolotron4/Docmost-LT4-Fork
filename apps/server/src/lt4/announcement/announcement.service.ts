@@ -38,7 +38,7 @@ export class AnnouncementService {
   constructor(@InjectKysely() private readonly db: KyselyDB) {}
 
   private assertAdmin(user: User) {
-    if (!hasPermission(user, 'settings')) {
+    if (!hasPermission(user, 'announcements')) {
       throw new ForbiddenException();
     }
   }

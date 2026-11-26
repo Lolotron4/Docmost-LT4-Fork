@@ -21,7 +21,7 @@ export class TemplateAccessService {
   ) {}
 
   isWorkspaceAdmin(user: User) {
-    return hasPermission(user, 'settings');
+    return hasPermission(user, 'templates');
   }
 
   membersMayCreate(workspace: Workspace) {

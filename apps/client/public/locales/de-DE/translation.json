@@ -3083,5 +3083,15 @@
   "{{count}} members_one": "{{count}} Mitglied",
   "Edit groups": "Gruppen bearbeiten",
   "Applies to accounts created from now on. Existing accounts keep their groups.": "Gilt für Konten, die ab jetzt erstellt werden. Bestehende Konten behalten ihre Gruppen.",
-  "New accounts are added to these groups automatically.": "Neue Konten werden automatisch in diese Gruppen aufgenommen."
+  "New accounts are added to these groups automatically.": "Neue Konten werden automatisch in diese Gruppen aufgenommen.",
+  "General settings, security, sign-in, integrations and public sharing": "Allgemeine Einstellungen, Sicherheit, Anmeldung, Integrationen und öffentliche Freigabe",
+  "Manage announcements": "Ankündigungen verwalten",
+  "Create, change and remove banners for the workspace": "Banner für den Arbeitsbereich erstellen, ändern und entfernen",
+  "Manage templates": "Vorlagen verwalten",
+  "Edit workspace templates and templates in every space": "Vorlagen des Arbeitsbereichs und in allen Bereichen bearbeiten",
+  "Manage AI assistant": "KI-Assistent verwalten",
+  "Set up provider, keys and who may use the AI assistant": "Anbieter, Schlüssel und Freigabe des KI-Assistenten einrichten",
+  "Use AI assistant": "KI-Assistent nutzen",
+  "Always allowed to use the AI assistant, even when it is limited to certain people": "Darf den KI-Assistenten immer nutzen, auch wenn er auf bestimmte Personen beschränkt ist",
+  "Content and tools": "Inhalte und Werkzeuge"
 }

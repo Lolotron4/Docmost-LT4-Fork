@@ -108,7 +108,7 @@ const groupedData: DataGroup[] = [
         label: "Announcements",
         icon: IconSpeakerphone,
         path: "/settings/announcements",
-        role: "admin",
+        permission: "announcements",
       },
       {
         label: "Audit log",
@@ -120,7 +120,7 @@ const groupedData: DataGroup[] = [
         label: "AI assistant",
         icon: IconSparkles,
         path: "/settings/ai",
-        role: "admin",
+        permission: "ai_manage",
       },
       {
         label: "Integrations",

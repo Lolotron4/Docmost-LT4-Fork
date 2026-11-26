@@ -212,7 +212,7 @@ export class RoleService implements OnModuleInit, OnModuleDestroy {
         description: r.description,
         position: r.key === 'owner' ? 0 : (i + 1) * 10,
         // jsonb: Arrays würde der pg-Treiber als Postgres-Array senden
-        permissions: sql`${JSON.stringify(r.permissions)}::jsonb` as any,
+        permissions: sql`${JSON.stringify(r.permissions)}::text::jsonb` as any,
         isSystem: r.isSystem,
         updatedAt: new Date(),
       };

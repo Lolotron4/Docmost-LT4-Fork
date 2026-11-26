@@ -14,13 +14,17 @@
 // (CASL-Fabrik, Hilfsfunktionen) die Rechte nachschlagen können.
 
 export const LT4_PERMISSIONS = [
-  'settings', // Arbeitsbereich-Einstellungen, Sicherheit, KI, Ankündigungen, Vorlagen
+  'settings', // Allgemeine Einstellungen, Sicherheit, Integrationen, Freigabe
   'members', // Mitglieder einladen, Rollen zuweisen, deaktivieren, Beitrittslinks
   'spaces', // Bereiche anlegen und alle Bereiche verwalten
   'groups', // Gruppen verwalten
+  'roles', // Rollen verwalten (nur untergeordnete)
+  'announcements', // Ankündigungen (Banner) verwalten
+  'templates', // Vorlagen des Arbeitsbereichs und aller Bereiche verwalten
+  'ai_manage', // KI-Assistent einrichten (Anbieter, Schlüssel, Freigabe)
+  'ai_use', // KI-Assistent immer nutzen dürfen, auch wenn er eingeschränkt ist
   'api', // API-Schlüssel aller Personen verwalten
   'audit', // Audit-Log lesen
-  'roles', // Rollen verwalten (nur untergeordnete)
 ] as const;
 
 export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];

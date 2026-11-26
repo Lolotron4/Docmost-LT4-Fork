@@ -44,7 +44,8 @@ const errorMessage = (err: any) => {
 
 export default function AiSettings() {
   const { t } = useTranslation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("ai_manage");
   const [workspace, setWorkspace] = useAtom(workspaceAtom);
   const queryClient = useQueryClient();
   const { data } = useQuery({

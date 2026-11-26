@@ -15,13 +15,19 @@ Rollen stehen von oben nach unten. Ganz oben steht immer der **Owner**.
 
 | Recht | Erlaubt |
 | --- | --- |
-| Arbeitsbereich-Einstellungen verwalten | Allgemein, Sicherheit, KI, Ankündigungen, Integrationen, Arbeitsbereich-Vorlagen |
-| Mitglieder verwalten | Einladen, Beitrittslinks, Rollen zuweisen, deaktivieren, entfernen |
-| Bereiche verwalten | Bereiche anlegen und alle Bereiche verwalten |
-| Gruppen verwalten | Gruppen anlegen und Mitglieder ändern |
-| Alle API-Schlüssel verwalten | API-Schlüssel aller sehen und widerrufen |
+| Arbeitsbereich-Einstellungen verwalten | Allgemein, Sicherheit, Anmeldung (SSO/LDAP), Integrationen, öffentliche Freigabe |
+| Ankündigungen verwalten | Banner erstellen, ändern, entfernen |
 | Audit-Log ansehen | Audit-Log |
+| Mitglieder verwalten | Einladen, Beitrittslinks, Rollen zuweisen, deaktivieren, entfernen |
+| Gruppen verwalten | Gruppen anlegen und Mitglieder ändern |
 | Rollen verwalten | Rollen unterhalb der eigenen bearbeiten |
+| Bereiche verwalten | Bereiche anlegen und alle Bereiche verwalten |
+| Vorlagen verwalten | Vorlagen des Arbeitsbereichs und aller Bereiche bearbeiten |
+| KI-Assistent nutzen | KI immer nutzen, auch wenn sie auf bestimmte Personen beschränkt ist |
+| KI-Assistent verwalten | Anbieter, Schlüssel und Freigabe einrichten |
+| Alle API-Schlüssel verwalten | API-Schlüssel aller sehen und widerrufen |
+
+Rollen, die vor LT4 v1.2.0 gespeichert wurden und "Einstellungen" hatten, bekommen Ankündigungen, Vorlagen und beide KI-Rechte per Migration dazu.
 
 Grundrechte (Seiten lesen, auf die man Zugriff hat, Dateien hochladen, eigene API-Schlüssel) hat jede Rolle.
 

@@ -40,7 +40,7 @@ import {
   moveRole,
   updateRole,
 } from "./roles-service";
-import { LT4_PERMISSIONS, Lt4Permission, PERMISSION_LABELS } from "./role-permissions";
+import { Lt4Permission, PERMISSION_GROUPS, PERMISSION_LABELS } from "./role-permissions";
 import { useRoleLabels, useSetRolesData } from "./use-roles";
 
 type Editing = { mode: "new" } | { mode: "edit"; role: ILt4Role } | null;
@@ -296,24 +296,31 @@ export default function RolesSettings() {
             </Text>
           ) : (
             <Stack gap={8}>
-              {LT4_PERMISSIONS.map((p) => (
-                <Checkbox
-                  key={p}
-                  label={t(PERMISSION_LABELS[p].label)}
-                  description={
-                    canGrant(p)
-                      ? t(PERMISSION_LABELS[p].description)
-                      : t("You can only grant rights you have yourself.")
-                  }
-                  checked={perms.includes(p)}
-                  disabled={!canGrant(p)}
-                  onChange={(e) => {
-                    const checked = e.currentTarget.checked;
-                    setPerms((cur) =>
-                      checked ? [...cur, p] : cur.filter((x) => x !== p),
-                    );
-                  }}
-                />
+              {PERMISSION_GROUPS.map((group) => (
+                <Stack key={group.label} gap={8}>
+                  <Text size="xs" fw={600} c="dimmed" tt="uppercase">
+                    {t(group.label)}
+                  </Text>
+                  {group.items.map((p) => (
+                    <Checkbox
+                      key={p}
+                      label={t(PERMISSION_LABELS[p].label)}
+                      description={
+                        canGrant(p)
+                          ? t(PERMISSION_LABELS[p].description)
+                          : t("You can only grant rights you have yourself.")
+                      }
+                      checked={perms.includes(p)}
+                      disabled={!canGrant(p)}
+                      onChange={(e) => {
+                        const checked = e.currentTarget.checked;
+                        setPerms((cur) =>
+                          checked ? [...cur, p] : cur.filter((x) => x !== p),
+                        );
+                      }}
+                    />
+                  ))}
+                </Stack>
               ))}
               <Text size="xs" c="dimmed">
                 {t(
