@@ -3080,5 +3080,8 @@
   "You cannot activate a user with a role equal to or above your own": "Du kannst niemanden mit gleicher oder höherer Rolle aktivieren",
   "You cannot delete a user with a role equal to or above your own": "Du kannst niemanden mit gleicher oder höherer Rolle löschen",
   "You can only change passwords of members below your own role": "Du kannst nur Passwörter von Mitgliedern unterhalb deiner Rolle ändern",
-  "{{count}} members_one": "{{count}} Mitglied"
+  "{{count}} members_one": "{{count}} Mitglied",
+  "Edit groups": "Gruppen bearbeiten",
+  "Applies to accounts created from now on. Existing accounts keep their groups.": "Gilt für Konten, die ab jetzt erstellt werden. Bestehende Konten behalten ihre Gruppen.",
+  "New accounts are added to these groups automatically.": "Neue Konten werden automatisch in diese Gruppen aufgenommen."
 }

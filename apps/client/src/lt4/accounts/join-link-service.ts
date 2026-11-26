@@ -11,6 +11,7 @@ export interface IJoinLink {
   createdAt: string;
   creatorName?: string | null;
   isActive?: boolean;
+  groups?: { id: string; name: string }[];
 }
 
 export interface IJoinLinkInfo {
@@ -39,7 +40,10 @@ export const createJoinLink = (data: {
   role: string;
   maxUses?: number;
   expiresInDays?: number;
+  groupIds?: string[];
 }) => post<IJoinLink>("/join-links/create", data);
+export const updateJoinLinkGroups = (id: string, groupIds: string[]) =>
+  post<void>("/join-links/update-groups", { id, groupIds });
 export const revokeJoinLink = (id: string) => post<void>("/join-links/revoke", { id });
 export const getJoinLinkInfo = (code: string) =>
   post<IJoinLinkInfo>("/join-links/info", { code });

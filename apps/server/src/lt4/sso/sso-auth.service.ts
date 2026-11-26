@@ -352,9 +352,10 @@ export class SsoAuthService {
 
     const email = profile.email ?? (await this.freePlaceholderEmail(workspace.id, profile));
     return executeTx(this.db, async (trx) => {
-      const role = viaJoinCode
+      const joinCode = viaJoinCode
         ? await this.joinCodeService.consumeInTx(trx, workspace.id, st.joinCode)
         : null;
+      const role = joinCode?.role ?? null;
       const user = await this.signupService.signup(
         {
           name: (profile.name || email.split('@')[0]).slice(0, 50),
@@ -375,6 +376,14 @@ export class SsoAuthService {
         .where('id', '=', user.id)
         .execute();
       if (role) user.role = role as UserRole;
+      if (joinCode) {
+        await this.joinCodeService.addToGroupsInTx(
+          trx,
+          workspace.id,
+          user.id,
+          joinCode.groupIds,
+        );
+      }
       await this.insertLink(user.id, workspace.id, provider.id, profile.subject, trx);
       return user;
     });

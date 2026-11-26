@@ -26,6 +26,7 @@ import {
   JoinCodeIdDto,
   JoinRegisterDto,
   SetMemberPasswordDto,
+  UpdateJoinCodeGroupsDto,
 } from './accounts.dto';
 
 @SkipThrottle({ ...ALL_NAMED_THROTTLERS_SKIPPED, [AUTH_THROTTLER]: false })
@@ -85,6 +86,18 @@ export class JoinCodeController {
     @Body() dto: CreateJoinCodeDto,
   ) {
     return this.joinCodeService.create(user, workspace, dto);
+  }
+
+  @SkipThrottle({ [AUTH_THROTTLER]: true })
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('update-groups')
+  updateGroups(
+    @AuthUser() user: User,
+    @AuthWorkspace() workspace: Workspace,
+    @Body() dto: UpdateJoinCodeGroupsDto,
+  ) {
+    return this.joinCodeService.updateGroups(user, workspace, dto);
   }
 
   @SkipThrottle({ [AUTH_THROTTLER]: true })

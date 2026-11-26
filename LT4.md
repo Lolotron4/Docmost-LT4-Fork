@@ -26,7 +26,7 @@ Eigener Code liegt bewusst in eigenen Ordnern, damit Updates von Docmost (`upstr
 | --- | --- |
 | Seitenrechte pro Seite | fertig |
 | 2FA (TOTP) mit Backup-Codes, Pflicht pro Workspace, Admin-Reset | fertig |
-| Beitrittslinks mit Registrierungscode, Konten ohne E-Mail (Benutzername) | fertig |
+| Beitrittslinks mit Registrierungscode, Konten ohne E-Mail (Benutzername), automatische Gruppenzuordnung | fertig |
 | SSO (OIDC) | geplant |
 | Bases (Inline-Datenbanken) | geplant |
 | Kanban, Kalender | geplant |
