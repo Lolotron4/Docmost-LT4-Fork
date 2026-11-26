@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import api from "@/lib/api-client";
 import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
 import { updateWorkspace } from "@/features/workspace/services/workspace-service.ts";
+import { ShareLinkPolicySection } from "@/lt4/share-guard/share-link-policy-section.tsx";
 
 export type PasswordPolicy = {
   minLength: number;
@@ -175,6 +176,8 @@ export function WorkspaceSecuritySections() {
       <PasswordPolicySection />
       <Divider my="xl" />
       <DataSection />
+      <Divider my="xl" />
+      <ShareLinkPolicySection />
     </>
   );
 }

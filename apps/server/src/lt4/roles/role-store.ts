@@ -25,6 +25,7 @@ export const LT4_PERMISSIONS = [
   'templates_create', // Vorlagen erstellen und eigene Vorlagen verwalten
   'templates', // Vorlagen anderer verwalten (alle Vorlagen)
   'pages_copy', // Seiten in einen anderen Bereich kopieren, auch mit nur Leserecht
+  'shares_unrestricted', // Gastlinks ohne Ablauf/Passwort erstellen, auch wenn Regeln das verlangen
   'assignments', // Abgaben aller Personen verwalten: gesperrte Seiten freischalten, Frist verlängern
   'ai_manage', // KI-Assistent einrichten (Anbieter, Schlüssel, Freigabe)
   'ai_use', // KI-Assistent immer nutzen dürfen, auch wenn er eingeschränkt ist

@@ -889,6 +889,16 @@ export interface Lt4GroupRoles {
   workspaceId: string;
 }
 
+// LT4-Fork: Gastlinks (Ablauf und Passwort für Freigaben)
+export interface Lt4ShareSettings {
+  createdAt: Generated<Timestamp>;
+  expiresAt: Timestamp | null;
+  passwordHash: string | null;
+  shareId: string;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
 // LT4-Fork: Webhooks
 export interface Lt4Webhooks {
   createdAt: Generated<Timestamp>;
@@ -943,6 +953,7 @@ export interface Lt4AssignmentSubmissions {
 }
 
 export interface DB {
+  lt4ShareSettings: Lt4ShareSettings;
   lt4Webhooks: Lt4Webhooks;
   lt4Assignments: Lt4Assignments;
   lt4AssignmentSubmissions: Lt4AssignmentSubmissions;

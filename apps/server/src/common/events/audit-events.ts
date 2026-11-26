@@ -94,6 +94,7 @@ export const AuditEvent = {
   // Share
   SHARE_CREATED: 'share.created',
   SHARE_DELETED: 'share.deleted',
+  SHARE_UPDATED: 'share.updated', // LT4: Gastlink (Ablauf/Passwort) geändert
 
   // Import / Export
   PAGE_IMPORTED: 'page.imported',

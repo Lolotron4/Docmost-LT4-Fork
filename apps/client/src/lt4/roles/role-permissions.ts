@@ -9,6 +9,7 @@ export const LT4_PERMISSIONS = [
   "templates_create",
   "templates",
   "pages_copy",
+  "shares_unrestricted",
   "assignments",
   "ai_manage",
   "ai_use",
@@ -25,7 +26,7 @@ export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];
 export const PERMISSION_GROUPS: { label: string; items: Lt4Permission[] }[] = [
   { label: "Workspace", items: ["settings", "announcements", "webhooks", "audit", "page_stats", "backups"] },
   { label: "People", items: ["members", "groups", "roles"] },
-  { label: "Content and tools", items: ["spaces", "pages_copy", "assignments", "templates_create", "templates", "ai_use", "ai_manage", "api"] },
+  { label: "Content and tools", items: ["spaces", "pages_copy", "shares_unrestricted", "assignments", "templates_create", "templates", "ai_use", "ai_manage", "api"] },
 ];
 
 export const PERMISSION_LABELS: Record<
@@ -71,6 +72,11 @@ export const PERMISSION_LABELS: Record<
     label: "Copy pages to other spaces",
     description:
       "Copy pages into a space you can edit, even from spaces where you can only read",
+  },
+  shares_unrestricted: {
+    label: "Public links without restrictions",
+    description:
+      "Create public links without expiry date or password, even when the workspace rules require them",
   },
   assignments: {
     label: "Manage all assignments",

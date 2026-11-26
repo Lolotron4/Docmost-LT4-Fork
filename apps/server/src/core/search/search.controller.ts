@@ -8,6 +8,7 @@ import {
   Logger,
   NotFoundException,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { SearchService } from './search.service';
@@ -34,6 +35,8 @@ import { PublicSpaceService } from '../public-space/public-space.service';
 import { PageRepo } from '@docmost/db/repos/page/page.repo';
 import { ShareService } from '../share/share.service';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
+import { ShareGuardService } from '../../lt4/share-guard/share-guard.service';
+import { FastifyRequest } from 'fastify';
 
 @UseGuards(JwtAuthGuard)
 @Controller('search')
@@ -49,6 +52,7 @@ export class SearchController {
     private readonly shareService: ShareService,
     private readonly shareRepo: ShareRepo,
     private moduleRef: ModuleRef,
+    private readonly shareGuard: ShareGuardService,
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -102,6 +106,7 @@ export class SearchController {
   async searchShare(
     @Body() searchDto: SearchShareDTO,
     @AuthWorkspace() workspace: Workspace,
+    @Req() req: FastifyRequest,
   ) {
     delete searchDto.spaceId;
     if (!searchDto.shareId) {
@@ -115,6 +120,9 @@ export class SearchController {
     ) {
       throw new NotFoundException('Share not found');
     }
+
+    // LT4: Gastlinks mit Ablauf/Passwort
+    await this.shareGuard.assertAccess(share, req);
 
     if (this.environmentService.getSearchDriver() === 'typesense') {
       return this.searchTypesense(searchDto, {

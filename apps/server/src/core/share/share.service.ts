@@ -334,6 +334,8 @@ export class ShareService {
     shareId: string,
     references: Array<{ sourcePageId: string; transclusionId: string }>,
     workspaceId: string,
+    // LT4: zusätzliche Prüfung pro Quell-Freigabe (Gastlinks mit Ablauf/Passwort)
+    canAccessShare?: (share: { id: string }) => Promise<boolean>,
   ): Promise<{ items: TransclusionLookup[] }> {
     const share = await this.shareRepo.findById(shareId);
     if (!share || share.workspaceId !== workspaceId) {
@@ -380,6 +382,12 @@ export class ShareService {
         const sourceShare = await this.getShareForPage(pageId, workspaceId);
         if (!sourceShare) return null;
         if (!(await isSharingAllowedFor(sourceShare.spaceId))) return null;
+        if (
+          canAccessShare &&
+          sourceShare.id !== share.id &&
+          !(await canAccessShare({ id: sourceShare.id }))
+        )
+          return null;
         const restricted =
           await this.pagePermissionRepo.hasRestrictedAncestor(pageId);
         if (restricted) return null;
