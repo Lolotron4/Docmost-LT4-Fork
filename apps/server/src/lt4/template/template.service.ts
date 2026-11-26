@@ -303,16 +303,39 @@ export class TemplateService {
       }
     }
 
-    // Seite zuerst leer anlegen, damit Anhänge ihr zugeordnet werden können
-    const page = await this.pageService.create(user.id, workspace.id, {
+    const page = await this.createPageUnchecked(user, workspace, template, {
       spaceId: dto.spaceId,
       parentPageId: dto.parentPageId,
-      title: template.title ?? undefined,
+      variableValues: dto.variableValues,
+    });
+    return { id: page.id, slugId: page.slugId, spaceId: page.spaceId, title: page.title };
+  }
+
+  /**
+   * Legt eine Seite aus einer Vorlage an, ohne Rechte zu prüfen (der Aufrufer
+   * hat das schon getan, z. B. beim Verteilen einer Abgabe).
+   */
+  async createPageUnchecked(
+    user: User,
+    workspace: Workspace,
+    template: Template,
+    opts: {
+      spaceId: string;
+      parentPageId?: string;
+      title?: string;
+      variableValues?: Record<string, string>;
+    },
+  ) {
+    // Seite zuerst leer anlegen, damit Anhänge ihr zugeordnet werden können
+    const page = await this.pageService.create(user.id, workspace.id, {
+      spaceId: opts.spaceId,
+      parentPageId: opts.parentPageId,
+      title: opts.title ?? template.title ?? undefined,
       icon: template.icon ?? undefined,
     });
-    const content = await this.prepareForPage(template, dto.variableValues, page, user.id);
+    const content = await this.prepareForPage(template, opts.variableValues, page, user.id);
     await this.writeContent(page.id, content);
-    return { id: page.id, slugId: page.slugId, spaceId: page.spaceId, title: page.title };
+    return page;
   }
 
   private async writeContent(pageId: string, content: any) {
