@@ -13,6 +13,8 @@
 // Der Cache ist modulweit, damit auch synchrone Stellen im Kern
 // (CASL-Fabrik, Hilfsfunktionen) die Rechte nachschlagen können.
 
+import { ForbiddenException } from '@nestjs/common';
+
 export const LT4_PERMISSIONS = [
   'settings', // Allgemeine Einstellungen, Sicherheit, Integrationen, Freigabe
   'members', // Mitglieder einladen, Rollen zuweisen, deaktivieren, Beitrittslinks
@@ -131,34 +133,127 @@ export function rankOf(workspaceId: string, key: string): number {
   return i < 0 ? roles.length : i;
 }
 
-type RoleHolder = { role?: string | null; workspaceId?: string | null };
+type RoleHolder = {
+  id?: string | null;
+  role?: string | null;
+  workspaceId?: string | null;
+};
+
+// ------------------------------------------------------------ Gruppen-Rollen
+// Eine Gruppe kann eine Rolle haben. Mitglieder bekommen deren Rechte dazu;
+// für die Rangfolge zählt die höchste ihrer Rollen (eigene oder Gruppe).
+
+/** userId -> Rollenschlüssel aus Gruppen */
+let userGroupRoles = new Map<string, string[]>();
+/** groupId -> Rollenschlüssel */
+let groupRoles = new Map<string, string>();
+let reloadHook: (() => void) | null = null;
+let reloadTimer: NodeJS.Timeout | null = null;
+
+export function setGroupRoleData(
+  byGroup: Map<string, string>,
+  byUser: Map<string, string[]>,
+) {
+  groupRoles = byGroup;
+  userGroupRoles = byUser;
+}
+
+export function setGroupRoleReloadHook(fn: () => void) {
+  reloadHook = fn;
+}
+
+/**
+ * Nach Änderungen an Gruppenmitgliedschaften aufrufen. Lädt kurz danach neu
+ * (nach dem Commit der Transaktion des Aufrufers).
+ */
+export function scheduleGroupRoleReload() {
+  if (!reloadHook) return;
+  if (reloadTimer) clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(() => {
+    reloadTimer = null;
+    reloadHook?.();
+  }, 300);
+  reloadTimer.unref?.();
+}
+
+export function groupRoleOf(groupId: string): string | undefined {
+  return groupRoles.get(groupId);
+}
+
+/** Eigene Rolle und Rollen aus Gruppen (ohne Owner aus Gruppen). */
+export function roleKeysOf(user: RoleHolder): string[] {
+  const keys = user?.role ? [user.role] : [];
+  const fromGroups = user?.id ? userGroupRoles.get(user.id) ?? [] : [];
+  for (const k of fromGroups) if (k !== 'owner' && !keys.includes(k)) keys.push(k);
+  return keys;
+}
+
+export function groupRoleKeysOf(userId: string): string[] {
+  return userGroupRoles.get(userId) ?? [];
+}
+
+/** Wirft, wenn eine der Gruppen eine Rolle hat, die nicht unter der eigenen steht. */
+export function assertGroupRolesBelow(actor: RoleHolder, groupIds: string[] | null | undefined) {
+  for (const id of groupIds ?? []) {
+    const role = groupRoles.get(id);
+    if (role && !isBelow(actor, role)) {
+      throw new ForbiddenException('This group has a role above or equal to your own');
+    }
+  }
+}
+
+/** Höchster Rang (kleinste Zahl) über alle Rollen der Person. */
+function topRankOf(user: RoleHolder): number {
+  if (!user?.workspaceId) return Number.MAX_SAFE_INTEGER;
+  const keys = roleKeysOf(user);
+  if (!keys.length) return Number.MAX_SAFE_INTEGER;
+  return Math.min(...keys.map((k) => rankOf(user.workspaceId, k)));
+}
 
 export function isOwner(user: RoleHolder): boolean {
   return user?.role === 'owner';
 }
 
+function permissionsOfKey(workspaceId: string | null | undefined, key: string) {
+  const role = workspaceId ? findRole(workspaceId, key) : undefined;
+  if (role) return role.permissions;
+  // Fallback, falls workspaceId fehlt: eingebaute Standardwerte
+  return defaultRoles().find((r) => r.key === key)?.permissions ?? [];
+}
+
 export function permissionsOf(user: RoleHolder): Lt4Permission[] {
   if (!user?.role) return [];
   if (isOwner(user)) return ALL;
-  const role = user.workspaceId ? findRole(user.workspaceId, user.role) : undefined;
-  if (role) return role.permissions;
-  // Fallback, falls workspaceId fehlt: eingebaute Standardwerte
-  return defaultRoles().find((r) => r.key === user.role)?.permissions ?? [];
+  const set = new Set<Lt4Permission>();
+  for (const key of roleKeysOf(user)) {
+    for (const p of permissionsOfKey(user.workspaceId, key)) set.add(p);
+  }
+  return LT4_PERMISSIONS.filter((p) => set.has(p));
 }
 
 export function hasPermission(user: RoleHolder, permission: Lt4Permission) {
   return permissionsOf(user).includes(permission);
 }
 
-/** Steht die Rolle `key` echt unter der Rolle des Handelnden? Owner dürfen alles. */
+/** Steht die Rolle `key` echt unter der höchsten Rolle des Handelnden? Owner dürfen alles. */
 export function isBelow(actor: RoleHolder, key: string): boolean {
   if (isOwner(actor)) return true;
   if (!actor?.workspaceId || !actor.role) return false;
   if (key === 'owner') return false;
-  return rankOf(actor.workspaceId, key) > rankOf(actor.workspaceId, actor.role);
+  return rankOf(actor.workspaceId, key) > topRankOf(actor);
 }
 
 /** Darf der Handelnde eine Person mit der Rolle `targetRole` verwalten? */
 export function canActOnRole(actor: RoleHolder, targetRole: string): boolean {
   return isBelow(actor, targetRole);
+}
+
+/**
+ * Darf der Handelnde diese Person verwalten? Berücksichtigt auch Rollen,
+ * die die Person über Gruppen hat (die höchste zählt).
+ */
+export function canActOnUser(actor: RoleHolder, target: RoleHolder): boolean {
+  if (isOwner(actor)) return true;
+  if (!target?.role) return false;
+  return roleKeysOf(target).every((k) => isBelow(actor, k));
 }

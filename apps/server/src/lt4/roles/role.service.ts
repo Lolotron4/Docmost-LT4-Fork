@@ -27,13 +27,17 @@ import {
   Lt4Permission,
   Lt4Role,
   permissionsOf,
+  roleKeysOf,
   sanitizePermissions,
+  setGroupRoleData,
+  setGroupRoleReloadHook,
   setWorkspaceRoles,
 } from './role-store';
 import {
   CreateRoleDto,
   DeleteRoleDto,
   MoveRoleDto,
+  SetGroupRoleDto,
   UpdateRoleDto,
 } from './role.dto';
 
@@ -58,6 +62,9 @@ export class RoleService implements OnModuleInit, OnModuleDestroy {
   ) {}
 
   async onModuleInit() {
+    setGroupRoleReloadHook(() => {
+      this.reloadGroupRoles().catch(() => undefined);
+    });
     await this.reloadAll();
     // Falls mehrere Prozesse laufen, gleichen sie sich regelmäßig ab.
     this.timer = setInterval(() => {
@@ -80,10 +87,34 @@ export class RoleService implements OnModuleInit, OnModuleDestroy {
         byWs.set(r.workspaceId, list);
       }
       for (const [ws, list] of byWs) setWorkspaceRoles(ws, list);
+      await this.reloadGroupRoles();
     } catch (err) {
       // z. B. vor der Migration
       this.logger.warn(`Rollen konnten nicht geladen werden: ${(err as Error)?.message}`);
     }
+  }
+
+  /** Lädt Gruppen-Rollen und daraus die Rollen jeder Person aus Gruppen. */
+  async reloadGroupRoles() {
+    const groups = await this.db
+      .selectFrom('lt4GroupRoles')
+      .select(['groupId', 'roleKey'])
+      .execute();
+    const byGroup = new Map(groups.map((g) => [g.groupId, g.roleKey]));
+    const byUser = new Map<string, string[]>();
+    if (groups.length) {
+      const rows = await this.db
+        .selectFrom('groupUsers')
+        .innerJoin('lt4GroupRoles', 'lt4GroupRoles.groupId', 'groupUsers.groupId')
+        .select(['groupUsers.userId', 'lt4GroupRoles.roleKey'])
+        .execute();
+      for (const r of rows) {
+        const list = byUser.get(r.userId) ?? [];
+        if (!list.includes(r.roleKey)) list.push(r.roleKey);
+        byUser.set(r.userId, list);
+      }
+    }
+    setGroupRoleData(byGroup, byUser);
   }
 
   async reloadWorkspace(workspaceId: string, trx?: any) {
@@ -123,12 +154,24 @@ export class RoleService implements OnModuleInit, OnModuleDestroy {
       .groupBy('role')
       .execute();
     const countOf = new Map(counts.map((c) => [c.role, Number(c.count)]));
+    const groupRows = await this.db
+      .selectFrom('lt4GroupRoles')
+      .innerJoin('groups', 'groups.id', 'lt4GroupRoles.groupId')
+      .select(['lt4GroupRoles.groupId', 'lt4GroupRoles.roleKey', 'groups.name'])
+      .where('lt4GroupRoles.workspaceId', '=', user.workspaceId)
+      .execute();
     const canManageRoles = hasPermission(user, 'roles');
     const canManageMembers = hasPermission(user, 'members');
 
     return {
       permissions: LT4_PERMISSIONS,
       myRole: user.role,
+      myRoles: roleKeysOf(user),
+      groupRoles: groupRows.map((g) => ({
+        groupId: g.groupId,
+        groupName: g.name,
+        roleKey: g.roleKey,
+      })),
       myPermissions: permissionsOf(user),
       roles: roles.map((r, index) => ({
         key: r.key,
@@ -138,6 +181,9 @@ export class RoleService implements OnModuleInit, OnModuleDestroy {
         isSystem: r.isSystem,
         rank: index,
         userCount: countOf.get(r.key) ?? 0,
+        groups: groupRows
+          .filter((g) => g.roleKey === r.key)
+          .map((g) => ({ id: g.groupId, name: g.name })),
         // Darf ich diese Rolle bearbeiten? Owner alles, sonst nur untergeordnete.
         editable:
           canManageRoles &&
@@ -395,9 +441,16 @@ export class RoleService implements OnModuleInit, OnModuleDestroy {
         .where('workspaceId', '=', ws)
         .where('key', '=', dto.key)
         .execute();
+      // Gruppen mit dieser Rolle verlieren sie
+      await trx
+        .deleteFrom('lt4GroupRoles')
+        .where('workspaceId', '=', ws)
+        .where('roleKey', '=', dto.key)
+        .execute();
       await this.persist(ws, roles, trx);
     });
     await this.reloadWorkspace(ws);
+    await this.reloadGroupRoles();
 
     this.auditService.log({
       event: AuditEvent.ROLE_DELETED,
@@ -407,6 +460,68 @@ export class RoleService implements OnModuleInit, OnModuleDestroy {
         before: { name: existing.name, permissions: existing.permissions },
         after: { replacementRole: replacement },
       },
+    });
+    return this.list(user);
+  }
+
+  // ----------------------------------------------------------- Gruppen-Rolle
+
+  /**
+   * Rolle einer Gruppe setzen oder entfernen (roleKey null). Braucht das Recht
+   * "Mitglieder verwalten"; alte und neue Rolle müssen unter der eigenen stehen.
+   */
+  async setGroupRole(user: User, dto: SetGroupRoleDto) {
+    if (!hasPermission(user, 'members')) {
+      throw new ForbiddenException('You are not allowed to assign roles');
+    }
+    const ws = user.workspaceId;
+    const group = await this.db
+      .selectFrom('groups')
+      .select(['id', 'name'])
+      .where('id', '=', dto.groupId)
+      .where('workspaceId', '=', ws)
+      .executeTakeFirst();
+    if (!group) throw new NotFoundException('Group not found');
+
+    const current = await this.db
+      .selectFrom('lt4GroupRoles')
+      .select('roleKey')
+      .where('groupId', '=', group.id)
+      .executeTakeFirst();
+    if (current && !isBelow(user, current.roleKey)) {
+      throw new ForbiddenException('This group has a role above or equal to your own');
+    }
+    const next = dto.roleKey || null;
+    if (next) {
+      if (next === 'owner') {
+        throw new BadRequestException('The owner role cannot be given to a group');
+      }
+      if (!findRole(ws, next)) throw new BadRequestException('Unknown role');
+      if (!isBelow(user, next)) {
+        throw new ForbiddenException('You can only assign roles below your own role');
+      }
+    }
+
+    if (next) {
+      await this.db
+        .insertInto('lt4GroupRoles')
+        .values({ groupId: group.id, workspaceId: ws, roleKey: next })
+        .onConflict((oc) => oc.column('groupId').doUpdateSet({ roleKey: next }))
+        .execute();
+    } else {
+      await this.db.deleteFrom('lt4GroupRoles').where('groupId', '=', group.id).execute();
+    }
+    await this.reloadGroupRoles();
+
+    this.auditService.log({
+      event: AuditEvent.ROLE_UPDATED,
+      resourceType: AuditResource.GROUP,
+      resourceId: group.id,
+      changes: {
+        before: { groupRole: current?.roleKey ?? null },
+        after: { groupRole: next },
+      },
+      metadata: { groupName: group.name },
     });
     return this.list(user);
   }

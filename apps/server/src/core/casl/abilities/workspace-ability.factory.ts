@@ -22,6 +22,7 @@ export default class WorkspaceAbilityFactory {
     }
     return buildWorkspaceAbility(
       permissionsOf({
+        id: user.id,
         role: user.role,
         workspaceId: user.workspaceId ?? workspace?.id,
       }),

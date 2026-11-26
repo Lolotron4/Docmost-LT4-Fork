@@ -163,7 +163,7 @@ export default function RolesSettings() {
           const canUp =
             role.editable && role.key !== "owner" && prev && prev.key !== "owner" && prev.editable;
           const canDown = role.editable && role.key !== "owner" && next && next.editable;
-          const isMine = role.key === myRole;
+          const isMine = (data?.myRoles ?? [myRole]).includes(role.key);
           return (
             <Paper key={role.key} withBorder p="sm" radius="md">
               <Group justify="space-between" wrap="nowrap" align="flex-start">
@@ -190,6 +190,11 @@ export default function RolesSettings() {
                         </Tooltip>
                       )}
                     </Group>
+                    {role.groups?.length > 0 && (
+                      <Text size="xs" c="dimmed">
+                        {t("Groups")}: {role.groups.map((g) => g.name).join(", ")}
+                      </Text>
+                    )}
                     {descriptionOf(role) && (
                       <Text size="xs" c="dimmed">
                         {descriptionOf(role)}

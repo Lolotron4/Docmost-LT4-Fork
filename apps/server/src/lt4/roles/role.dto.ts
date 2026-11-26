@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
 } from 'class-validator';
 
@@ -67,4 +68,15 @@ export class DeleteRoleDto {
   @IsString()
   @MaxLength(64)
   replacementKey?: string;
+}
+
+export class SetGroupRoleDto {
+  @IsUUID()
+  groupId: string;
+
+  // null oder leer = Rolle entfernen
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  roleKey?: string | null;
 }

@@ -872,7 +872,15 @@ export interface Lt4Roles {
   workspaceId: string;
 }
 
+export interface Lt4GroupRoles {
+  createdAt: Generated<Timestamp>;
+  groupId: string;
+  roleKey: string;
+  workspaceId: string;
+}
+
 export interface DB {
+  lt4GroupRoles: Lt4GroupRoles;
   lt4JoinCodes: Lt4JoinCodes;
   lt4Roles: Lt4Roles;
   lt4AiSettings: Lt4AiSettings;

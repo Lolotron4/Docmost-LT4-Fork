@@ -1,5 +1,5 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
-import { canActOnRole, findRole } from '../roles/role-store';
+import { assertGroupRolesBelow, canActOnRole, canActOnUser, findRole, scheduleGroupRoleReload } from '../roles/role-store';
 import {
   BadRequestException,
   ForbiddenException,
@@ -150,6 +150,7 @@ export class JoinCodeService {
       : null;
 
     const groupIds = await this.validGroupIds(workspace.id, dto.groupIds);
+    assertGroupRolesBelow(user, groupIds);
 
     return this.db
       .insertInto('lt4JoinCodes')
@@ -174,6 +175,7 @@ export class JoinCodeService {
   ) {
     this.assertCanManage(user, workspace);
     const groupIds = await this.validGroupIds(workspace.id, dto.groupIds);
+    assertGroupRolesBelow(user, groupIds);
     const result = await this.db
       .updateTable('lt4JoinCodes')
       .set({ groupIds: groupIds.length ? groupIds : null })
@@ -320,6 +322,7 @@ export class JoinCodeService {
       .values(groups.map((group) => ({ userId, groupId: group.id })))
       .onConflict((oc) => oc.columns(['userId', 'groupId']).doNothing())
       .execute();
+    scheduleGroupRoleReload();
   }
 
   // -------------------------------------------- Admin: Passwort setzen
@@ -332,7 +335,7 @@ export class JoinCodeService {
     this.assertCanManage(actor, workspace);
     const target = await this.userRepo.findById(dto.userId, workspace.id);
     if (!target) throw new NotFoundException('User not found');
-    if (!canActOnRole(actor, target.role)) {
+    if (!canActOnUser(actor, target)) {
       throw new ForbiddenException('You can only change passwords of members below your own role');
     }
 

@@ -6,6 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { scheduleGroupRoleReload } from '../../../lt4/roles/role-store';
 import { LicenseCheckService } from '../../../integrations/environment/license-check.service';
 import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { CreateWorkspaceDto } from '../dto/create-workspace.dto';
@@ -38,6 +39,7 @@ import {
 import {
   getWorkspaceDefaultLocale,
   cannotActOnRole,
+  cannotActOnUser,
   isKnownRole,
 } from '../workspace.util';
 import { v4 } from 'uuid';
@@ -870,7 +872,7 @@ export class WorkspaceService {
 
       if (
         cannotActOnRole(authUser, newRole) ||
-        cannotActOnRole(authUser, user.role)
+        cannotActOnUser(authUser, user)
       ) {
         throw new ForbiddenException();
       }
@@ -989,7 +991,7 @@ export class WorkspaceService {
         throw new BadRequestException('You cannot deactivate yourself');
       }
 
-      if (cannotActOnRole(authUser, user.role)) {
+      if (cannotActOnUser(authUser, user)) {
         throw new BadRequestException(
           'You cannot deactivate a user with a role equal to or above your own',
         );
@@ -1043,7 +1045,7 @@ export class WorkspaceService {
       throw new BadRequestException('User is not deactivated');
     }
 
-    if (cannotActOnRole(authUser, user.role)) {
+    if (cannotActOnUser(authUser, user)) {
       throw new BadRequestException(
         'You cannot activate a user with a role equal to or above your own',
       );
@@ -1092,7 +1094,7 @@ export class WorkspaceService {
         throw new BadRequestException('You cannot delete yourself');
       }
 
-      if (cannotActOnRole(authUser, user.role)) {
+      if (cannotActOnUser(authUser, user)) {
         throw new BadRequestException(
           'You cannot delete a user with a role equal to or above your own',
         );
@@ -1117,6 +1119,7 @@ export class WorkspaceService {
       );
 
       await trx.deleteFrom('groupUsers').where('userId', '=', userId).execute();
+      scheduleGroupRoleReload();
       await trx
         .deleteFrom('spaceMembers')
         .where('userId', '=', userId)

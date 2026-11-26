@@ -3098,5 +3098,11 @@
   "Create new templates and manage your own templates (where they can be used, delete)": "Neue Vorlagen erstellen und eigene Vorlagen verwalten (wo sie nutzbar sind, löschen)",
   "Manage templates of others: change where they can be used, edit and delete them": "Vorlagen anderer verwalten: festlegen, wo sie nutzbar sind, bearbeiten und löschen",
   "Copy pages to other spaces": "Seiten in andere Bereiche kopieren",
-  "Copy pages into a space you can edit, even from spaces where you can only read": "Seiten in einen Bereich kopieren, in dem man schreiben darf, auch aus Bereichen mit nur Leserecht"
+  "Copy pages into a space you can edit, even from spaces where you can only read": "Seiten in einen Bereich kopieren, in dem man schreiben darf, auch aus Bereichen mit nur Leserecht",
+  "No role": "Keine Rolle",
+  "Group role": "Rolle der Gruppe",
+  "All members of this group get the rights of this role.": "Alle Mitglieder dieser Gruppe bekommen die Rechte dieser Rolle.",
+  "This group has a role above or equal to your own": "Diese Gruppe hat eine Rolle, die gleich hoch oder höher als deine ist",
+  "The owner role cannot be given to a group": "Die Owner-Rolle kann keiner Gruppe gegeben werden",
+  "You can only assign roles below your own role": "Du kannst nur Rollen unterhalb deiner eigenen Rolle vergeben"
 }

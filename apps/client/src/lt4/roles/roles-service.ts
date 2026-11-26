@@ -12,11 +12,14 @@ export interface ILt4Role {
   userCount: number;
   editable: boolean;
   assignable: boolean;
+  groups?: { id: string; name: string }[];
 }
 
 export interface ILt4RolesResponse {
   permissions: Lt4Permission[];
   myRole: string;
+  myRoles?: string[];
+  groupRoles?: { groupId: string; groupName: string; roleKey: string }[];
   myPermissions: Lt4Permission[];
   roles: ILt4Role[];
 }
@@ -50,6 +53,14 @@ export async function moveRole(data: {
   direction: "up" | "down";
 }): Promise<ILt4RolesResponse> {
   const req = await api.post<ILt4RolesResponse>("/roles/move", data);
+  return req.data;
+}
+
+export async function setGroupRole(data: {
+  groupId: string;
+  roleKey: string | null;
+}): Promise<ILt4RolesResponse> {
+  const req = await api.post<ILt4RolesResponse>("/roles/group-role", data);
   return req.data;
 }
 

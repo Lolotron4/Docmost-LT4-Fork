@@ -8,6 +8,7 @@ import EditGroupModal from "@/features/group/components/edit-group-modal.tsx";
 import GroupActionMenu from "@/features/group/components/group-action-menu.tsx";
 import useUserRole from "@/hooks/use-user-role.tsx";
 import { useTranslation } from "react-i18next";
+import { GroupRoleSelect } from "@/lt4/roles/group-role-select";
 
 export default function GroupDetails() {
   const { groupId } = useParams();
@@ -23,6 +24,10 @@ export default function GroupDetails() {
           {/* Todo: back navigation */}
           <Title order={4}>{group.name}</Title>
           <Text c="dimmed">{group.description}</Text>
+
+          <div style={{ marginTop: 12 }}>
+            <GroupRoleSelect groupId={group.id} />
+          </div>
 
           <Group my="md" justify="flex-end">
             {isAdmin && (

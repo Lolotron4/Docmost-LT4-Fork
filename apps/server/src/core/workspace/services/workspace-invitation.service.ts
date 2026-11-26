@@ -6,6 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { assertGroupRolesBelow, scheduleGroupRoleReload } from '../../../lt4/roles/role-store';
 import { AcceptInviteDto, InviteUserDto } from '../dto/invitation.dto';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { InjectKysely } from 'nestjs-kysely';
@@ -143,6 +144,7 @@ export class WorkspaceInvitationService {
     ) {
       throw new ForbiddenException();
     }
+    assertGroupRolesBelow(authUser, groupIds);
 
     let invites: WorkspaceInvitation[] = [];
 
@@ -337,6 +339,7 @@ export class WorkspaceInvitationService {
           }
         }
 
+        scheduleGroupRoleReload();
         // delete invitation record
         await trx
           .deleteFrom('workspaceInvitations')

@@ -4,7 +4,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { User } from '@docmost/db/types/entity.types';
 import { RoleService } from './role.service';
-import { CreateRoleDto, DeleteRoleDto, MoveRoleDto, UpdateRoleDto } from './role.dto';
+import { CreateRoleDto, DeleteRoleDto, MoveRoleDto, SetGroupRoleDto, UpdateRoleDto } from './role.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('roles')
@@ -40,5 +40,11 @@ export class RoleController {
   @Post('delete')
   delete(@AuthUser() user: User, @Body() dto: DeleteRoleDto) {
     return this.roles.delete(user, dto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('group-role')
+  setGroupRole(@AuthUser() user: User, @Body() dto: SetGroupRoleDto) {
+    return this.roles.setGroupRole(user, dto);
   }
 }
