@@ -1,4 +1,5 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
+import { assertGroupRolesBelow, canActOnRole, canActOnUser, findRole, scheduleGroupRoleReload } from '../roles/role-store';
 import {
   BadRequestException,
   ForbiddenException,
@@ -73,7 +74,7 @@ type JoinCodeRow = {
 };
 
 export type ConsumedJoinCode = {
-  role: UserRole.ADMIN | UserRole.MEMBER;
+  role: string;
   groupIds: string[];
 };
 
@@ -136,7 +137,12 @@ export class JoinCodeService {
 
   async create(user: User, workspace: Workspace, dto: CreateJoinCodeDto) {
     this.assertCanManage(user, workspace);
-    if (dto.role === UserRole.ADMIN && user.role === UserRole.MEMBER) {
+    // Nur Rollen unter der eigenen (Rangfolge), nie Owner
+    if (
+      dto.role === UserRole.OWNER ||
+      !findRole(workspace.id, dto.role) ||
+      !canActOnRole(user, dto.role)
+    ) {
       throw new ForbiddenException();
     }
     const expiresAt = dto.expiresInDays
@@ -144,6 +150,7 @@ export class JoinCodeService {
       : null;
 
     const groupIds = await this.validGroupIds(workspace.id, dto.groupIds);
+    assertGroupRolesBelow(user, groupIds);
 
     return this.db
       .insertInto('lt4JoinCodes')
@@ -168,6 +175,7 @@ export class JoinCodeService {
   ) {
     this.assertCanManage(user, workspace);
     const groupIds = await this.validGroupIds(workspace.id, dto.groupIds);
+    assertGroupRolesBelow(user, groupIds);
     const result = await this.db
       .updateTable('lt4JoinCodes')
       .set({ groupIds: groupIds.length ? groupIds : null })
@@ -282,7 +290,11 @@ export class JoinCodeService {
       .where('id', '=', row.id)
       .execute();
     return {
-      role: row.role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.MEMBER,
+      // Rolle muss noch existieren; Owner nie über einen Link
+      role:
+        row.role !== UserRole.OWNER && findRole(workspaceId, row.role)
+          ? row.role
+          : UserRole.MEMBER,
       groupIds: row.groupIds ?? [],
     };
   }
@@ -310,6 +322,7 @@ export class JoinCodeService {
       .values(groups.map((group) => ({ userId, groupId: group.id })))
       .onConflict((oc) => oc.columns(['userId', 'groupId']).doNothing())
       .execute();
+    scheduleGroupRoleReload();
   }
 
   // -------------------------------------------- Admin: Passwort setzen
@@ -322,8 +335,8 @@ export class JoinCodeService {
     this.assertCanManage(actor, workspace);
     const target = await this.userRepo.findById(dto.userId, workspace.id);
     if (!target) throw new NotFoundException('User not found');
-    if (target.role === UserRole.OWNER && actor.role !== UserRole.OWNER) {
-      throw new ForbiddenException('Only an owner can change the password of an owner');
+    if (!canActOnUser(actor, target)) {
+      throw new ForbiddenException('You can only change passwords of members below your own role');
     }
 
     await assertPasswordPolicy(this.db, workspace.id, dto.password);

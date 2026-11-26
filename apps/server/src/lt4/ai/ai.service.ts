@@ -1,5 +1,6 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 // KI-Schreibassistent: Einstellungen (Admin) und Textgenerierung mit Claude, ChatGPT und Gemini.
+import { hasPermission } from '../roles/role-store';
 import {
   BadRequestException,
   ForbiddenException,
@@ -19,11 +20,6 @@ import { User, Workspace } from '@docmost/db/types/entity.types';
 import { WorkspaceRepo } from '@docmost/db/repos/workspace/workspace.repo';
 import { EnvironmentService } from '../../integrations/environment/environment.service';
 import WorkspaceAbilityFactory from '../../core/casl/abilities/workspace-ability.factory';
-import {
-  WorkspaceCaslAction,
-  WorkspaceCaslSubject,
-} from '../../core/casl/interfaces/workspace-ability.type';
-import { UserRole } from '../../common/helpers/types/permission';
 import { AiGenerateDto, UpdateAiSettingsDto } from './ai.dto';
 import {
   AI_PROVIDERS,
@@ -68,8 +64,8 @@ export class AiService {
   ) {}
 
   private assertAdmin(user: User, workspace: Workspace) {
-    const ability = this.workspaceAbility.createForUser(user, workspace);
-    if (ability.cannot(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings)) {
+    // LT4-Rollen: eigenes Recht "KI verwalten"
+    if (!hasPermission({ ...user, workspaceId: user.workspaceId ?? workspace.id }, 'ai_manage')) {
       throw new ForbiddenException();
     }
   }
@@ -111,7 +107,7 @@ export class AiService {
   /** Darf diese Person den Assistenten nutzen? Admins und Owner immer. */
   private async canUse(user: User, workspace: Workspace, settings: StoredSettings) {
     if (settings.access === 'all') return true;
-    if (user.role === UserRole.ADMIN || user.role === UserRole.OWNER) return true;
+    if (hasPermission(user, 'ai_use')) return true;
     if (settings.allowedUserIds.includes(user.id)) return true;
     if (!settings.allowedGroupIds.length) return false;
     const membership = await this.db

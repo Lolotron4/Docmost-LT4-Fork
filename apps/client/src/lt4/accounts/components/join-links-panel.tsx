@@ -26,7 +26,7 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import useUserRole from "@/hooks/use-user-role.tsx";
+import { useRoleLabels } from "@/lt4/roles/use-roles";
 import {
   createJoinLink,
   IJoinLink,
@@ -41,6 +41,7 @@ const QUERY_KEY = ["lt4-join-links"];
 
 export function JoinLinksPanel() {
   const { t, i18n } = useTranslation();
+  const { labelOf } = useRoleLabels();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: QUERY_KEY, queryFn: listJoinLinks });
   const revoke = useMutation({
@@ -113,7 +114,7 @@ export function JoinLinksPanel() {
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                    <Text size="sm">{link.role === "admin" ? t("Admin") : t("Member")}</Text>
+                    <Text size="sm">{labelOf(link.role)}</Text>
                   </Table.Td>
                   <Table.Td>
                     {link.groups?.length ? (
@@ -233,9 +234,9 @@ function EditJoinLinkGroupsModal({
 function CreateJoinLinkButton() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { isOwner, isAdmin } = useUserRole();
+  const { assignableRoles } = useRoleLabels();
   const [opened, setOpened] = useState(false);
-  const [role, setRole] = useState<"member" | "admin">("member");
+  const [role, setRole] = useState<string>("member");
   const [maxUses, setMaxUses] = useState<number | string>("");
   const [expiresInDays, setExpiresInDays] = useState<number | string>(14);
   const [groupIds, setGroupIds] = useState<string[]>([]);
@@ -303,12 +304,9 @@ function CreateJoinLinkButton() {
           <Stack gap="md">
             <Select
               label={t("Role")}
-              data={[
-                { value: "member", label: t("Member") },
-                ...(isAdmin || isOwner ? [{ value: "admin", label: t("Admin") }] : []),
-              ]}
+              data={assignableRoles().map((r) => ({ value: r.value, label: r.label }))}
               value={role}
-              onChange={(v) => v && setRole(v as "member" | "admin")}
+              onChange={(v) => v && setRole(v)}
               allowDeselect={false}
             />
             <JoinLinkGroupSelect

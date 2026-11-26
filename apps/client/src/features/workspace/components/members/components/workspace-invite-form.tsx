@@ -13,7 +13,7 @@ import { IconPlus } from "@tabler/icons-react";
 import React, { useEffect, useRef, useState } from "react";
 import { MultiGroupSelect } from "@/features/group/components/multi-group-select.tsx";
 import { UserRole } from "@/lib/types.ts";
-import { userRoleData } from "@/features/workspace/types/user-role-data.ts";
+import { useRoleLabels } from "@/lt4/roles/use-roles";
 import { useCreateInvitationMutation } from "@/features/workspace/queries/workspace-query.ts";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -27,6 +27,8 @@ export function WorkspaceInviteForm({ onClose }: Props) {
   const { t } = useTranslation();
   const [emails, setEmails] = useState<string[]>([]);
   const [role, setRole] = useState<string | null>(UserRole.MEMBER);
+  // LT4-Fork: auch eigene Rollen, nur unter der eigenen Rolle
+  const { assignableRoles } = useRoleLabels();
   const [groupIds, setGroupIds] = useState<string[]>([]);
   const [messageOpen, setMessageOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -104,13 +106,7 @@ export function WorkspaceInviteForm({ onClose }: Props) {
           label={t("Select role")}
           placeholder={t("Choose a role")}
           variant="filled"
-          data={userRoleData
-            .filter((role) => role.value !== UserRole.OWNER)
-            .map((role) => ({
-              ...role,
-              label: t(`${role.label}`),
-              description: t(`${role.description}`),
-            }))}
+          data={assignableRoles()}
           defaultValue={UserRole.MEMBER}
           allowDeselect={false}
           checkIconPosition="right"

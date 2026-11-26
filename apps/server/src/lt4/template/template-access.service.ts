@@ -4,12 +4,13 @@
 //  - Bereichs-Vorlagen: Bereichs-Admins; Bereichs-Schreiber, wenn "Mitglieder dürfen Vorlagen erstellen" an ist.
 //  - Workspace-Vorlagen: Mitglieder, wenn "Mitglieder dürfen Vorlagen erstellen" an ist.
 //  - Benutzen/Ansehen: Workspace-Vorlagen alle, Bereichs-Vorlagen alle Mitglieder des Bereichs.
+import { hasPermission } from '../roles/role-store';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { TemplateRepo } from '@docmost/db/repos/template/template.repo';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import { SpaceRepo } from '@docmost/db/repos/space/space.repo';
 import { Template, User, Workspace } from '@docmost/db/types/entity.types';
-import { SpaceRole, UserRole } from '../../common/helpers/types/permission';
+import { SpaceRole } from '../../common/helpers/types/permission';
 
 @Injectable()
 export class TemplateAccessService {
@@ -20,7 +21,7 @@ export class TemplateAccessService {
   ) {}
 
   isWorkspaceAdmin(user: User) {
-    return user.role === UserRole.ADMIN || user.role === UserRole.OWNER;
+    return hasPermission(user, 'templates');
   }
 
   membersMayCreate(workspace: Workspace) {
@@ -30,6 +31,25 @@ export class TemplateAccessService {
   async spaceRoles(user: User, spaceId: string): Promise<string[]> {
     const roles = await this.spaceMemberRepo.getUserSpaceRoles(user.id, spaceId);
     return (roles ?? []).map((r) => r.role);
+  }
+
+  /**
+   * LT4-Rollen: Darf diese Person in diesem Bereich (null = Workspace) neue
+   * Vorlagen anlegen bzw. eigene Vorlagen dorthin verschieben?
+   */
+  async canCreateIn(user: User, workspace: Workspace, spaceId: string | null) {
+    if (await this.canManageScope(user, workspace, spaceId)) return true;
+    if (!hasPermission(user, 'templates_create')) return false;
+    if (!spaceId) return true;
+    return (await this.spaceRoles(user, spaceId)).length > 0;
+  }
+
+  /** LT4-Rollen: Darf diese Person diese Vorlage ändern, verschieben, löschen? */
+  async canEdit(user: User, workspace: Workspace, template: Template) {
+    if (await this.canManageScope(user, workspace, template.spaceId ?? null)) return true;
+    return (
+      template.creatorId === user.id && hasPermission(user, 'templates_create')
+    );
   }
 
   /** Darf diese Person Vorlagen in diesem Bereich (null = Workspace) anlegen und ändern? */
@@ -73,7 +93,7 @@ export class TemplateAccessService {
     includeContent = false,
   ): Promise<Template> {
     const template = await this.findViewableTemplate(templateId, user, workspace, includeContent);
-    if (!(await this.canManageScope(user, workspace, template.spaceId))) {
+    if (!(await this.canEdit(user, workspace, template))) {
       throw new ForbiddenException();
     }
     return template;

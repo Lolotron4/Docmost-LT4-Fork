@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { IGroup } from "@/features/group/types/group.types.ts";
+import { GroupRoleSelect } from "@/lt4/roles/group-role-select";
 
 const formSchema = z.object({
   name: z.string().min(2).max(100),
@@ -84,6 +85,9 @@ export function EditGroupForm({ onClose, group: groupProp }: EditGroupFormProps)
               maxRows={8}
               {...form.getInputProps("description")}
             />
+
+            {/* LT4-Fork: Rolle der Gruppe (wird sofort gespeichert) */}
+            {groupId && <GroupRoleSelect groupId={groupId} fullWidth />}
           </Stack>
 
           <Group justify="flex-end" mt="md">

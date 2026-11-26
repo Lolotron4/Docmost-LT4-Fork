@@ -4,7 +4,7 @@ import api from "@/lib/api-client";
 export interface IJoinLink {
   id: string;
   code: string;
-  role: "member" | "admin";
+  role: string;
   maxUses: number | null;
   useCount: number;
   expiresAt: string | null;
@@ -37,7 +37,7 @@ async function post<T>(url: string, body?: unknown): Promise<T> {
 
 export const listJoinLinks = () => post<{ items: IJoinLink[] }>("/join-links/list");
 export const createJoinLink = (data: {
-  role: "member" | "admin";
+  role: string;
   maxUses?: number;
   expiresInDays?: number;
   groupIds?: string[];

@@ -80,6 +80,9 @@ export const AUDIT_EVENT_LABELS: Record<string, string> = {
   "announcement.archived": "Announcement archived",
   "announcement.unarchived": "Announcement restored",
   "announcement.deleted": "Announcement deleted",
+  "role.created": "Role created",
+  "role.updated": "Role changed",
+  "role.deleted": "Role deleted",
   "integration.installed": "Integration installed",
   "integration.uninstalled": "Integration removed",
   "integration.connected": "Integration connected",
@@ -95,5 +98,6 @@ export const AUDIT_CATEGORIES: { value: string; label: string }[] = [
   { value: "share.", label: "Public links" },
   { value: "workspace.", label: "Workspace" },
   { value: "api_key.", label: "API keys" },
+  { value: "role.", label: "Roles" },
   { value: "attachment.", label: "Files" },
 ];

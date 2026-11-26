@@ -21,7 +21,8 @@ export default function InviteActionMenu({ invitationId }: Props) {
   const { t } = useTranslation();
   const resendInvitationMutation = useResendInvitationMutation();
   const revokeInvitationMutation = useRevokeInvitationMutation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("members");
   const clipboard = useClipboard();
   const queryClient = useQueryClient();
 

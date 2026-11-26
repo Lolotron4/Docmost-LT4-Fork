@@ -14,10 +14,9 @@ import { RadioMenuItem } from "@/components/ui/radio-menu-item";
 import { IUserProfile } from "@/features/user/types/user.types";
 import { useMemberActions } from "@/features/workspace/hooks/use-member-actions";
 import { useChangeMemberRoleMutation } from "@/features/workspace/queries/workspace-query";
-import { userRoleData } from "@/features/workspace/types/user-role-data";
+import { useRoleLabels } from "@/lt4/roles/use-roles";
 import useUserRole from "@/hooks/use-user-role";
 import APP_ROUTE from "@/lib/app-route";
-import { UserRole } from "@/lib/types";
 
 type UserProfileManageMenuProps = {
   profile: IUserProfile;
@@ -28,11 +27,12 @@ export function UserProfileManageMenu({ profile }: UserProfileManageMenuProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const roleLabelId = useId();
-  const { isOwner } = useUserRole();
+  const { can } = useUserRole();
+  const { roles, nameOf, canManageRole } = useRoleLabels();
   const changeMemberRoleMutation = useChangeMemberRoleMutation();
   const isDeactivated = !!profile.deactivatedAt;
-  // admins cannot act on owners or assign the owner role, same as the server
-  const canManage = isOwner || profile.role !== UserRole.OWNER;
+  // LT4-Fork: nur Personen und Rollen unter der eigenen Rolle (Owner: alle)
+  const canManage = can("members") && canManageRole(profile.role);
 
   const refreshProfile = () =>
     queryClient.invalidateQueries({ queryKey: ["user-profile", profile.id] });
@@ -69,20 +69,18 @@ export function UserProfileManageMenu({ profile }: UserProfileManageMenuProps) {
       <Menu.Dropdown>
         <Menu.Label id={roleLabelId}>{t("Role")}</Menu.Label>
         <div role="group" aria-labelledby={roleLabelId}>
-          {userRoleData.map((role) => {
-            const checked = profile.role === role.value;
+          {roles.map((role) => {
+            const checked = profile.role === role.key;
             return (
               <Menu.Item
-                key={role.value}
+                key={role.key}
                 component={RadioMenuItem}
                 aria-checked={checked}
-                disabled={
-                  !canManage || (!isOwner && role.value === UserRole.OWNER)
-                }
-                onClick={() => handleRoleChange(role.value)}
+                disabled={!canManage || !role.assignable}
+                onClick={() => handleRoleChange(role.key)}
                 rightSection={checked && <IconCheck size={20} aria-hidden />}
               >
-                {t(role.label)}
+                {nameOf(role)}
               </Menu.Item>
             );
           })}

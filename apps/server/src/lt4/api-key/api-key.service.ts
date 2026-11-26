@@ -1,6 +1,7 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 // API-Schlüssel: signierte Tokens (Typ api_key), die an eine Zeile in api_keys
 // gebunden sind. Widerruf/Ablauf werden bei jeder Anfrage gegen die Datenbank geprüft.
+import { hasPermission } from '../roles/role-store';
 import {
   BadRequestException,
   ForbiddenException,
@@ -16,7 +17,6 @@ import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { WorkspaceRepo } from '@docmost/db/repos/workspace/workspace.repo';
 import { TokenService } from '../../core/auth/services/token.service';
 import { JwtApiKeyPayload } from '../../core/auth/dto/jwt-payload';
-import { UserRole } from '../../common/helpers/types/permission';
 import { isUserDisabled } from '../../common/helpers';
 import { CreateApiKeyDto } from './api-key.dto';
 
@@ -34,8 +34,8 @@ export function isApiRestricted(workspace: Pick<Workspace, 'settings'>): boolean
   return (workspace?.settings as any)?.api?.restrictToAdmins === true;
 }
 
-const isAdmin = (user: Pick<User, 'role'>) =>
-  user.role === UserRole.ADMIN || user.role === UserRole.OWNER;
+const isAdmin = (user: Pick<User, 'role' | 'workspaceId'>) =>
+  hasPermission(user, 'api');
 
 @Injectable()
 export class ApiKeyService {

@@ -7,6 +7,7 @@ import {
   HttpStatus,
   ForbiddenException,
 } from '@nestjs/common';
+import { groupRoleOf, isBelow, scheduleGroupRoleReload } from '../../lt4/roles/role-store';
 import { GroupService } from './services/group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
@@ -143,7 +144,7 @@ export class GroupController {
 
   @HttpCode(HttpStatus.OK)
   @Post('members/add')
-  addGroupMember(
+  async addGroupMember(
     @Body() addGroupUserDto: AddGroupUserDto,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
@@ -155,16 +156,19 @@ export class GroupController {
       throw new ForbiddenException();
     }
 
-    return this.groupUserService.addUsersToGroupBatch(
+    // LT4-Fork: Gruppen mit Rolle nur verwalten, wenn die Rolle unter der eigenen steht
+    assertCanTouchGroupRole(user, addGroupUserDto.groupId);
+    await this.groupUserService.addUsersToGroupBatch(
       addGroupUserDto.userIds,
       addGroupUserDto.groupId,
       workspace.id,
     );
+    scheduleGroupRoleReload();
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('members/remove')
-  removeGroupMember(
+  async removeGroupMember(
     @Body() removeGroupUserDto: RemoveGroupUserDto,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
@@ -176,16 +180,19 @@ export class GroupController {
       throw new ForbiddenException();
     }
 
-    return this.groupUserService.removeUserFromGroup(
+    // LT4-Fork: Gruppen mit Rolle nur verwalten, wenn die Rolle unter der eigenen steht
+    assertCanTouchGroupRole(user, removeGroupUserDto.groupId);
+    await this.groupUserService.removeUserFromGroup(
       removeGroupUserDto.userId,
       removeGroupUserDto.groupId,
       workspace.id,
     );
+    scheduleGroupRoleReload();
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('delete')
-  deleteGroup(
+  async deleteGroup(
     @Body() groupIdDto: GroupIdDto,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
@@ -196,6 +203,18 @@ export class GroupController {
     ) {
       throw new ForbiddenException();
     }
-    return this.groupService.deleteGroup(groupIdDto.groupId, workspace.id);
+    // LT4-Fork: Gruppen mit Rolle nur verwalten, wenn die Rolle unter der eigenen steht
+    assertCanTouchGroupRole(user, groupIdDto.groupId);
+    await this.groupService.deleteGroup(groupIdDto.groupId, workspace.id);
+    scheduleGroupRoleReload();
+  }
+}
+
+function assertCanTouchGroupRole(user: User, groupId: string) {
+  const role = groupRoleOf(groupId);
+  if (role && !isBelow(user, role)) {
+    throw new ForbiddenException(
+      'This group has a role above or equal to your own',
+    );
   }
 }

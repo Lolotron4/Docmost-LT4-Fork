@@ -4,7 +4,7 @@ import {
   createMongoAbility,
   MongoAbility,
 } from '@casl/ability';
-import { UserRole } from '../../../common/helpers/types/permission';
+import { Lt4Permission, permissionsOf } from '../../../lt4/roles/role-store';
 import { User, Workspace } from '@docmost/db/types/entity.types';
 import {
   IWorkspaceAbility,
@@ -14,64 +14,42 @@ import {
 
 @Injectable()
 export default class WorkspaceAbilityFactory {
+  // LT4-Fork: Rechte kommen aus der Rolle (eingebaut oder selbst angelegt),
+  // siehe lt4/roles/role-store.ts.
   createForUser(user: User, workspace: Workspace) {
-    const userRole = user.role;
-
-    switch (userRole) {
-      case UserRole.OWNER:
-        return buildWorkspaceOwnerAbility();
-      case UserRole.ADMIN:
-        return buildWorkspaceAdminAbility();
-      case UserRole.MEMBER:
-        return buildWorkspaceMemberAbility();
-      default:
-        throw new NotFoundException('Workspace permissions not found');
+    if (!user?.role) {
+      throw new NotFoundException('Workspace permissions not found');
     }
+    return buildWorkspaceAbility(
+      permissionsOf({
+        id: user.id,
+        role: user.role,
+        workspaceId: user.workspaceId ?? workspace?.id,
+      }),
+    );
   }
 }
 
-function buildWorkspaceOwnerAbility() {
+function buildWorkspaceAbility(permissions: Lt4Permission[]) {
   const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(
     createMongoAbility,
   );
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Space);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Attachment);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.API);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Audit);
+  const has = (p: Lt4Permission) => permissions.includes(p);
 
-  return build();
-}
-
-function buildWorkspaceAdminAbility() {
-  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(
-    createMongoAbility,
-  );
-
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Space);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Attachment);
-  can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.API);
-
-  return build();
-}
-
-function buildWorkspaceMemberAbility() {
-  const { can, build } = new AbilityBuilder<MongoAbility<IWorkspaceAbility>>(
-    createMongoAbility,
-  );
+  // Grundrechte jedes Mitglieds
   can(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Settings);
   can(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Member);
   can(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Space);
   can(WorkspaceCaslAction.Read, WorkspaceCaslSubject.Group);
   can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Attachment);
   can(WorkspaceCaslAction.Create, WorkspaceCaslSubject.API);
+
+  if (has('settings')) can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Settings);
+  if (has('members')) can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Member);
+  if (has('spaces')) can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Space);
+  if (has('groups')) can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Group);
+  if (has('api')) can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.API);
+  if (has('audit')) can(WorkspaceCaslAction.Manage, WorkspaceCaslSubject.Audit);
 
   return build();
 }

@@ -34,6 +34,13 @@ Der Build ist fertig, wenn unter GitHub → Actions → "LT4 Image" ein grüner 
 Branch-Referenz im Stack umstellen **und** `LT4_IMAGE` auf den passenden Tag setzen
 (z. B. `...:lt4-themes`), warten bis der Build auf GitHub grün ist, dann "Pull and redeploy".
 
-## Zurück zum Bauen auf dem Server
+## Standard seit LT4 v1.2.0
 
-`LT4_IMAGE` und `LT4_PULL_POLICY` löschen. Dann gilt wieder der alte Weg.
+Die Compose-Datei enthält kein `build:` mehr beim App-Dienst, weil Portainer bei
+Git-Stacks sonst immer auf dem Server baut. Ohne Variablen wird
+`ghcr.io/lolotron4/docmost-lt4-fork:main` geladen.
+
+## Doch auf dem Server bauen
+
+Im Stack setzen: `COMPOSE_PROFILES=local-build`, `LT4_IMAGE=docmost-lt4:local`,
+`LT4_PULL_POLICY=never`. Dann baut der Hilfsdienst `docmost-build` das Image.

@@ -1,7 +1,7 @@
 import { Group, Table, Avatar, Text, Alert, Badge } from "@mantine/core";
 import { useWorkspaceInvitationsQuery } from "@/features/workspace/queries/workspace-query.ts";
 import React from "react";
-import { getUserRoleLabel } from "@/features/workspace/types/user-role-data.ts";
+import { useRoleLabels } from "@/lt4/roles/use-roles";
 import InviteActionMenu from "@/features/workspace/components/members/components/invite-action-menu.tsx";
 import { IconInfoCircle } from "@tabler/icons-react";
 import { timeAgo } from "@/lib/time.ts";
@@ -17,7 +17,9 @@ export default function WorkspaceInvitesTable() {
     cursor,
     limit: 100,
   });
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("members");
+  const { labelOf } = useRoleLabels();
 
   return (
     <>
@@ -52,7 +54,7 @@ export default function WorkspaceInvitesTable() {
                   </Group>
                 </Table.Td>
 
-                <Table.Td>{t(getUserRoleLabel(invitation.role))}</Table.Td>
+                <Table.Td>{labelOf(invitation.role)}</Table.Td>
 
                 <Table.Td>
                   <Group gap="xs" wrap="nowrap">

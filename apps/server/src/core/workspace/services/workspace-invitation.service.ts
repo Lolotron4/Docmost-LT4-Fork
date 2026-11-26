@@ -6,6 +6,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { assertGroupRolesBelow, scheduleGroupRoleReload } from '../../../lt4/roles/role-store';
 import { AcceptInviteDto, InviteUserDto } from '../dto/invitation.dto';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
 import { InjectKysely } from 'nestjs-kysely';
@@ -44,7 +45,8 @@ import {
 import {
   getWorkspaceDefaultLocale,
   getWorkspaceDefaultPageEditMode,
-  isAdminActingOnOwner,
+  cannotActOnRole,
+  isKnownRole,
   normalizeInvitationMessage,
 } from '../workspace.util';
 import { INVITATION_EXPIRY_DAYS } from '../workspace.constants';
@@ -134,9 +136,15 @@ export class WorkspaceInvitationService {
     const { emails, role, groupIds } = inviteUserDto;
     const message = normalizeInvitationMessage(inviteUserDto.message);
 
-    if (isAdminActingOnOwner(authUser.role, role)) {
+    // LT4-Fork: nur Rollen unter der eigenen, nie Owner per Einladung
+    if (
+      role === 'owner' ||
+      !isKnownRole(workspace.id, role) ||
+      cannotActOnRole(authUser, role)
+    ) {
       throw new ForbiddenException();
     }
+    assertGroupRolesBelow(authUser, groupIds);
 
     let invites: WorkspaceInvitation[] = [];
 
@@ -331,6 +339,7 @@ export class WorkspaceInvitationService {
           }
         }
 
+        scheduleGroupRoleReload();
         // delete invitation record
         await trx
           .deleteFrom('workspaceInvitations')
