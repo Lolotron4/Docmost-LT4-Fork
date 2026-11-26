@@ -68,6 +68,16 @@ export function NotificationItem({
         return "<bold>{{name}}</bold> changed a verified page";
       case "lt4.read_requested":
         return "<bold>{{name}}</bold> asked you to confirm that you have read a page";
+      case "lt4.task_assigned":
+        return notification.actor
+          ? "<bold>{{name}}</bold> assigned a task to you"
+          : "A task was assigned to you";
+      case "lt4.task_due":
+        return notification.data?.kind === "overdue"
+          ? "A task is overdue"
+          : notification.data?.kind === "today"
+            ? "A task is due today"
+            : "A task is due tomorrow";
       case "page.verification_expiring":
         return "Page verification expires soon";
       case "page.verification_expired":
@@ -144,7 +154,13 @@ export function NotificationItem({
     }
     return null;
   };
-  const detail = lastError ?? getImportDetail();
+  // LT4: Aufgabentext (enthält das Datum) unter der Meldung
+  const getTaskDetail = (): string | null => {
+    if (!notification.type.startsWith("lt4.task_")) return null;
+    const text = typeof notification.data?.text === "string" ? notification.data.text : "";
+    return text || null;
+  };
+  const detail = lastError ?? getTaskDetail() ?? getImportDetail();
 
   const markReadIfNeeded = () => {
     if (isUnread) {

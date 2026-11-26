@@ -89,6 +89,43 @@ export class CollaborationHandler {
           },
         );
       },
+      // LT4: Aufgabe aus der Übersicht "Meine Aufgaben" abhaken
+      lt4SetTaskChecked: async (
+        documentName: string,
+        payload: { itemId: string; checked: boolean; user: User },
+      ) => {
+        const { itemId, checked, user } = payload;
+        let found = false;
+        await this.withYdocConnection(
+          hocuspocus,
+          documentName,
+          { user },
+          (doc) => {
+            const fragment = doc.getXmlFragment('default');
+            const visit = (node: Y.XmlElement | Y.XmlFragment): boolean => {
+              for (const child of node.toArray()) {
+                if (!(child instanceof Y.XmlElement)) continue;
+                if (child.nodeName === 'taskItem') {
+                  const first = child
+                    .toArray()
+                    .find((c) => c instanceof Y.XmlElement && c.getAttribute('id'));
+                  if (
+                    first instanceof Y.XmlElement &&
+                    first.getAttribute('id') === itemId
+                  ) {
+                    child.setAttribute('checked', checked as any);
+                    return true;
+                  }
+                }
+                if (visit(child)) return true;
+              }
+              return false;
+            };
+            found = visit(fragment);
+          },
+        );
+        return found;
+      },
       updatePageContent: async (
         documentName: string,
         payload: {

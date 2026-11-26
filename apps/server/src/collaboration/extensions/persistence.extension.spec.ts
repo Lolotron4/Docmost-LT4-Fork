@@ -66,6 +66,7 @@ describe('PersistenceExtension.onStoreDocument', () => {
         notifyInvalidated: jest.fn().mockResolvedValue(undefined),
       } as any,
       { getPageHistoryInterval: () => 5 * 60_000 } as any,
+      { syncPage: jest.fn().mockResolvedValue([]) } as any,
     );
   });
 
@@ -173,6 +174,7 @@ function setup() {
       notifyInvalidated: jest.fn(),
     } as any,
     { getPageHistoryInterval: () => 300_000 } as any,
+    { syncPage: jest.fn(async () => []) } as any,
   );
   return { extension, page, repo, queue, history, transclusion };
 }

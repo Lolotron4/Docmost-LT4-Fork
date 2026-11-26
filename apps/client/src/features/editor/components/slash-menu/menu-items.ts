@@ -3,6 +3,7 @@ import {
   IconBlockquote,
   IconCaretRightFilled,
   IconCheckbox,
+  IconUserCheck,
   IconCode,
   IconH1,
   IconH2,
@@ -131,6 +132,21 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       icon: IconCheckbox,
       command: ({ editor, range }: CommandProps) => {
         editor.chain().focus().deleteRange(range).toggleTaskList().run();
+      },
+    },
+    {
+      // LT4: Checkbox mit zugewiesener Person (erscheint unter "Meine Aufgaben")
+      title: "Assign task",
+      description: "To-do for a person, with an optional due date.",
+      searchTerms: ["aufgabe", "task", "assign", "zuweisen", "todo", "due", "fällig"],
+      icon: IconUserCheck,
+      command: ({ editor, range }: CommandProps) => {
+        const chain = editor.chain().focus().deleteRange(range);
+        if (!editor.isActive("taskItem")) chain.toggleTaskList();
+        chain.run();
+        const { $from } = editor.state.selection;
+        const before = $from.parent.textBetween(0, $from.parentOffset, undefined, " ");
+        editor.chain().focus().insertContent(before && !before.endsWith(" ") ? " @" : "@").run();
       },
     },
     {
