@@ -1,4 +1,4 @@
-# Gastlinks: öffentliche Links mit Ablaufdatum und Passwort (LT4 v1.3.0)
+# Gastlinks: öffentliche Links mit Ablaufdatum und Passwort (LT4 v1.4.0)
 
 LT4 erweitert das öffentliche Teilen aus dem Docmost-Kern ("Teilen" > "Im Web teilen").
 Für jeden öffentlichen Link kann man jetzt festlegen:
