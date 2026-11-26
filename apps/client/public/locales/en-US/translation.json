@@ -2711,5 +2711,9 @@
   "e.g. Backup script": "e.g. Backup script",
   "Edit groups": "Edit groups",
   "Applies to accounts created from now on. Existing accounts keep their groups.": "Applies to accounts created from now on. Existing accounts keep their groups.",
-  "New accounts are added to these groups automatically.": "New accounts are added to these groups automatically."
+  "New accounts are added to these groups automatically.": "New accounts are added to these groups automatically.",
+  "{{count}} views_one": "1 view",
+  "{{count}} views_other": "{{count}} views",
+  "{{count}} pages_one": "1 page",
+  "{{count}} pages_other": "{{count}} pages"
 }

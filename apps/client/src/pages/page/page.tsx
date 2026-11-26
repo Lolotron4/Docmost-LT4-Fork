@@ -27,6 +27,7 @@ import { useDisablePrint } from "@/lt4/security/hooks/use-disable-print.ts";
 import { PageCover } from "@/features/page-cover/components/page-cover.tsx";
 import { PageFormattingToolbar } from "@/features/editor/components/fixed-toolbar/fixed-toolbar";
 import { usePageEditLockCheck } from "@/lt4/page-verification/hooks/use-page-edit-mode";
+import { usePageViewTracker } from "@/lt4/page-stats/use-page-view-tracker";
 import { PageLoadingContent, PageLoadError, usePageLayout } from "./page-loading";
 const MemoizedFullEditor = React.memo(FullEditor);
 const MemoizedTitleEditor = React.memo(TitleEditor);
@@ -68,6 +69,7 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
     refetch: refetchPage,
   } = usePageQuery({ pageId });
   usePageEditLockCheck(page?.id ?? pageId);
+  usePageViewTracker(page && !page.deletedAt ? page.id : undefined);
   const spaceQuery = useGetSpaceBySlugQuery(page?.space?.slug ?? spaceSlug);
   const { data: space } = spaceQuery;
   const { exportDisabledLabel } = useExportDisabled(page?.space?.slug);
