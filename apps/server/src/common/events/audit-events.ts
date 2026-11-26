@@ -141,6 +141,15 @@ export const AuditEvent = {
   ROLE_UPDATED: 'role.updated',
   ROLE_DELETED: 'role.deleted',
 
+  // LT4: Lesebestätigung
+  READ_CONFIRMATION_REQUESTED: 'page.read_confirmation_requested',
+  READ_CONFIRMATION_COMPLETED: 'page.read_confirmation_completed',
+
+  // LT4: Webhooks
+  WEBHOOK_CREATED: 'webhook.created',
+  WEBHOOK_UPDATED: 'webhook.updated',
+  WEBHOOK_DELETED: 'webhook.deleted',
+
   // Base
   BASE_PROPERTY_UPDATED: 'base.property.updated',
   BASE_FORM_SHARE_UPDATED: 'base.form_share.updated',
@@ -186,6 +195,7 @@ export const AuditResource = {
   TEMPLATE: 'template',
   ANNOUNCEMENT: 'announcement',
   ROLE: 'role',
+  WEBHOOK: 'webhook',
   BACKUP: 'backup',
 } as const;
 

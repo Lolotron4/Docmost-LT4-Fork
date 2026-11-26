@@ -55,6 +55,8 @@ import {
   PageVerificationModal,
 } from "@/lt4/page-verification";
 import { ReadConfirmationMenuItem } from "@/lt4/read-confirmation/read-confirmation";
+import { PageStatsMenuItem, PageStatsModal } from "@/lt4/page-stats/page-stats-modal";
+import useUserRole from "@/hooks/use-user-role.tsx";
 import {
   useFavoriteIds,
   useAddFavoriteMutation,
@@ -180,6 +182,10 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
     verificationOpened,
     { open: openVerificationModal, close: closeVerificationModal },
   ] = useDisclosure(false);
+  const [statsOpened, { open: openStatsModal, close: closeStatsModal }] =
+    useDisclosure(false);
+  const { can } = useUserRole();
+  const canSeeStats = !readOnly || can("page_stats");
   const [
     attachmentsOpened,
     { open: openAttachmentsModal, close: closeAttachmentsModal },
@@ -372,6 +378,8 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
 
           {!readOnly && !page?.isBase && <ReadConfirmationMenuItem pageId={page?.id} />}
 
+          {canSeeStats && <PageStatsMenuItem onClick={openStatsModal} />}
+
           <Menu.Divider />
 
           {!readOnly && (
@@ -488,6 +496,12 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
         pageId={page.id}
         opened={verificationOpened}
         onClose={closeVerificationModal}
+      />
+
+      <PageStatsModal
+        pageId={page.id}
+        opened={statsOpened}
+        onClose={closeStatsModal}
       />
 
       <PageAttachmentsModal

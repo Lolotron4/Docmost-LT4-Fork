@@ -30,6 +30,8 @@ export const LT4_PERMISSIONS = [
   'ai_use', // KI-Assistent immer nutzen dürfen, auch wenn er eingeschränkt ist
   'api', // API-Schlüssel aller Personen verwalten
   'audit', // Audit-Log lesen
+  'page_stats', // Seitenstatistik aller Seiten mit Namen der Lesenden sehen
+  'webhooks', // Webhooks (Discord & Co.) einrichten
   'backups', // Sicherungen erstellen, herunterladen und wiederherstellen
 ] as const;
 
