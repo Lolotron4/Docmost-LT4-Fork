@@ -3093,5 +3093,10 @@
   "Set up provider, keys and who may use the AI assistant": "Anbieter, Schlüssel und Freigabe des KI-Assistenten einrichten",
   "Use AI assistant": "KI-Assistent nutzen",
   "Always allowed to use the AI assistant, even when it is limited to certain people": "Darf den KI-Assistenten immer nutzen, auch wenn er auf bestimmte Personen beschränkt ist",
-  "Content and tools": "Inhalte und Werkzeuge"
+  "Content and tools": "Inhalte und Werkzeuge",
+  "Create templates": "Vorlagen erstellen",
+  "Create new templates and manage your own templates (where they can be used, delete)": "Neue Vorlagen erstellen und eigene Vorlagen verwalten (wo sie nutzbar sind, löschen)",
+  "Manage templates of others: change where they can be used, edit and delete them": "Vorlagen anderer verwalten: festlegen, wo sie nutzbar sind, bearbeiten und löschen",
+  "Copy pages to other spaces": "Seiten in andere Bereiche kopieren",
+  "Copy pages into a space you can edit, even from spaces where you can only read": "Seiten in einen Bereich kopieren, in dem man schreiben darf, auch aus Bereichen mit nur Leserecht"
 }

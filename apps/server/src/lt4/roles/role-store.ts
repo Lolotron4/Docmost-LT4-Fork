@@ -20,7 +20,9 @@ export const LT4_PERMISSIONS = [
   'groups', // Gruppen verwalten
   'roles', // Rollen verwalten (nur untergeordnete)
   'announcements', // Ankündigungen (Banner) verwalten
-  'templates', // Vorlagen des Arbeitsbereichs und aller Bereiche verwalten
+  'templates_create', // Vorlagen erstellen und eigene Vorlagen verwalten
+  'templates', // Vorlagen anderer verwalten (alle Vorlagen)
+  'pages_copy', // Seiten in einen anderen Bereich kopieren, auch mit nur Leserecht
   'ai_manage', // KI-Assistent einrichten (Anbieter, Schlüssel, Freigabe)
   'ai_use', // KI-Assistent immer nutzen dürfen, auch wenn er eingeschränkt ist
   'api', // API-Schlüssel aller Personen verwalten

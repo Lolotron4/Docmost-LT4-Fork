@@ -1,3 +1,4 @@
+import useUserRole from "@/hooks/use-user-role.tsx";
 import { useAtom } from "jotai";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -49,6 +50,8 @@ export interface NodeMenuProps {
 
 export function NodeMenu({ node, canEdit }: NodeMenuProps) {
   const { t } = useTranslation();
+  const { can } = useUserRole();
+  const canCopyReadOnly = can("pages_copy");
   const clipboard = useClipboard({ timeout: 500 });
   const { spaceSlug } = useParams();
   const { exportDisabled, exportDisabledLabel } = useExportDisabled(spaceSlug);
@@ -206,6 +209,20 @@ export function NodeMenu({ node, canEdit }: NodeMenuProps) {
               {t("Export page")}
             </Menu.Item>
           </Tooltip>
+
+          {/* LT4-Fork: Rollen-Recht "Seiten kopieren" bei nur Leserecht */}
+          {!canEdit && canCopyReadOnly && (
+            <Menu.Item
+              leftSection={<IconCopy size={16} />}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openCopyPageModal();
+              }}
+            >
+              {t("Copy to space")}
+            </Menu.Item>
+          )}
 
           {canEdit && (
             <>

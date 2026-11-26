@@ -22,7 +22,9 @@ Rollen stehen von oben nach unten. Ganz oben steht immer der **Owner**.
 | Gruppen verwalten | Gruppen anlegen und Mitglieder ändern |
 | Rollen verwalten | Rollen unterhalb der eigenen bearbeiten |
 | Bereiche verwalten | Bereiche anlegen und alle Bereiche verwalten |
-| Vorlagen verwalten | Vorlagen des Arbeitsbereichs und aller Bereiche bearbeiten |
+| Vorlagen erstellen | Neue Vorlagen anlegen (Arbeitsbereich oder eigene Bereiche) und eigene Vorlagen verwalten: wo nutzbar, bearbeiten, löschen |
+| Vorlagen verwalten | Vorlagen anderer verwalten: wo nutzbar, bearbeiten, löschen |
+| Seiten in andere Bereiche kopieren | Kopie in einen Bereich mit Schreibrecht, auch aus Bereichen mit nur Leserecht |
 | KI-Assistent nutzen | KI immer nutzen, auch wenn sie auf bestimmte Personen beschränkt ist |
 | KI-Assistent verwalten | Anbieter, Schlüssel und Freigabe einrichten |
 | Alle API-Schlüssel verwalten | API-Schlüssel aller sehen und widerrufen |

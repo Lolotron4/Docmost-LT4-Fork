@@ -6,7 +6,9 @@ export const LT4_PERMISSIONS = [
   "groups",
   "roles",
   "announcements",
+  "templates_create",
   "templates",
+  "pages_copy",
   "ai_manage",
   "ai_use",
   "api",
@@ -19,7 +21,7 @@ export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];
 export const PERMISSION_GROUPS: { label: string; items: Lt4Permission[] }[] = [
   { label: "Workspace", items: ["settings", "announcements", "audit"] },
   { label: "People", items: ["members", "groups", "roles"] },
-  { label: "Content and tools", items: ["spaces", "templates", "ai_use", "ai_manage", "api"] },
+  { label: "Content and tools", items: ["spaces", "pages_copy", "templates_create", "templates", "ai_use", "ai_manage", "api"] },
 ];
 
 export const PERMISSION_LABELS: Record<
@@ -51,9 +53,20 @@ export const PERMISSION_LABELS: Record<
     label: "Manage announcements",
     description: "Create, change and remove banners for the workspace",
   },
+  templates_create: {
+    label: "Create templates",
+    description:
+      "Create new templates and manage your own templates (where they can be used, delete)",
+  },
   templates: {
     label: "Manage templates",
-    description: "Edit workspace templates and templates in every space",
+    description:
+      "Manage templates of others: change where they can be used, edit and delete them",
+  },
+  pages_copy: {
+    label: "Copy pages to other spaces",
+    description:
+      "Copy pages into a space you can edit, even from spaces where you can only read",
   },
   ai_manage: {
     label: "Manage AI assistant",
