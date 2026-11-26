@@ -84,7 +84,7 @@ export class ReadConfirmationService {
   }
 
   /** Alle aktiven Nutzer mit Zugriff auf die Seite (ohne den Anfragenden). */
-  private async audience(page: Page, excludeId?: string | null): Promise<UserRef[]> {
+  async audience(page: Page, excludeId?: string | null): Promise<UserRef[]> {
     const rows = await this.db
       .selectFrom('users')
       .select(['users.id', 'users.name', 'users.avatarUrl'])

@@ -14,6 +14,7 @@ export const LT4_PERMISSIONS = [
   "ai_use",
   "api",
   "audit",
+  "page_stats",
   "webhooks",
 ] as const;
 
@@ -21,7 +22,7 @@ export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];
 
 /** Gruppen für die Anzeige im Rollen-Dialog. */
 export const PERMISSION_GROUPS: { label: string; items: Lt4Permission[] }[] = [
-  { label: "Workspace", items: ["settings", "announcements", "webhooks", "audit"] },
+  { label: "Workspace", items: ["settings", "announcements", "webhooks", "audit", "page_stats"] },
   { label: "People", items: ["members", "groups", "roles"] },
   { label: "Content and tools", items: ["spaces", "pages_copy", "assignments", "templates_create", "templates", "ai_use", "ai_manage", "api"] },
 ];
@@ -94,6 +95,11 @@ export const PERMISSION_LABELS: Record<
   audit: {
     label: "View audit log",
     description: "See who changed what in the workspace",
+  },
+  page_stats: {
+    label: "View page statistics with names",
+    description:
+      "See for every page who opened it and when, and who has not opened it yet",
   },
 };
 

@@ -9,6 +9,7 @@ import {
   IconUserPlus,
   IconTemplate,
   IconRosetteDiscountCheck,
+  IconClockExclamation,
   IconInbox,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
@@ -68,6 +69,7 @@ export default function GlobalSidebar() {
     ...(hasReviews
       ? [{ label: "Reviews", icon: IconRosetteDiscountCheck, path: "/reviews" }]
       : []),
+    { label: "Outdated pages", icon: IconClockExclamation, path: "/outdated-pages" },
     { label: "Assignments", icon: IconInbox, path: "/assignments" },
   ];
   const { data: favoriteSpacesData, isPending: isFavoritesPending } = useFavoritesQuery("space");
