@@ -889,6 +889,27 @@ export interface Lt4GroupRoles {
   workspaceId: string;
 }
 
+// LT4-Fork: Webhooks
+export interface Lt4Webhooks {
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  enabled: Generated<boolean>;
+  events: Generated<Json>;
+  failureCount: Generated<number>;
+  id: Generated<string>;
+  language: Generated<string>;
+  lastError: string | null;
+  lastSentAt: Timestamp | null;
+  lastStatus: number | null;
+  name: string;
+  secret: string | null;
+  spaceIds: string[] | null;
+  type: Generated<string>;
+  updatedAt: Generated<Timestamp>;
+  url: string;
+  workspaceId: string;
+}
+
 export interface Lt4Assignments {
   id: Generated<string>;
   workspaceId: string;
@@ -922,6 +943,7 @@ export interface Lt4AssignmentSubmissions {
 }
 
 export interface DB {
+  lt4Webhooks: Lt4Webhooks;
   lt4Assignments: Lt4Assignments;
   lt4AssignmentSubmissions: Lt4AssignmentSubmissions;
   lt4GroupRoles: Lt4GroupRoles;

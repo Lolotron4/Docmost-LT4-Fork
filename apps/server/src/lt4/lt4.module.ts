@@ -54,11 +54,14 @@ import { AssignmentController } from './assignment/assignment.controller';
 import { AssignmentService } from './assignment/assignment.service';
 import { PageStatsController } from './page-stats/page-stats.controller';
 import { PageStatsService } from './page-stats/page-stats.service';
+import { WebhookController } from './webhooks/webhook.controller';
+import { WebhookService } from './webhooks/webhook.service';
+import { WebhookDispatcherService } from './webhooks/webhook-dispatcher.service';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule, NotificationModule, Lt4IntegrationsModule, Lt4McpModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController, AttachmentSearchController, LdapController, RoleController, AssignmentController, PageStatsController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService, AttachmentIndexService, LdapService, RoleService, AssignmentService, PageStatsService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController, AttachmentSearchController, LdapController, RoleController, AssignmentController, PageStatsController, WebhookController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService, AttachmentIndexService, LdapService, RoleService, AssignmentService, PageStatsService, WebhookService, WebhookDispatcherService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}

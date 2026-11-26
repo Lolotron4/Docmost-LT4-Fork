@@ -31,6 +31,7 @@ export const LT4_PERMISSIONS = [
   'api', // API-Schlüssel aller Personen verwalten
   'audit', // Audit-Log lesen
   'page_stats', // Seitenstatistik aller Seiten mit Namen der Lesenden sehen
+  'webhooks', // Webhooks (Discord & Co.) einrichten
 ] as const;
 
 export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];

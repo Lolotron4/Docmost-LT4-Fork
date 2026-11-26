@@ -12,6 +12,7 @@ import {
   IconPlug,
   IconShieldLock,
   IconSparkles,
+  IconWebhook,
   IconSpeakerphone,
   IconKey,
   IconHistory,
@@ -115,6 +116,12 @@ const groupedData: DataGroup[] = [
         icon: IconHistory,
         path: "/settings/audit-log",
         permission: "audit",
+      },
+      {
+        label: "Webhooks",
+        icon: IconWebhook,
+        path: "/settings/webhooks",
+        permission: "webhooks",
       },
       {
         label: "AI assistant",

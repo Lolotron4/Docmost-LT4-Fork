@@ -5,6 +5,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
@@ -19,6 +20,8 @@ import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import { PageAccessService } from '../../core/page/page-access/page-access.service';
 import { NotificationService } from '../../core/notification/notification.service';
 import { WsService } from '../../ws/ws.service';
+import { AUDIT_SERVICE, IAuditService } from '../../integrations/audit/audit.service';
+import { AuditEvent, AuditResource } from '../../common/events/audit-events';
 
 export const READ_REQUESTED_NOTIFICATION = 'lt4.read_requested';
 
@@ -36,7 +39,23 @@ export class ReadConfirmationService {
     private readonly pageAccessService: PageAccessService,
     private readonly notificationService: NotificationService,
     private readonly wsService: WsService,
+    @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
   ) {}
+
+  /** Audit-Eintrag (und damit auch Webhooks wie Discord). */
+  private audit(event: string, page: Page, metadata?: Record<string, any>) {
+    try {
+      this.auditService.log({
+        event: event as any,
+        resourceType: AuditResource.PAGE,
+        resourceId: page.id,
+        spaceId: page.spaceId,
+        metadata: { pageTitle: page.title, ...metadata },
+      });
+    } catch {
+      /* Audit darf nie die eigentliche Aktion verhindern */
+    }
+  }
 
   private async loadPage(pageId: string, user: User): Promise<Page> {
     const page = await this.pageRepo.findById(pageId);
@@ -233,6 +252,12 @@ export class ReadConfirmationService {
       const audience = await this.audience(page, existing?.requestedById ?? user.id);
       await this.notify(page, user, audience.filter((u) => u.id !== user.id), message);
     }
+    if (!existing) {
+      this.audit(AuditEvent.READ_CONFIRMATION_REQUESTED, page, {
+        message,
+        dueAt: dueAt?.toISOString() ?? null,
+      });
+    }
     await this.emit(page);
     return this.info(page.id, user);
   }
@@ -251,6 +276,11 @@ export class ReadConfirmationService {
       .execute();
     const audience = await this.audience(page, existing.requestedById);
     await this.notify(page, user, audience.filter((u) => u.id !== user.id), existing.message);
+    this.audit(AuditEvent.READ_CONFIRMATION_REQUESTED, page, {
+      message: existing.message,
+      dueAt: existing.dueAt ? new Date(existing.dueAt).toISOString() : null,
+      again: true,
+    });
     await this.emit(page);
     return this.info(page.id, user);
   }
@@ -280,6 +310,7 @@ export class ReadConfirmationService {
     const page = await this.loadPage(pageId, user);
     const existing = await this.findRequest(page.id);
     if (!existing) throw new BadRequestException('No read confirmation requested for this page');
+    const before = await this.confirmations(existing.id, existing.roundStartedAt);
     await this.db
       .insertInto('lt4ReadConfirmations')
       .values({ requestId: existing.id, userId: user.id, confirmedAt: new Date() })
@@ -287,8 +318,27 @@ export class ReadConfirmationService {
         oc.columns(['requestId', 'userId']).doUpdateSet({ confirmedAt: new Date() }),
       )
       .execute();
+    if (!before.has(user.id)) await this.checkCompleted(page, existing, user.id);
     await this.emit(page);
     return this.info(page.id, user);
+  }
+
+  /** Meldet einmalig, wenn mit dieser Bestätigung alle gelesen haben. */
+  private async checkCompleted(
+    page: Page,
+    request: { id: string; requestedById: string | null; roundStartedAt: any },
+    userId: string,
+  ) {
+    try {
+      const audience = await this.audience(page, request.requestedById);
+      if (!audience.some((u) => u.id === userId)) return;
+      const confirmed = await this.confirmations(request.id, request.roundStartedAt);
+      if (audience.every((u) => confirmed.has(u.id))) {
+        this.audit(AuditEvent.READ_CONFIRMATION_COMPLETED, page, { count: audience.length });
+      }
+    } catch (err) {
+      this.logger.warn(`Lesebestätigung prüfen fehlgeschlagen: ${err}`);
+    }
   }
 
   async status(pageId: string, user: User) {

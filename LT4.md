@@ -29,6 +29,7 @@ Eigener Code liegt bewusst in eigenen Ordnern, damit Updates von Docmost (`upstr
 | Beitrittslinks mit Registrierungscode, Konten ohne E-Mail (Benutzername), automatische Gruppenzuordnung | fertig |
 | Abgaben für Gruppenarbeit (Frist, Sperre, Freischalten), siehe docs/lt4/abgaben.md | fertig |
 | Seitenstatistik und veraltete Seiten, siehe docs/lt4/seitenstatistik.md | fertig |
+| Webhooks für Discord und andere Dienste (pro Bereich), siehe docs/lt4/webhooks.md | fertig |
 | SSO (OIDC) | geplant |
 | Bases (Inline-Datenbanken) | geplant |
 | Kanban, Kalender | geplant |
