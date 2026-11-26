@@ -1,5 +1,5 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
-import { Group, Select, Text } from "@mantine/core";
+import { Badge, Group, Select, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -8,7 +8,13 @@ import { setGroupRole } from "./roles-service";
 import { useRoleLabels, useSetRolesData } from "./use-roles";
 
 /** Rolle einer Gruppe: alle Mitglieder bekommen deren Rechte dazu. */
-export function GroupRoleSelect({ groupId }: { groupId: string }) {
+export function GroupRoleSelect({
+  groupId,
+  fullWidth,
+}: {
+  groupId: string;
+  fullWidth?: boolean;
+}) {
   const { t } = useTranslation();
   const { can } = useUserRole();
   const queryClient = useQueryClient();
@@ -45,7 +51,7 @@ export function GroupRoleSelect({ groupId }: { groupId: string }) {
   if (!can("members") && !current) return null;
 
   return (
-    <Group gap="xs" align="flex-end">
+    <Group gap="xs" align="flex-end" grow={fullWidth}>
       <Select
         label={t("Group role")}
         description={t("All members of this group get the rights of this role.")}
@@ -54,7 +60,8 @@ export function GroupRoleSelect({ groupId }: { groupId: string }) {
         onChange={change}
         disabled={!canChange}
         allowDeselect={false}
-        w={340}
+        w={fullWidth ? "100%" : 340}
+        variant={fullWidth ? "filled" : "default"}
       />
       {current && !canChange && (
         <Text size="xs" c="dimmed">
@@ -62,5 +69,18 @@ export function GroupRoleSelect({ groupId }: { groupId: string }) {
         </Text>
       )}
     </Group>
+  );
+}
+
+/** Kleines Abzeichen mit der Rolle einer Gruppe (für Listen). */
+export function GroupRoleBadge({ groupId }: { groupId: string }) {
+  const { data, roles, nameOf } = useRoleLabels();
+  const key = data?.groupRoles?.find((g) => g.groupId === groupId)?.roleKey;
+  const role = roles.find((r) => r.key === key);
+  if (!role) return null;
+  return (
+    <Badge size="xs" variant="light" ml={6}>
+      {nameOf(role)}
+    </Badge>
   );
 }
