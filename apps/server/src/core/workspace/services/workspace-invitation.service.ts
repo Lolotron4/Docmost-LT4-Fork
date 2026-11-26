@@ -44,7 +44,8 @@ import {
 import {
   getWorkspaceDefaultLocale,
   getWorkspaceDefaultPageEditMode,
-  isAdminActingOnOwner,
+  cannotActOnRole,
+  isKnownRole,
   normalizeInvitationMessage,
 } from '../workspace.util';
 import { INVITATION_EXPIRY_DAYS } from '../workspace.constants';
@@ -134,7 +135,12 @@ export class WorkspaceInvitationService {
     const { emails, role, groupIds } = inviteUserDto;
     const message = normalizeInvitationMessage(inviteUserDto.message);
 
-    if (isAdminActingOnOwner(authUser.role, role)) {
+    // LT4-Fork: nur Rollen unter der eigenen, nie Owner per Einladung
+    if (
+      role === 'owner' ||
+      !isKnownRole(workspace.id, role) ||
+      cannotActOnRole(authUser, role)
+    ) {
       throw new ForbiddenException();
     }
 

@@ -37,7 +37,8 @@ import {
 } from '../workspace.constants';
 import {
   getWorkspaceDefaultLocale,
-  isAdminActingOnOwner,
+  cannotActOnRole,
+  isKnownRole,
 } from '../workspace.util';
 import { v4 } from 'uuid';
 import { InjectQueue } from '@nestjs/bullmq';
@@ -844,7 +845,11 @@ export class WorkspaceService {
     userRoleDto: UpdateWorkspaceUserRoleDto,
     workspaceId: string,
   ) {
-    const newRole = userRoleDto.role.toLowerCase();
+    // LT4-Fork: eigene Rollen haben eine UUID als Schlüssel
+    const newRole = userRoleDto.role.trim();
+    if (!isKnownRole(workspaceId, newRole)) {
+      throw new BadRequestException('Unknown role');
+    }
     const result = await executeTx(this.db, async (trx) => {
       const workspace = await this.workspaceRepo.findById(workspaceId, {
         withLock: true,
@@ -864,8 +869,8 @@ export class WorkspaceService {
       }
 
       if (
-        isAdminActingOnOwner(authUser.role, newRole) ||
-        isAdminActingOnOwner(authUser.role, user.role)
+        cannotActOnRole(authUser, newRole) ||
+        cannotActOnRole(authUser, user.role)
       ) {
         throw new ForbiddenException();
       }
@@ -984,9 +989,9 @@ export class WorkspaceService {
         throw new BadRequestException('You cannot deactivate yourself');
       }
 
-      if (isAdminActingOnOwner(authUser.role, user.role)) {
+      if (cannotActOnRole(authUser, user.role)) {
         throw new BadRequestException(
-          'You cannot deactivate a user with owner role',
+          'You cannot deactivate a user with a role equal to or above your own',
         );
       }
 
@@ -1038,9 +1043,9 @@ export class WorkspaceService {
       throw new BadRequestException('User is not deactivated');
     }
 
-    if (isAdminActingOnOwner(authUser.role, user.role)) {
+    if (cannotActOnRole(authUser, user.role)) {
       throw new BadRequestException(
-        'You cannot activate a user with owner role',
+        'You cannot activate a user with a role equal to or above your own',
       );
     }
 
@@ -1087,9 +1092,9 @@ export class WorkspaceService {
         throw new BadRequestException('You cannot delete yourself');
       }
 
-      if (isAdminActingOnOwner(authUser.role, user.role)) {
+      if (cannotActOnRole(authUser, user.role)) {
         throw new BadRequestException(
-          'You cannot delete a user with owner role',
+          'You cannot delete a user with a role equal to or above your own',
         );
       }
 

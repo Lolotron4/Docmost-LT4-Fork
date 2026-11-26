@@ -1,4 +1,5 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
+import { hasPermission } from '../roles/role-store';
 import { Body, Controller, ForbiddenException, HttpCode, HttpStatus, Inject, Post, Req, UseGuards } from '@nestjs/common';
 import { IsBoolean, IsInt, Max, Min } from 'class-validator';
 import { InjectKysely } from 'nestjs-kysely';
@@ -49,7 +50,7 @@ export class SecuritySettingsController {
   @HttpCode(HttpStatus.OK)
   @Post('password-policy/update')
   async update(@Body() dto: PasswordPolicyDto, @AuthUser() user: User) {
-    if (user.role !== 'admin' && user.role !== 'owner') throw new ForbiddenException();
+    if (!hasPermission(user, 'settings')) throw new ForbiddenException();
     const before = await getPasswordPolicy(this.db, user.workspaceId);
     const policy = normalizePolicy(dto);
     await this.db

@@ -1,4 +1,5 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
+import { canActOnRole, findRole } from '../roles/role-store';
 import {
   BadRequestException,
   ForbiddenException,
@@ -121,7 +122,12 @@ export class JoinCodeService {
 
   async create(user: User, workspace: Workspace, dto: CreateJoinCodeDto) {
     this.assertCanManage(user, workspace);
-    if (dto.role === UserRole.ADMIN && user.role === UserRole.MEMBER) {
+    // Nur Rollen unter der eigenen (Rangfolge), nie Owner
+    if (
+      dto.role === UserRole.OWNER ||
+      !findRole(workspace.id, dto.role) ||
+      !canActOnRole(user, dto.role)
+    ) {
       throw new ForbiddenException();
     }
     const expiresAt = dto.expiresInDays
@@ -226,7 +232,7 @@ export class JoinCodeService {
     trx: KyselyTransaction,
     workspaceId: string,
     code: string,
-  ): Promise<UserRole.ADMIN | UserRole.MEMBER> {
+  ): Promise<string> {
     const row = await trx
       .selectFrom('lt4JoinCodes')
       .selectAll()
@@ -242,7 +248,10 @@ export class JoinCodeService {
       .set({ useCount: sql`use_count + 1` })
       .where('id', '=', row.id)
       .execute();
-    return row.role === UserRole.ADMIN ? UserRole.ADMIN : UserRole.MEMBER;
+    // Rolle muss noch existieren; Owner nie über einen Link
+    return row.role !== UserRole.OWNER && findRole(workspaceId, row.role)
+      ? row.role
+      : UserRole.MEMBER;
   }
 
   // -------------------------------------------- Admin: Passwort setzen
@@ -255,8 +264,8 @@ export class JoinCodeService {
     this.assertCanManage(actor, workspace);
     const target = await this.userRepo.findById(dto.userId, workspace.id);
     if (!target) throw new NotFoundException('User not found');
-    if (target.role === UserRole.OWNER && actor.role !== UserRole.OWNER) {
-      throw new ForbiddenException('Only an owner can change the password of an owner');
+    if (!canActOnRole(actor, target.role)) {
+      throw new ForbiddenException('You can only change passwords of members below your own role');
     }
 
     await assertPasswordPolicy(this.db, workspace.id, dto.password);

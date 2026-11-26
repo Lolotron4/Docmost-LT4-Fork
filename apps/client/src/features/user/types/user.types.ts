@@ -34,6 +34,8 @@ export interface IUser {
 export interface ICurrentUser {
   user: IUser;
   workspace: IWorkspace;
+  // LT4-Fork: Rechte der (ggf. eigenen) Rolle
+  permissions?: string[];
 }
 
 export interface IUserSettings {

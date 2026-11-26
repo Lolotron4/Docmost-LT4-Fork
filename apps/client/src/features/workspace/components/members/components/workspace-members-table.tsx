@@ -6,14 +6,10 @@ import {
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import React, { useState } from "react";
 import RoleSelectMenu from "@/components/ui/role-select-menu.tsx";
-import {
-  getUserRoleLabel,
-  userRoleData,
-} from "@/features/workspace/types/user-role-data.ts";
+import { useRoleLabels } from "@/lt4/roles/use-roles";
 import useUserRole from "@/hooks/use-user-role.tsx";
 import { useMfaMembers } from "@/lt4/mfa/use-mfa-members";
 import { MfaMemberBadge } from "@/lt4/mfa/components/mfa-member-badge";
-import { UserRole } from "@/lib/types.ts";
 import { useTranslation } from "react-i18next";
 import Paginate from "@/components/common/paginate.tsx";
 import { SearchInput } from "@/components/common/search-input.tsx";
@@ -41,7 +37,9 @@ export default function WorkspaceMembersTable() {
     status,
   });
   const changeMemberRoleMutation = useChangeMemberRoleMutation();
-  const { isAdmin, isOwner } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("members");
+  const { labelOf, assignableRoles, canManageRole } = useRoleLabels();
   const mfaUserIds = useMfaMembers(isAdmin);
 
   const handleStatusChange = (value: MemberListStatus) => {
@@ -49,9 +47,8 @@ export default function WorkspaceMembersTable() {
     resetPagination();
   };
 
-  const assignableUserRoles = isOwner
-    ? userRoleData
-    : userRoleData.filter((role) => role.value !== UserRole.OWNER);
+  // LT4-Fork: nur Rollen unter der eigenen (Owner: alle)
+  const assignableUserRoles = assignableRoles({ withOwner: true });
 
   const handleRoleChange = async (
     userId: string,
@@ -150,20 +147,20 @@ export default function WorkspaceMembersTable() {
                     )}
                   </Table.Td>
                   <Table.Td>
-                    {isAdmin && !user.deletedAt ? (
+                    {isAdmin && !user.deletedAt && canManageRole(user.role) ? (
                       <RoleSelectMenu
                         roles={assignableUserRoles}
-                        roleName={getUserRoleLabel(user.role)}
+                        roleName={labelOf(user.role)}
                         onChange={(newRole) =>
                           handleRoleChange(user.id, user.role, newRole)
                         }
                       />
                     ) : (
-                      <Text fz="sm">{t(getUserRoleLabel(user.role))}</Text>
+                      <Text fz="sm">{labelOf(user.role)}</Text>
                     )}
                   </Table.Td>
                   <Table.Td>
-                    {isAdmin && !user.deletedAt && (
+                    {isAdmin && !user.deletedAt && canManageRole(user.role) && (
                       <MemberActionMenu
                         userId={user.id}
                         name={user.name}

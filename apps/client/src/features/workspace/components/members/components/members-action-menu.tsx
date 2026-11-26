@@ -18,7 +18,8 @@ export default function MemberActionMenu({
   deactivatedAt,
 }: Props) {
   const { t } = useTranslation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("members");
 
   const isDeactivated = !!deactivatedAt;
 

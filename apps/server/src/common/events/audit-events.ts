@@ -136,6 +136,11 @@ export const AuditEvent = {
   ANNOUNCEMENT_UNARCHIVED: 'announcement.unarchived',
   ANNOUNCEMENT_DELETED: 'announcement.deleted',
 
+  // LT4: Rollen
+  ROLE_CREATED: 'role.created',
+  ROLE_UPDATED: 'role.updated',
+  ROLE_DELETED: 'role.deleted',
+
   // Base
   BASE_PROPERTY_UPDATED: 'base.property.updated',
   BASE_FORM_SHARE_UPDATED: 'base.form_share.updated',
@@ -172,6 +177,7 @@ export const AuditResource = {
   SIEM_DESTINATION: 'siem_destination',
   TEMPLATE: 'template',
   ANNOUNCEMENT: 'announcement',
+  ROLE: 'role',
 } as const;
 
 export type AuditResourceType =

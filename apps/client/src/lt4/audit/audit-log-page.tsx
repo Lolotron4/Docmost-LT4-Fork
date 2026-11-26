@@ -77,7 +77,8 @@ function describe(e: AuditEntry): string {
 
 export default function AuditLogPage() {
   const { t } = useTranslation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("audit");
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<Filters>({});
   const [selected, setSelected] = useState<AuditEntry | null>(null);

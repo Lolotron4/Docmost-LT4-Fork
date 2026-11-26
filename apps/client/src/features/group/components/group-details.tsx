@@ -13,7 +13,8 @@ export default function GroupDetails() {
   const { groupId } = useParams();
   const { data: group, isLoading } = useGroupQuery(groupId);
   const [opened, { open, close }] = useDisclosure(false);
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("groups");
 
   return (
     <>

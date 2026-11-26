@@ -1,12 +1,13 @@
-import { IsEnum, IsNotEmpty, IsUUID } from 'class-validator';
-import { UserRole } from '../../../common/helpers/types/permission';
+import { IsNotEmpty, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class UpdateWorkspaceUserRoleDto {
   @IsNotEmpty()
   @IsUUID()
   userId: string;
 
+  // LT4-Fork: eingebaute Rolle oder UUID einer eigenen Rolle
   @IsNotEmpty()
-  @IsEnum(UserRole)
+  @IsString()
+  @MaxLength(64)
   role: string;
 }

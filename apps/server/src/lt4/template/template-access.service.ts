@@ -4,12 +4,13 @@
 //  - Bereichs-Vorlagen: Bereichs-Admins; Bereichs-Schreiber, wenn "Mitglieder dürfen Vorlagen erstellen" an ist.
 //  - Workspace-Vorlagen: Mitglieder, wenn "Mitglieder dürfen Vorlagen erstellen" an ist.
 //  - Benutzen/Ansehen: Workspace-Vorlagen alle, Bereichs-Vorlagen alle Mitglieder des Bereichs.
+import { hasPermission } from '../roles/role-store';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { TemplateRepo } from '@docmost/db/repos/template/template.repo';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import { SpaceRepo } from '@docmost/db/repos/space/space.repo';
 import { Template, User, Workspace } from '@docmost/db/types/entity.types';
-import { SpaceRole, UserRole } from '../../common/helpers/types/permission';
+import { SpaceRole } from '../../common/helpers/types/permission';
 
 @Injectable()
 export class TemplateAccessService {
@@ -20,7 +21,7 @@ export class TemplateAccessService {
   ) {}
 
   isWorkspaceAdmin(user: User) {
-    return user.role === UserRole.ADMIN || user.role === UserRole.OWNER;
+    return hasPermission(user, 'settings');
   }
 
   membersMayCreate(workspace: Workspace) {

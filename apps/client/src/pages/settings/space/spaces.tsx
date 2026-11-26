@@ -7,15 +7,18 @@ import { DocumentTitle } from "@/components/ui/document-title.tsx";
 import { Navigate } from "react-router-dom";
 import APP_ROUTE from "@/lib/app-route.ts";
 import useCurrentUser from "@/features/user/hooks/use-current-user.ts";
-import { UserRole } from "@/lib/types.ts";
+import { fallbackPermissions } from "@/lt4/roles/role-permissions";
 
 export default function Spaces() {
   const { t } = useTranslation();
   // role from the query: the stored user atom is still empty on a first visit
   const { data: currentUser } = useCurrentUser();
   const role = currentUser?.user?.role;
+  // LT4-Fork: Recht "Bereiche verwalten" der (ggf. eigenen) Rolle
+  const permissions =
+    currentUser?.permissions ?? fallbackPermissions(role);
 
-  if (role !== UserRole.ADMIN && role !== UserRole.OWNER) {
+  if (role !== "owner" && !permissions.includes("spaces")) {
     return <Navigate to={APP_ROUTE.SPACES} replace />;
   }
 

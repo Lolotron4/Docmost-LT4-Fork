@@ -8,7 +8,8 @@ import { DocumentTitle } from "@/components/ui/document-title.tsx";
 
 export default function Groups() {
   const { t } = useTranslation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("groups");
 
   return (
     <>

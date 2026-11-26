@@ -17,7 +17,8 @@ export default function WorkspaceMembers() {
   const [segmentValue, setSegmentValue] = useState("members");
   const [workspace] = useAtom(workspaceAtom);
   const [searchParams] = useSearchParams();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("members");
   const navigate = useNavigate();
 
   useEffect(() => {

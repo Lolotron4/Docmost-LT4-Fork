@@ -19,8 +19,11 @@ import { NoUrls } from '../../common/validators/no-urls.validator';
 import { USERNAME_PATTERN } from './username';
 
 export class CreateJoinCodeDto {
-  @IsIn(['member', 'admin'])
-  role: 'member' | 'admin';
+  // Eingebaute Rolle oder UUID einer eigenen Rolle (Prüfung im Service)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(64)
+  role: string;
 
   @IsOptional()
   @IsInt()

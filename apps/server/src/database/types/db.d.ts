@@ -857,8 +857,23 @@ export interface Lt4AiSettings {
   workspaceId: string;
 }
 
+// LT4-Fork: eigene Rollen
+export interface Lt4Roles {
+  createdAt: Generated<Timestamp>;
+  description: string | null;
+  id: Generated<string>;
+  isSystem: Generated<boolean>;
+  key: string;
+  name: string;
+  permissions: Generated<Json>;
+  position: Generated<number>;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
 export interface DB {
   lt4JoinCodes: Lt4JoinCodes;
+  lt4Roles: Lt4Roles;
   lt4AiSettings: Lt4AiSettings;
   lt4ReadRequests: Lt4ReadRequests;
   lt4ReadConfirmations: Lt4ReadConfirmations;
