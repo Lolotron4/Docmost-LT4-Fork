@@ -22,6 +22,8 @@
 #   CONTAINER_APP_NAME / CONTAINER_DB_NAME / CONTAINER_REDIS_NAME  Containernamen
 #   DOCMOST_INTERNAL_NETWORK  Name des internen Netzes (Standard: lt4-dm-test)
 #   FILE_UPLOAD_SIZE_LIMIT / FILE_IMPORT_SIZE_LIMIT  z. B. 500mb / 800mb
+#   LT4_BACKUP_UPLOAD_LIMIT  Höchstgröße beim Hochladen einer Sicherung (Standard 20gb).
+#                  Sicherungen liegen in DATA_DIR/docmost/lt4-backups (Anleitung: docs/lt4/sicherungen.md)
 #
 # Optional, Integrationen (Linkvorschauen, Anleitung: docs/lt4/integrationen.md):
 #   INTEGRATION_GITHUB_CLIENT_ID / INTEGRATION_GITHUB_CLIENT_SECRET  GitHub-OAuth-App (für private Repos)
@@ -61,6 +63,7 @@ services:
       INTEGRATION_GITLAB_CLIENT_ID: ${INTEGRATION_GITLAB_CLIENT_ID:-}
       INTEGRATION_GITLAB_CLIENT_SECRET: ${INTEGRATION_GITLAB_CLIENT_SECRET:-}
       INTEGRATION_GITLAB_URL: ${INTEGRATION_GITLAB_URL:-}
+      LT4_BACKUP_UPLOAD_LIMIT: ${LT4_BACKUP_UPLOAD_LIMIT:-20gb}
     expose:
       - "3000"
     restart: unless-stopped

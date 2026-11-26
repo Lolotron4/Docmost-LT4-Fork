@@ -153,6 +153,14 @@ export const AuditEvent = {
   // Base
   BASE_PROPERTY_UPDATED: 'base.property.updated',
   BASE_FORM_SHARE_UPDATED: 'base.form_share.updated',
+
+  // LT4: Sicherungen
+  BACKUP_CREATED: 'backup.created',
+  BACKUP_DELETED: 'backup.deleted',
+  BACKUP_DOWNLOADED: 'backup.downloaded',
+  BACKUP_UPLOADED: 'backup.uploaded',
+  BACKUP_RESTORED: 'backup.restored',
+  BACKUP_SETTINGS_UPDATED: 'backup.settings_updated',
 } as const;
 
 export type AuditEventType = (typeof AuditEvent)[keyof typeof AuditEvent];
@@ -188,6 +196,7 @@ export const AuditResource = {
   ANNOUNCEMENT: 'announcement',
   ROLE: 'role',
   WEBHOOK: 'webhook',
+  BACKUP: 'backup',
 } as const;
 
 export type AuditResourceType =

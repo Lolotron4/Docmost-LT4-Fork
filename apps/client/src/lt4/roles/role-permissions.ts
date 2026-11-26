@@ -16,13 +16,14 @@ export const LT4_PERMISSIONS = [
   "audit",
   "page_stats",
   "webhooks",
+  "backups",
 ] as const;
 
 export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];
 
 /** Gruppen für die Anzeige im Rollen-Dialog. */
 export const PERMISSION_GROUPS: { label: string; items: Lt4Permission[] }[] = [
-  { label: "Workspace", items: ["settings", "announcements", "webhooks", "audit", "page_stats"] },
+  { label: "Workspace", items: ["settings", "announcements", "webhooks", "audit", "page_stats", "backups"] },
   { label: "People", items: ["members", "groups", "roles"] },
   { label: "Content and tools", items: ["spaces", "pages_copy", "assignments", "templates_create", "templates", "ai_use", "ai_manage", "api"] },
 ];
@@ -101,10 +102,16 @@ export const PERMISSION_LABELS: Record<
     description:
       "See for every page who opened it and when, and who has not opened it yet",
   },
+  backups: {
+    label: "Manage backups",
+    description:
+      "Create, download and restore backups of the whole instance. Restoring replaces all data.",
+  },
 };
 
 /** Für ältere zwischengespeicherte Sitzungen ohne permissions-Feld. */
 export function fallbackPermissions(role?: string | null): string[] {
-  if (role === "owner" || role === "admin") return [...LT4_PERMISSIONS];
+  if (role === "owner") return [...LT4_PERMISSIONS];
+  if (role === "admin") return LT4_PERMISSIONS.filter((p) => p !== "backups");
   return [];
 }
