@@ -1,6 +1,6 @@
 # Aufgaben mit Fälligkeit (LT4)
 
-Seit LT4-Docs v1.3.0 lassen sich Checkboxen auf Seiten Personen zuweisen.
+Seit LT4-Docs v1.4.0 lassen sich Checkboxen auf Seiten Personen zuweisen.
 
 ## So geht's
 

@@ -28,6 +28,7 @@ import {
   usePageEditMode,
 } from "@/lt4/page-verification";
 import { ReadConfirmationBar } from "@/lt4/read-confirmation/read-confirmation";
+import { AssignmentBar } from "@/lt4/assignment/assignment-bar";
 import { useTranslation } from "react-i18next";
 import { IContributor } from "@/features/page/types/page.types.ts";
 import { PageEditMode } from "@/features/user/types/user.types.ts";
@@ -122,6 +123,7 @@ export function FullEditor({
       )}
       {space && <SpaceArchivedNotice space={space} />}
       <MemoizedDeletedPageBanner slugId={slugId} />
+      <AssignmentBar pageId={pageId} />
       <ReadConfirmationBar pageId={pageId} />
       {editable && verificationUnavailable && (
         <Alert color="yellow" mx="md" mb="sm">
