@@ -8,8 +8,15 @@ import {
   Inject,
   NotFoundException,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
+import {
+  ShareGuardService,
+  assertSharePassword,
+  parseDate,
+} from '../../lt4/share-guard/share-guard.service';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { User, Workspace } from '@docmost/db/types/entity.types';
 import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
@@ -48,6 +55,7 @@ export class ShareController {
     private readonly pageAccessService: PageAccessService,
     private readonly licenseCheckService: LicenseCheckService,
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,
+    private readonly shareGuard: ShareGuardService,
   ) {}
 
   @ApiKeyScope('read')
@@ -66,6 +74,7 @@ export class ShareController {
   async getSharedPageInfo(
     @Body() dto: ShareInfoDto,
     @AuthWorkspace() workspace: Workspace,
+    @Req() req: FastifyRequest,
   ) {
     if (!dto.pageId && !dto.shareId) {
       throw new BadRequestException();
@@ -81,6 +90,12 @@ export class ShareController {
       throw new NotFoundException('Shared page not found');
     }
 
+    // LT4: Gastlinks mit Ablauf/Passwort
+    await this.shareGuard.assertAccess(
+      { id: shareData.share.id, workspaceId: workspace.id },
+      req,
+    );
+
     return {
       ...shareData,
       features: this.licenseCheckService.resolveFeatures(
@@ -93,7 +108,7 @@ export class ShareController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('/info')
-  async getShare(@Body() dto: ShareIdDto) {
+  async getShare(@Body() dto: ShareIdDto, @Req() req: FastifyRequest) {
     const share = await this.shareRepo.findById(dto.shareId, {
       includeSharedPage: true,
     });
@@ -110,6 +125,9 @@ export class ShareController {
       throw new NotFoundException('Share not found');
     }
 
+    // LT4: Gastlinks mit Ablauf/Passwort
+    await this.shareGuard.assertAccess(share, req);
+
     return share;
   }
 
@@ -119,11 +137,18 @@ export class ShareController {
   async transclusionLookup(
     @Body() dto: ShareTransclusionLookupDto,
     @AuthWorkspace() workspace: Workspace,
+    @Req() req: FastifyRequest,
   ) {
+    // LT4: Gastlinks mit Ablauf/Passwort
+    const share = await this.shareRepo.findById(dto.shareId);
+    if (share && share.workspaceId === workspace.id) {
+      await this.shareGuard.assertAccess(share, req);
+    }
     return this.shareService.lookupTransclusionForShare(
       dto.shareId,
       dto.references,
       workspace.id,
+      (s) => this.shareGuard.canAccess(s, req),
     );
   }
 
@@ -179,6 +204,15 @@ export class ShareController {
       throw new ForbiddenException('Public sharing is disabled');
     }
 
+    // LT4: Regeln für Gastlinks (Ablauf/Passwort) vor dem Erstellen prüfen
+    const lt4ExpiresAt = parseDate(createShareDto.expiresAt);
+    const lt4Password = createShareDto.password || null;
+    assertSharePassword(lt4Password);
+    await this.shareGuard.validateAgainstPolicy(user, {
+      expiresAt: lt4ExpiresAt,
+      hasPassword: !!lt4Password,
+    });
+
     const share = await this.shareService.createShare({
       page,
       authUserId: user.id,
@@ -196,6 +230,13 @@ export class ShareController {
         spaceId: page.spaceId,
       },
     });
+
+    if (lt4ExpiresAt || lt4Password) {
+      await this.shareGuard.update(user, share, {
+        expiresAt: lt4ExpiresAt ? lt4ExpiresAt.toISOString() : null,
+        password: lt4Password,
+      });
+    }
 
     return share;
   }
@@ -259,6 +300,7 @@ export class ShareController {
   async getSharePageTree(
     @Body() dto: ShareIdDto,
     @AuthWorkspace() workspace: Workspace,
+    @Req() req: FastifyRequest,
   ) {
     const treeData = await this.shareService.getShareTree(
       dto.shareId,
@@ -272,6 +314,9 @@ export class ShareController {
     if (!sharingAllowed) {
       throw new NotFoundException('Share not found');
     }
+
+    // LT4: Gastlinks mit Ablauf/Passwort
+    await this.shareGuard.assertAccess(treeData.share, req);
 
     return {
       ...treeData,

@@ -879,7 +879,18 @@ export interface Lt4GroupRoles {
   workspaceId: string;
 }
 
+// LT4-Fork: Gastlinks (Ablauf und Passwort für Freigaben)
+export interface Lt4ShareSettings {
+  createdAt: Generated<Timestamp>;
+  expiresAt: Timestamp | null;
+  passwordHash: string | null;
+  shareId: string;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
 export interface DB {
+  lt4ShareSettings: Lt4ShareSettings;
   lt4GroupRoles: Lt4GroupRoles;
   lt4JoinCodes: Lt4JoinCodes;
   lt4Roles: Lt4Roles;

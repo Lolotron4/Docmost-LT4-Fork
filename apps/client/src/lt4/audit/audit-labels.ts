@@ -67,6 +67,7 @@ export const AUDIT_EVENT_LABELS: Record<string, string> = {
   "page.verification_invalidated": "Reviewed page changed",
   "share.created": "Public link created",
   "share.deleted": "Public link removed",
+  "share.updated": "Public link expiry or password changed",
   "sso.provider_created": "Login provider added",
   "sso.provider_updated": "Login provider changed",
   "sso.provider_deleted": "Login provider removed",

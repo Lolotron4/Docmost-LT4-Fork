@@ -44,6 +44,7 @@ describe('SearchController public-space-search gate', () => {
       {} as any,
       {} as any,
       {} as any,
+      { assertAccess: jest.fn() } as any,
     );
     return { controller, searchService, publicSpaceService, pageRepo };
   }
@@ -150,6 +151,7 @@ describe('SearchController share-search gate', () => {
       shareService as any,
       shareRepo as any,
       {} as any,
+      { assertAccess: jest.fn() } as any,
     );
     const searchTypesense = jest
       .spyOn(controller, 'searchTypesense')
@@ -169,6 +171,7 @@ describe('SearchController share-search gate', () => {
         controller.searchShare(
           { query: 'orbital', shareId: 'closedkey' } as any,
           workspace,
+          {} as any,
         ),
       ).rejects.toBeInstanceOf(NotFoundException);
       expect(searchService.searchPage).not.toHaveBeenCalled();
@@ -183,6 +186,7 @@ describe('SearchController share-search gate', () => {
       controller.searchShare(
         { query: 'orbital', shareId: 'missingkey' } as any,
         workspace,
+        {} as any,
       ),
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(searchService.searchPage).not.toHaveBeenCalled();
@@ -194,6 +198,7 @@ describe('SearchController share-search gate', () => {
     await controller.searchShare(
       { query: 'orbital', shareId: 'openkey', spaceId: OPEN_SPACE_ID } as any,
       workspace,
+      {} as any,
     );
 
     expect(searchService.searchPage).toHaveBeenCalledWith(

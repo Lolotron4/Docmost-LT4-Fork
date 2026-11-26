@@ -60,6 +60,9 @@ export interface ICreateShare {
   pageId?: string;
   includeSubPages?: boolean;
   searchIndexing?: boolean;
+  // LT4: Gastlinks
+  expiresAt?: string | null;
+  password?: string | null;
 }
 
 export type IUpdateShare = ICreateShare & { shareId: string; pageId?: string };
