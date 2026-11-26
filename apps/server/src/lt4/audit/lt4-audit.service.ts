@@ -4,6 +4,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { ClsService } from 'nestjs-cls';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { sql } from 'kysely';
 import { isIP } from 'node:net';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
@@ -18,6 +19,14 @@ import {
 } from '../../common/middlewares/audit-context.middleware';
 
 export const DEFAULT_AUDIT_RETENTION_DAYS = 365;
+
+/** Wird nach jedem Audit-Ereignis ausgelöst (z. B. für Webhooks). */
+export const LT4_AUDIT_EVENT = 'lt4.audit';
+export interface Lt4AuditEventData {
+  workspaceId: string;
+  actorId: string | null;
+  payload: AuditLogPayload;
+}
 const CLEANUP_INTERVAL_MS = 6 * 60 * 60 * 1000;
 
 @Injectable()
@@ -28,6 +37,7 @@ export class Lt4AuditService implements IAuditService, OnModuleInit, OnModuleDes
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
     private readonly cls: ClsService,
+    private readonly events: EventEmitter2,
   ) {}
 
   onModuleInit() {
@@ -48,13 +58,21 @@ export class Lt4AuditService implements IAuditService, OnModuleInit, OnModuleDes
     }
   }
 
-  private async resolveWorkspaceId(ctx: Partial<AuditLogContext> | undefined, actorId?: string | null) {
+  private async resolveWorkspaceId(
+    ctx: Partial<AuditLogContext> | undefined,
+    actorId?: string | null,
+    payloads: AuditLogPayload[] = [],
+  ) {
     if (ctx?.workspaceId) return ctx.workspaceId;
-    if (!actorId) return null;
+    // Neu angelegte Personen (Registrierung) haben noch keinen Handelnden
+    const userId =
+      actorId ??
+      payloads.find((p) => p.resourceType === 'user' && isUuid(p.resourceId))?.resourceId;
+    if (!userId) return null;
     const row = await this.db
       .selectFrom('users')
       .select('workspaceId')
-      .where('id', '=', actorId)
+      .where('id', '=', userId)
       .executeTakeFirst();
     return row?.workspaceId ?? null;
   }
@@ -63,8 +81,16 @@ export class Lt4AuditService implements IAuditService, OnModuleInit, OnModuleDes
     if (payloads.length === 0) return;
     try {
       const actorId = ctx.actorId ?? null;
-      const workspaceId = await this.resolveWorkspaceId(ctx, actorId);
+      const workspaceId = await this.resolveWorkspaceId(ctx, actorId, payloads);
       if (!workspaceId) return;
+      // Für Webhooks (Discord & Co.); darf das Speichern nicht verhindern
+      for (const payload of payloads) {
+        try {
+          this.events.emit(LT4_AUDIT_EVENT, { workspaceId, actorId, payload } as Lt4AuditEventData);
+        } catch {
+          /* ignorieren */
+        }
+      }
       const ip = ctx.ipAddress && isIP(ctx.ipAddress.replace(/^::ffff:/, '')) ? ctx.ipAddress : null;
       await this.db
         .insertInto('audit')

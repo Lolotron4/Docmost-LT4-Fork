@@ -17,6 +17,7 @@ Rollen stehen von oben nach unten. Ganz oben steht immer der **Owner**.
 | --- | --- |
 | Arbeitsbereich-Einstellungen verwalten | Allgemein, Sicherheit, Anmeldung (SSO/LDAP), Integrationen, öffentliche Freigabe |
 | Ankündigungen verwalten | Banner erstellen, ändern, entfernen |
+| Webhooks verwalten | Discord- und andere Webhooks einrichten (Einstellungen > Webhooks) |
 | Audit-Log ansehen | Audit-Log |
 | Mitglieder verwalten | Einladen, Beitrittslinks, Rollen zuweisen, deaktivieren, entfernen |
 | Gruppen verwalten | Gruppen anlegen und Mitglieder ändern |
