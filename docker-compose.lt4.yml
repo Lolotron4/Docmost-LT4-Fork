@@ -13,6 +13,11 @@
 #                  /var/lib/postgresql (passt zu postgres:18). Für postgres:17 und älter
 #                  /var/lib/postgresql/data setzen, sonst legt das Image ein anonymes
 #                  Volume an und startet mit einer leeren Datenbank.
+#   REDIS_IMAGE    Redis-Image (Standard: redis:8.2.3-alpine, feste Version statt
+#                  wanderndem "redis:8"). Redis hält nur Warteschlangen und Sitzungen.
+#                  Startet Redis nach einem Wechsel auf eine ÄLTERE Version nicht
+#                  ("Can't handle RDB format version"), den Ordner DATA_DIR/redis_data
+#                  leeren. Seiten und Dateien sind davon nicht betroffen.
 #   LT4_IMAGE      Fertiges Image statt Bau auf dem Server, z. B.
 #                  ghcr.io/lolotron4/docmost-lt4-fork:main (Tag = Branchname, "/" wird "-",
 #                  also lt4/themes -> :lt4-themes). Zusammen mit LT4_PULL_POLICY=always.
@@ -90,7 +95,7 @@ services:
       - lt4-internal
 
   redis:
-    image: redis:8
+    image: ${REDIS_IMAGE:-redis:8.2.3-alpine}
     container_name: ${CONTAINER_REDIS_NAME:-docmost-lt4-test1-redis}
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     restart: unless-stopped
