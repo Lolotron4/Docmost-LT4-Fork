@@ -2723,5 +2723,9 @@
   "{{count}} min left_one": "{{count}} min left",
   "{{count}} min left_other": "{{count}} min left",
   "{{count}} pages will be created_one": "{{count}} page will be created",
-  "{{count}} pages will be created_other": "{{count}} pages will be created"
+  "{{count}} pages will be created_other": "{{count}} pages will be created",
+  "{{count}} views_one": "1 view",
+  "{{count}} views_other": "{{count}} views",
+  "{{count}} pages_one": "1 page",
+  "{{count}} pages_other": "{{count}} pages"
 }

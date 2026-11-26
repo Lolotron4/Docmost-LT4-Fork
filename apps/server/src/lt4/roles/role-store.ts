@@ -25,11 +25,15 @@ export const LT4_PERMISSIONS = [
   'templates_create', // Vorlagen erstellen und eigene Vorlagen verwalten
   'templates', // Vorlagen anderer verwalten (alle Vorlagen)
   'pages_copy', // Seiten in einen anderen Bereich kopieren, auch mit nur Leserecht
+  'shares_unrestricted', // Gastlinks ohne Ablauf/Passwort erstellen, auch wenn Regeln das verlangen
   'assignments', // Abgaben aller Personen verwalten: gesperrte Seiten freischalten, Frist verlängern
   'ai_manage', // KI-Assistent einrichten (Anbieter, Schlüssel, Freigabe)
   'ai_use', // KI-Assistent immer nutzen dürfen, auch wenn er eingeschränkt ist
   'api', // API-Schlüssel aller Personen verwalten
   'audit', // Audit-Log lesen
+  'page_stats', // Seitenstatistik aller Seiten mit Namen der Lesenden sehen
+  'webhooks', // Webhooks (Discord & Co.) einrichten
+  'backups', // Sicherungen erstellen, herunterladen und wiederherstellen
 ] as const;
 
 export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];
@@ -46,6 +50,12 @@ export interface Lt4Role {
 }
 
 const ALL: Lt4Permission[] = [...LT4_PERMISSIONS];
+/**
+ * Rechte, die die eingebaute Admin-Rolle NICHT automatisch hat. Owner
+ * können sie Admins (oder eigenen Rollen) bewusst geben.
+ */
+const OWNER_DEFAULT_ONLY: Lt4Permission[] = ['backups'];
+const ADMIN_DEFAULT: Lt4Permission[] = ALL.filter((p) => !OWNER_DEFAULT_ONLY.includes(p));
 
 export function defaultRoles(): Lt4Role[] {
   return [
@@ -62,7 +72,7 @@ export function defaultRoles(): Lt4Role[] {
       name: 'Admin',
       description: null,
       position: 100,
-      permissions: ALL,
+      permissions: ADMIN_DEFAULT,
       isSystem: true,
     },
     {

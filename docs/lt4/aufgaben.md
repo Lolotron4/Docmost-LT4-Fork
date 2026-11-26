@@ -1,6 +1,6 @@
 # Aufgaben mit Fälligkeit (LT4)
 
-Seit LT4-Docs v1.4.0 lassen sich Checkboxen auf Seiten Personen zuweisen.
+Seit LT4-Docs v1.8.0 lassen sich Checkboxen auf Seiten Personen zuweisen.
 
 ## So geht's
 
@@ -30,7 +30,7 @@ Im Editor sind überfällige Daten in offenen Aufgaben rot, heute fällige orang
 
 ## Technik
 
-- Tabelle `lt4_tasks` (Migration `20261126T210000-lt4-tasks`), ein Eintrag pro Aufgabe und Person.
+- Tabelle `lt4_tasks` (Migration `20261126T234500-lt4-tasks`), ein Eintrag pro Aufgabe und Person.
   Sie wird beim Speichern einer Seite abgeglichen; vorhandene Seiten werden bei der Migration
   ohne Benachrichtigung eingelesen.
 - Code: `apps/server/src/lt4/tasks`, `apps/client/src/lt4/tasks`.

@@ -859,6 +859,16 @@ export interface Lt4ReadRequests {
   updatedAt: Generated<Timestamp>;
 }
 
+// LT4-Fork: Seitenstatistik
+export interface Lt4PageViews {
+  pageId: string;
+  userId: string;
+  workspaceId: string;
+  day: Timestamp;
+  views: Generated<number>;
+  lastViewedAt: Generated<Timestamp>;
+}
+
 export interface Lt4ReadConfirmations {
   id: Generated<string>;
   requestId: string;
@@ -898,6 +908,37 @@ export interface Lt4GroupRoles {
   workspaceId: string;
 }
 
+// LT4-Fork: Gastlinks (Ablauf und Passwort für Freigaben)
+export interface Lt4ShareSettings {
+  createdAt: Generated<Timestamp>;
+  expiresAt: Timestamp | null;
+  passwordHash: string | null;
+  shareId: string;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
+// LT4-Fork: Webhooks
+export interface Lt4Webhooks {
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  enabled: Generated<boolean>;
+  events: Generated<Json>;
+  failureCount: Generated<number>;
+  id: Generated<string>;
+  language: Generated<string>;
+  lastError: string | null;
+  lastSentAt: Timestamp | null;
+  lastStatus: number | null;
+  name: string;
+  secret: string | null;
+  spaceIds: string[] | null;
+  type: Generated<string>;
+  updatedAt: Generated<Timestamp>;
+  url: string;
+  workspaceId: string;
+}
+
 export interface Lt4Assignments {
   id: Generated<string>;
   workspaceId: string;
@@ -931,6 +972,8 @@ export interface Lt4AssignmentSubmissions {
 }
 
 export interface DB {
+  lt4ShareSettings: Lt4ShareSettings;
+  lt4Webhooks: Lt4Webhooks;
   lt4Assignments: Lt4Assignments;
   lt4AssignmentSubmissions: Lt4AssignmentSubmissions;
   lt4GroupRoles: Lt4GroupRoles;
@@ -939,6 +982,7 @@ export interface DB {
   lt4AiSettings: Lt4AiSettings;
   lt4ReadRequests: Lt4ReadRequests;
   lt4Tasks: Lt4Tasks;
+  lt4PageViews: Lt4PageViews;
   lt4ReadConfirmations: Lt4ReadConfirmations;
   aiChats: AiChats;
   aiChatMessages: AiChatMessages;

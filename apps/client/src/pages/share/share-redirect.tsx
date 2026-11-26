@@ -3,12 +3,14 @@ import { useEffect } from "react";
 import { buildSharedPageUrl } from "@/features/page/page.utils.ts";
 import { Error404 } from "@/components/ui/error-404.tsx";
 import { useGetShareByIdQuery } from "@/features/share/queries/share-query.ts";
+import { getShareBlock } from "@/lt4/share-guard/share-guard-service.ts";
+import { ShareGate } from "@/lt4/share-guard/share-gate.tsx";
 
 export default function ShareRedirect() {
   const { shareId } = useParams();
   const navigate = useNavigate();
 
-  const { data: share, isLoading, isError } = useGetShareByIdQuery(shareId);
+  const { data: share, isLoading, isError, error } = useGetShareByIdQuery(shareId);
 
   useEffect(() => {
     if (share) {
@@ -24,6 +26,9 @@ export default function ShareRedirect() {
   }, [isLoading, share]);
 
   if (isError) {
+    // LT4: Gastlink mit Passwort oder abgelaufen
+    const shareBlock = getShareBlock(error);
+    if (shareBlock) return <ShareGate block={shareBlock} />;
     return <Error404 />;
   }
 

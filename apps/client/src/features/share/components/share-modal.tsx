@@ -29,6 +29,12 @@ import useTrial from "@/lt4/hooks/use-trial.tsx";
 import { useAtom } from "jotai";
 import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
 import { useSpaceQuery } from "@/features/space/queries/space-query.ts";
+import {
+  policyApplies,
+  ShareCreateForm,
+  ShareLinkOptions,
+  useShareLinkPolicy,
+} from "@/lt4/share-guard/share-link-options.tsx";
 
 interface ShareModalProps {
   readOnly: boolean;
@@ -51,6 +57,9 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
   const createShareMutation = useCreateShareMutation();
   const updateShareMutation = useUpdateShareMutation();
   const deleteShareMutation = useDeleteShareMutation();
+  // LT4: Gastlinks mit Ablauf/Passwort
+  const { data: sharePolicy } = useShareLinkPolicy();
+  const [creatingGuarded, setCreatingGuarded] = useState(false);
   // pageIsShared means that the share exists and its level equals zero.
   const pageIsShared = share && share.level === 0;
   // if level is greater than zero, then it is a descendant page from a shared page
@@ -69,6 +78,12 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
 
   const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.currentTarget.checked;
+    if (value && !share && policyApplies(sharePolicy)) {
+      // LT4: Regeln verlangen Ablauf/Passwort, erst das Formular zeigen
+      setCreatingGuarded(true);
+      return;
+    }
+    setCreatingGuarded(false);
     setIsPagePublic(value);
 
     try {
@@ -83,6 +98,24 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
       }
     } catch {
       setIsPagePublic(!value);
+    }
+  };
+
+  const handleGuardedCreate = async (data: {
+    expiresAt: string | null;
+    password: string | null;
+  }) => {
+    try {
+      await createShareMutation.mutateAsync({
+        pageId: pageId,
+        includeSubPages: true,
+        searchIndexing: false,
+        expiresAt: data.expiresAt,
+        password: data.password,
+      });
+      setCreatingGuarded(false);
+    } catch {
+      // Fehlermeldung kommt aus der Mutation
     }
   };
 
@@ -139,7 +172,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
   );
 
   return (
-    <Popover width={350} position="bottom" withArrow shadow="md">
+    <Popover width={370} position="bottom" withArrow shadow="md">
       <Popover.Target>
         <Button
           size="compact-sm"
@@ -239,11 +272,23 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
               </div>
               <Switch
                 onChange={handleChange}
-                defaultChecked={isPagePublic}
+                checked={isPagePublic || creatingGuarded}
                 disabled={readOnly}
                 size="xs"
               />
             </Group>
+
+            {creatingGuarded && !share && sharePolicy && (
+              <ShareCreateForm
+                policy={sharePolicy}
+                busy={createShareMutation.isPending}
+                onCreate={handleGuardedCreate}
+                onCancel={() => {
+                  setCreatingGuarded(false);
+                  setIsPagePublic(false);
+                }}
+              />
+            )}
 
             {pageIsShared && (
               <>
@@ -277,6 +322,7 @@ export default function ShareModal({ readOnly }: ShareModalProps) {
                     disabled={readOnly}
                   />
                 </Group>
+                <ShareLinkOptions shareId={share.id} readOnly={readOnly} />
               </>
             )}
           </>
