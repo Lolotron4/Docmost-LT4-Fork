@@ -36,6 +36,7 @@ const AnnouncementSettings = lazyWithPrefetch(
 const TemplatesPage = lazyWithPrefetch(() => import("@/lt4/template/pages/templates-page"));
 const AuditLogPage = lazyWithPrefetch(() => import("@/lt4/audit/audit-log-page"));
 const RolesSettings = lazyWithPrefetch(() => import("@/lt4/roles/roles-settings"));
+const WebhooksSettings = lazyWithPrefetch(() => import("@/lt4/webhooks/webhooks-settings"));
 const ReviewsPage = lazyWithPrefetch(() => import("@/lt4/page-verification/pages/reviews-page"));
 const TemplateEditorPage = lazyWithPrefetch(
   () => import("@/lt4/template/pages/template-editor-page"),
@@ -196,6 +197,7 @@ export default function App() {
             <Route path={"announcements"} element={<AnnouncementSettings />} />
             <Route path={"audit-log"} element={<AuditLogPage />} />
             <Route path={"roles"} element={<RolesSettings />} />
+            <Route path={"webhooks"} element={<WebhooksSettings />} />
           </Route>
         </Route>
       </Routes>

@@ -83,6 +83,11 @@ export const AUDIT_EVENT_LABELS: Record<string, string> = {
   "role.created": "Role created",
   "role.updated": "Role changed",
   "role.deleted": "Role deleted",
+  "webhook.created": "Webhook created",
+  "webhook.updated": "Webhook changed",
+  "webhook.deleted": "Webhook deleted",
+  "page.read_confirmation_requested": "Read confirmation requested",
+  "page.read_confirmation_completed": "Everyone confirmed reading",
   "integration.installed": "Integration installed",
   "integration.uninstalled": "Integration removed",
   "integration.connected": "Integration connected",
@@ -99,5 +104,6 @@ export const AUDIT_CATEGORIES: { value: string; label: string }[] = [
   { value: "workspace.", label: "Workspace" },
   { value: "api_key.", label: "API keys" },
   { value: "role.", label: "Roles" },
+  { value: "webhook.", label: "Webhooks" },
   { value: "attachment.", label: "Files" },
 ];

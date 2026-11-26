@@ -29,6 +29,7 @@ export const LT4_PERMISSIONS = [
   'ai_use', // KI-Assistent immer nutzen dürfen, auch wenn er eingeschränkt ist
   'api', // API-Schlüssel aller Personen verwalten
   'audit', // Audit-Log lesen
+  'webhooks', // Webhooks (Discord & Co.) einrichten
 ] as const;
 
 export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];

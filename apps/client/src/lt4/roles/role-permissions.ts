@@ -13,13 +13,14 @@ export const LT4_PERMISSIONS = [
   "ai_use",
   "api",
   "audit",
+  "webhooks",
 ] as const;
 
 export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];
 
 /** Gruppen für die Anzeige im Rollen-Dialog. */
 export const PERMISSION_GROUPS: { label: string; items: Lt4Permission[] }[] = [
-  { label: "Workspace", items: ["settings", "announcements", "audit"] },
+  { label: "Workspace", items: ["settings", "announcements", "webhooks", "audit"] },
   { label: "People", items: ["members", "groups", "roles"] },
   { label: "Content and tools", items: ["spaces", "pages_copy", "templates_create", "templates", "ai_use", "ai_manage", "api"] },
 ];
@@ -79,6 +80,10 @@ export const PERMISSION_LABELS: Record<
   api: {
     label: "Manage all API keys",
     description: "See and revoke API keys of all members",
+  },
+  webhooks: {
+    label: "Manage webhooks",
+    description: "Set up messages to Discord or other services for new pages, comments and more",
   },
   audit: {
     label: "View audit log",

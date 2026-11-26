@@ -50,11 +50,14 @@ import { Lt4IntegrationsModule } from './integrations/lt4-integrations.module';
 import { Lt4McpModule } from './mcp/mcp.module';
 import { RoleController } from './roles/role.controller';
 import { RoleService } from './roles/role.service';
+import { WebhookController } from './webhooks/webhook.controller';
+import { WebhookService } from './webhooks/webhook.service';
+import { WebhookDispatcherService } from './webhooks/webhook-dispatcher.service';
 
 @Module({
   imports: [TokenModule, AuthModule, PageModule, AttachmentModule, SpaceModule, PageAccessModule, NotificationModule, Lt4IntegrationsModule, Lt4McpModule],
-  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController, AttachmentSearchController, LdapController, RoleController],
-  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService, AttachmentIndexService, LdapService, RoleService],
+  controllers: [PagePermissionController, MfaController, JoinCodeController, SessionNameController, SsoController, BaseController, AiController, TemplateController, PersonalSpaceController, AnnouncementController, ApiKeyController, DocxExportController, PageVerificationController, ReadConfirmationController, AuditLogController, SecuritySettingsController, AttachmentSearchController, LdapController, RoleController, WebhookController],
+  providers: [PagePermissionService, MfaService, JoinCodeService, SsoProviderService, SsoAuthService, BaseService, AiService, TemplateService, TemplateAccessService, PersonalSpaceService, AnnouncementService, ApiKeyService, DocxExportService, PageVerificationService, PageVerificationSchedulerService, ReadConfirmationService, ImportImageStoreService, DocxImportService, PdfImportService, AttachmentIndexService, LdapService, RoleService, WebhookService, WebhookDispatcherService],
   exports: [MfaService, TemplateAccessService],
 })
 export class Lt4Module {}
