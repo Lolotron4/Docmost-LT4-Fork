@@ -41,6 +41,8 @@ import { PageVerificationInvalidationService } from '../../core/page/verificatio
 import { PageVerificationInvalidation } from '../../core/page/verification/page-verification-invalidation.types';
 import { isSameDocumentContent } from '../content-comparison.util';
 import { EnvironmentService } from '../../integrations/environment/environment.service';
+import { TaskSyncService } from '../../lt4/tasks/task-sync.service';
+import { taskMentionIds } from '../../lt4/tasks/task-extract';
 
 @Injectable()
 export class PersistenceExtension implements Extension {
@@ -61,6 +63,8 @@ export class PersistenceExtension implements Extension {
     private readonly transclusionService: TransclusionService,
     private readonly pageVerificationInvalidationService: PageVerificationInvalidationService,
     private readonly environmentService: EnvironmentService,
+    // LT4: Aufgaben (zugewiesene Checkboxen) abgleichen
+    private readonly taskSyncService: TaskSyncService,
   ) {}
 
   async onLoadDocument(data: onLoadDocumentPayload) {
@@ -267,10 +271,20 @@ export class PersistenceExtension implements Extension {
       await this.syncTransclusion(pageId, page.workspaceId, tiptapJson);
     }
 
+    // LT4: Aufgaben abgleichen; für zugewiesene Personen gibt es eine eigene
+    // Benachrichtigung ("Aufgabe zugewiesen") statt der normalen Erwähnung.
+    let lt4TaskMentionIds = new Set<string>();
+    if (page) {
+      const tasks = await this.taskSyncService.syncPage(page, tiptapJson);
+      lt4TaskMentionIds = taskMentionIds(tasks);
+    }
+
     if (page) {
       const mentions = extractMentions(tiptapJson);
 
-      const userMentions = extractUserMentions(mentions);
+      const userMentions = extractUserMentions(mentions).filter(
+        (m) => !lt4TaskMentionIds.has(m.id),
+      );
       const oldMentions = page.content ? extractMentions(page.content) : [];
       const oldMentionedUserIds = extractUserMentions(oldMentions).map(
         (m) => m.entityId,

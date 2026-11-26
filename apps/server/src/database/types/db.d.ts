@@ -827,6 +827,25 @@ export interface Lt4JoinCodes {
 }
 
 // LT4-Fork: KI-Schreibassistent
+export interface Lt4Tasks {
+  id: Generated<string>;
+  workspaceId: string;
+  spaceId: string;
+  pageId: string;
+  itemId: string;
+  assigneeId: string;
+  assignedById: string | null;
+  text: Generated<string>;
+  checked: Generated<boolean>;
+  dueDate: string | null;
+  completedAt: Timestamp | null;
+  assignedNotifiedAt: Timestamp | null;
+  dueSoonNotifiedAt: Timestamp | null;
+  overdueNotifiedAt: Timestamp | null;
+  createdAt: Generated<Timestamp>;
+  updatedAt: Generated<Timestamp>;
+}
+
 export interface Lt4ReadRequests {
   id: Generated<string>;
   pageId: string;
@@ -885,6 +904,7 @@ export interface DB {
   lt4Roles: Lt4Roles;
   lt4AiSettings: Lt4AiSettings;
   lt4ReadRequests: Lt4ReadRequests;
+  lt4Tasks: Lt4Tasks;
   lt4ReadConfirmations: Lt4ReadConfirmations;
   aiChats: AiChats;
   aiChatMessages: AiChatMessages;

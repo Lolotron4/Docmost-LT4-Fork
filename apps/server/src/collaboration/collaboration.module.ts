@@ -18,6 +18,7 @@ import { TransclusionModule } from '../core/page/transclusion/transclusion.modul
 import { PageVerificationInvalidationModule } from '../core/page/verification/page-verification-invalidation.module';
 import { StorageModule } from '../integrations/storage/storage.module';
 import { EnvironmentModule } from '../integrations/environment/environment.module';
+import { TaskSyncService } from '../lt4/tasks/task-sync.service';
 
 @Module({
   providers: [
@@ -30,8 +31,9 @@ import { EnvironmentModule } from '../integrations/environment/environment.modul
     PageHistoryRecorderService,
     CollaborationHandler,
     TransclusionService,
+    TaskSyncService,
   ],
-  exports: [CollaborationGateway, PageHistoryRecorderService],
+  exports: [CollaborationGateway, PageHistoryRecorderService, TaskSyncService],
   imports: [
     TokenModule,
     WatcherModule,

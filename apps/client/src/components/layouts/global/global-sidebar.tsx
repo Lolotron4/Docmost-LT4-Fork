@@ -9,6 +9,7 @@ import {
   IconUserPlus,
   IconTemplate,
   IconRosetteDiscountCheck,
+  IconChecklist,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./global-sidebar.module.css";
@@ -33,6 +34,7 @@ import { AvatarIconType } from "@/features/attachments/types/attachment.types";
 import { useHasFeature } from "@/lt4/hooks/use-feature";
 import { Feature } from "@/lt4/features";
 import { useUpgradeLabel } from "@/lt4/hooks/use-upgrade-label";
+import { useTaskCounts } from "@/lt4/tasks/task-service";
 
 export default function GlobalSidebar() {
   const { t } = useTranslation();
@@ -43,13 +45,32 @@ export default function GlobalSidebar() {
   const hasTemplates = useHasFeature(Feature.TEMPLATES);
   const hasReviews = useHasFeature(Feature.PAGE_VERIFICATION);
   const upgradeLabel = useUpgradeLabel();
-  const mainNavItems = [
+  // LT4: Aufgaben-Zähler (fällig/überfällig rot, sonst offene grau)
+  const { data: taskCounts } = useTaskCounts();
+  const mainNavItems: {
+    label: string;
+    icon: typeof IconHome;
+    path: string;
+    disabled?: boolean;
+    prefetch?: () => void;
+    badge?: { count: number; color: string } | null;
+  }[] = [
     { label: "Home", icon: IconHome, path: "/home" },
     {
       label: "Favorites",
       icon: IconStar,
       path: "/favorites",
       prefetch: () => prefetchFavorites("page"),
+    },
+    {
+      label: "My tasks",
+      icon: IconChecklist,
+      path: "/tasks",
+      badge: taskCounts?.due
+        ? { count: taskCounts.due, color: "red" }
+        : taskCounts?.open
+          ? { count: taskCounts.open, color: "gray" }
+          : null,
     },
     {
       label: "Spaces",
@@ -123,6 +144,11 @@ export default function GlobalSidebar() {
               >
                 <item.icon className={classes.linkIcon} stroke={2} />
                 <span>{t(item.label)}</span>
+                {item.badge && (
+                  <Badge size="xs" circle={item.badge.count < 10} variant="filled" color={item.badge.color} ml="auto" mr={6}>
+                    {item.badge.count > 99 ? "99+" : item.badge.count}
+                  </Badge>
+                )}
               </Link>
             ),
           )}

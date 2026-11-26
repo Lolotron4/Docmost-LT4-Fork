@@ -12,6 +12,8 @@ export type NotificationType =
   | "page.approval_requested"
   | "page.approval_rejected"
   | "lt4.read_requested"
+  | "lt4.task_assigned"
+  | "lt4.task_due"
   | "siem_destination.failing"
   | "siem_destination.disabled"
   | "siem_destination.recovered"
