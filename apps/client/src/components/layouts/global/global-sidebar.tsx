@@ -12,6 +12,7 @@ import {
   IconChecklist,
   IconClockExclamation,
   IconInbox,
+  IconCloudDown,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./global-sidebar.module.css";
@@ -92,6 +93,7 @@ export default function GlobalSidebar() {
       : []),
     { label: "Outdated pages", icon: IconClockExclamation, path: "/outdated-pages" },
     { label: "Assignments", icon: IconInbox, path: "/assignments" },
+    { label: "Offline pages", icon: IconCloudDown, path: "/offline" },
   ];
   const { data: favoriteSpacesData, isPending: isFavoritesPending } = useFavoritesQuery("space");
   const favoriteSpaces = favoriteSpacesData?.pages.flatMap((p) => p.items) ?? [];
