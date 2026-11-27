@@ -31,6 +31,7 @@ Eigener Code liegt bewusst in eigenen Ordnern, damit Updates von Docmost (`upstr
 | Seitenstatistik und veraltete Seiten, siehe docs/lt4/seitenstatistik.md | fertig |
 | Webhooks für Discord und andere Dienste (pro Bereich), siehe docs/lt4/webhooks.md | fertig |
 | SCIM 2.0: Konten und Gruppen aus Entra ID, Okta, Authentik abgleichen, siehe docs/lt4/scim.md | fertig |
+| Confluence-Import (HTML-Export als ZIP, mit Seitenbaum und Anhängen), siehe docs/lt4/confluence-import.md | fertig |
 | SSO (OIDC) | geplant |
 | Bases (Inline-Datenbanken) | geplant |
 | Kanban, Kalender | geplant |

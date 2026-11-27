@@ -119,12 +119,12 @@ export class FileImportTaskService {
         let ConfluenceModule: any;
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          ConfluenceModule = require('./../../../ee/confluence-import/confluence-import.service');
+          ConfluenceModule = require('./../../../lt4/confluence-import/confluence-import.service');
         } catch (err) {
           this.logger.error(
-            'Confluence import requested but EE module not bundled in this build',
+            'Confluence import requested but LT4 module not bundled in this build',
           );
-          return;
+          throw new Error('Confluence import is not available in this build');
         }
         const confluenceImportService = this.moduleRef.get(
           ConfluenceModule.ConfluenceImportService,

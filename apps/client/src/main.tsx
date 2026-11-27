@@ -24,6 +24,8 @@ import {
 import { installChunkLoadRecovery } from "@/lib/chunk-load-recovery.ts";
 import { AppErrorBoundary } from "@/components/ui/app-error-boundary.tsx";
 import posthog from "posthog-js";
+import { registerLt4ServiceWorker } from "@/lt4/offline/register-sw";
+import "@/lt4/offline/install-app";
 import { DatesLocaleProvider } from "@/components/dates-locale-provider";
 
 export const queryClient = new QueryClient({
@@ -47,6 +49,7 @@ if (isCloud() && isPostHogEnabled) {
 }
 
 installChunkLoadRecovery();
+registerLt4ServiceWorker();
 
 const container = document.getElementById("root") as HTMLElement;
 const root = (container as any).__reactRoot ??= ReactDOM.createRoot(container);

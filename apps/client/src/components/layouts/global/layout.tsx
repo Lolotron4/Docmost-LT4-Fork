@@ -8,6 +8,7 @@ import React from "react";
 import { useGetSpaceBySlugQuery } from "@/features/space/queries/space-query.ts";
 import { AppErrorBoundary } from "@/components/ui/app-error-boundary.tsx";
 import { PageLoading } from "@/pages/page/page-loading";
+import { OfflineSync } from "@/lt4/offline/offline-sync";
 
 export default function Layout() {
   const { spaceSlug, pageSlug } = useParams();
@@ -29,6 +30,7 @@ export default function Layout() {
         </AppErrorBoundary>
       </GlobalAppShell>
       {isCloud() && <PosthogUser />}
+      <OfflineSync />
       <SearchSpotlight spaceId={space?.id} />
     </UserProvider>
   );

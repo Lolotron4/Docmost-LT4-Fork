@@ -29,6 +29,9 @@ import { PageFormattingToolbar } from "@/features/editor/components/fixed-toolba
 import { usePageEditLockCheck } from "@/lt4/page-verification/hooks/use-page-edit-mode";
 import { usePageViewTracker } from "@/lt4/page-stats/use-page-view-tracker";
 import { PageLoadingContent, PageLoadError, usePageLayout } from "./page-loading";
+import { OfflineSnapshot } from "@/lt4/offline/offline-snapshot";
+import { OfflineRedirect } from "@/lt4/offline/offline-redirect";
+import { isNetworkError } from "@/lt4/offline/use-online-status";
 const MemoizedFullEditor = React.memo(FullEditor);
 const MemoizedTitleEditor = React.memo(TitleEditor);
 const MemoizedPageHeader = React.memo(PageHeader);
@@ -104,6 +107,11 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
         <PageLoadingContent {...layout} />
       </div>
     );
+  }
+
+  // LT4: Seite ohne Verbindung nicht ladbar -> Offline-Kopie anzeigen
+  if (pageError && isNetworkError(pageError)) {
+    return <OfflineRedirect pageId={pageId} />;
   }
 
   if (pageError || !page || !space) {
@@ -214,6 +222,7 @@ function PageContent({ pageSlug }: { pageSlug: string | undefined }) {
             showToolbar={layout.showToolbar}
           />
           <MemoizedHistoryModal pageId={page.id} />
+          <OfflineSnapshot page={page} />
         </div>
       </PagesByLabelContext.Provider>
     )

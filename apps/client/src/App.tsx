@@ -10,6 +10,7 @@ import { lazyWithPrefetch, prefetchLazyComponents } from "@/lib/lazy-prefetch.ts
 import { useTranslation } from "react-i18next";
 import { useTrackOrigin } from "@/hooks/use-track-origin";
 import AnnouncementBanners from "@/lt4/announcement/components/announcement-banners.tsx";
+import { OfflineBanner } from "@/lt4/offline/offline-banner";
 
 
 const SetupWorkspace = lazyWithPrefetch(() => import("@/pages/auth/setup-workspace.tsx"));
@@ -45,6 +46,12 @@ const StalePagesPage = lazyWithPrefetch(() => import("@/lt4/page-stats/stale-pag
 const AssignmentsPage = lazyWithPrefetch(() => import("@/lt4/assignment/assignments-page"));
 const TemplateEditorPage = lazyWithPrefetch(
   () => import("@/lt4/template/pages/template-editor-page"),
+);
+const OfflinePagesList = lazyWithPrefetch(() =>
+  import("@/lt4/offline/offline-pages").then((m) => ({ default: m.OfflinePagesList })),
+);
+const OfflinePageReader = lazyWithPrefetch(() =>
+  import("@/lt4/offline/offline-pages").then((m) => ({ default: m.OfflinePageReader })),
 );
 const Home = lazyWithPrefetch(() => import("@/pages/dashboard/home"));
 const AccountSettings = lazyWithPrefetch(
@@ -109,6 +116,7 @@ export default function App() {
 
   return (
     <Suspense fallback={null}>
+      <OfflineBanner />
       <Routes>
         <Route index element={<Navigate to="/home" />} />
 
@@ -121,6 +129,8 @@ export default function App() {
           />
           <Route path={"/invites/:invitationId"} element={<InviteSignup />} />
           <Route path={"/join"} element={<JoinPage />} />
+          <Route path={"/offline"} element={<OfflinePagesList />} />
+          <Route path={"/offline/:pageKey"} element={<OfflinePageReader />} />
           <Route path={"/forgot-password"} element={<ForgotPassword />} />
           <Route path={"/password-reset"} element={<PasswordReset />} />
 

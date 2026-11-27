@@ -57,6 +57,7 @@ import {
 import { ReadConfirmationMenuItem } from "@/lt4/read-confirmation/read-confirmation";
 import { PageStatsMenuItem, PageStatsModal } from "@/lt4/page-stats/page-stats-modal";
 import useUserRole from "@/hooks/use-user-role.tsx";
+import { OfflineMenuItem } from "@/lt4/offline/offline-snapshot";
 import {
   useFavoriteIds,
   useAddFavoriteMutation,
@@ -359,6 +360,8 @@ function PageActionMenu({ readOnly }: PageActionMenuProps) {
               {t("Attachments")}
             </Menu.Item>
           )}
+
+          {!page?.isBase && <OfflineMenuItem page={page} />}
 
           {!page?.isBase && (
             <Menu.Item
