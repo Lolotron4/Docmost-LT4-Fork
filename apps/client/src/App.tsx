@@ -39,6 +39,7 @@ const AuditLogPage = lazyWithPrefetch(() => import("@/lt4/audit/audit-log-page")
 const RolesSettings = lazyWithPrefetch(() => import("@/lt4/roles/roles-settings"));
 const WebhooksSettings = lazyWithPrefetch(() => import("@/lt4/webhooks/webhooks-settings"));
 const BackupSettings = lazyWithPrefetch(() => import("@/lt4/backup/backup-settings"));
+const ScimSettings = lazyWithPrefetch(() => import("@/lt4/scim/scim-settings"));
 const ReviewsPage = lazyWithPrefetch(() => import("@/lt4/page-verification/pages/reviews-page"));
 const TasksPage = lazyWithPrefetch(() => import("@/lt4/tasks/tasks-page"));
 const StalePagesPage = lazyWithPrefetch(() => import("@/lt4/page-stats/stale-pages-page"));
@@ -216,6 +217,7 @@ export default function App() {
             <Route path={"roles"} element={<RolesSettings />} />
             <Route path={"webhooks"} element={<WebhooksSettings />} />
             <Route path={"backups"} element={<BackupSettings />} />
+            <Route path={"scim"} element={<ScimSettings />} />
           </Route>
         </Route>
       </Routes>

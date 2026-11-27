@@ -919,6 +919,16 @@ export interface Lt4ShareSettings {
 }
 
 // LT4-Fork: Webhooks
+export interface Lt4ScimUsers {
+  createdAt: Generated<Timestamp>;
+  familyName: string | null;
+  givenName: string | null;
+  updatedAt: Generated<Timestamp>;
+  userId: string;
+  userName: string;
+  workspaceId: string;
+}
+
 export interface Lt4Webhooks {
   createdAt: Generated<Timestamp>;
   creatorId: string | null;
@@ -974,6 +984,7 @@ export interface Lt4AssignmentSubmissions {
 export interface DB {
   lt4ShareSettings: Lt4ShareSettings;
   lt4Webhooks: Lt4Webhooks;
+  lt4ScimUsers: Lt4ScimUsers;
   lt4Assignments: Lt4Assignments;
   lt4AssignmentSubmissions: Lt4AssignmentSubmissions;
   lt4GroupRoles: Lt4GroupRoles;
