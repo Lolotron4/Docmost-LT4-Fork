@@ -29,6 +29,7 @@ import { IPage } from "@/features/page/types/page.types.ts";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ConfluenceIcon } from "@/components/icons/confluence-icon.tsx";
+import { IconDeviceDesktopDown } from "@tabler/icons-react";
 import { getFileImportSizeLimit } from "@/lib/config.ts";
 import { formatBytes } from "@/lib";
 import { useHasFeature } from "@/lt4/hooks/use-feature";
@@ -94,6 +95,8 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
   const pdfFileRef = useRef<() => void>(null);
   const notionFileRef = useRef<() => void>(null);
   const confluenceFileRef = useRef<() => void>(null);
+  // LT4: .lt4docs-Dateien aus dem LT4-Docs Client
+  const lt4DocsFileRef = useRef<() => void>(null);
   const zipFileRef = useRef<() => void>(null);
 
   const canUseConfluence = useHasFeature(Feature.CONFLUENCE_IMPORT);
@@ -148,6 +151,8 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
         notionFileRef.current();
       } else if (source === "confluence" && confluenceFileRef.current) {
         confluenceFileRef.current();
+      } else if (source === "lt4docs" && lt4DocsFileRef.current) {
+        lt4DocsFileRef.current();
       } else if (source === "generic" && zipFileRef.current) {
         zipFileRef.current();
       }
@@ -468,6 +473,30 @@ function ImportFormatSelection({ spaceId, onClose }: ImportFormatSelection) {
                 {...props}
               >
                 Confluence
+              </Button>
+            </Tooltip>
+          )}
+        </FileButton>
+        <FileButton
+          onChange={(file) => handleZipUpload(file, "lt4docs")}
+          accept=".lt4docs,application/zip"
+          resetRef={lt4DocsFileRef}
+          inputProps={{
+            "aria-label": t("Choose {{format}} file", { format: "LT4-Docs" }),
+          }}
+        >
+          {(props) => (
+            <Tooltip
+              label={t("Seiten aus dem LT4-Docs Client (.lt4docs)")}
+              openDelay={400}
+            >
+              <Button
+                justify="start"
+                variant="default"
+                leftSection={<IconDeviceDesktopDown size={18} />}
+                {...props}
+              >
+                LT4-Docs
               </Button>
             </Tooltip>
           )}

@@ -1,0 +1,412 @@
+{
+ "type": "doc",
+ "content": [
+  {
+   "type": "paragraph",
+   "attrs": {
+    "indent": 0,
+    "textAlign": null
+   },
+   "content": [
+    {
+     "type": "text",
+     "text": "Unser Ziel für die Präsentation am Freitag."
+    }
+   ]
+  },
+  {
+   "type": "callout",
+   "attrs": {
+    "type": "info",
+    "icon": null,
+    "color": null
+   },
+   "content": [
+    {
+     "type": "paragraph",
+     "attrs": {
+      "indent": 0,
+      "textAlign": null
+     },
+     "content": [
+      {
+       "type": "text",
+       "text": "Abgabe bis Donnerstag 18 Uhr!"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "taskList",
+   "content": [
+    {
+     "type": "taskItem",
+     "attrs": {
+      "checked": false
+     },
+     "content": [
+      {
+       "type": "paragraph",
+       "attrs": {
+        "indent": 0,
+        "textAlign": null
+       },
+       "content": [
+        {
+         "type": "text",
+         "text": "Folien erstellen"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "taskItem",
+     "attrs": {
+      "checked": false
+     },
+     "content": [
+      {
+       "type": "paragraph",
+       "attrs": {
+        "indent": 0,
+        "textAlign": null
+       },
+       "content": [
+        {
+         "type": "text",
+         "text": "Quellen sammeln"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "paragraph",
+   "content": [
+    {
+     "type": "text",
+     "text": "Wichtig",
+     "marks": [
+      {
+       "type": "textStyle",
+       "attrs": {
+        "color": "#e03131"
+       }
+      }
+     ]
+    },
+    {
+     "type": "text",
+     "text": " markiert",
+     "marks": [
+      {
+       "type": "highlight",
+       "attrs": {
+        "color": "#ffec99"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "paragraph",
+   "attrs": {
+    "indent": 0,
+    "textAlign": null
+   }
+  },
+  {
+   "type": "table",
+   "content": [
+    {
+     "type": "tableRow",
+     "content": [
+      {
+       "type": "tableHeader",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Name"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "tableHeader",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Aufgabe"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "tableHeader",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Stand"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "tableRow",
+     "content": [
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Lena"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Folien"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "fertig"
+          }
+         ]
+        },
+        {
+         "type": "image",
+         "attrs": {
+          "src": "local-attachment/be79e3d4-24b5-46a5-ab23-509451ebb314/app-icon-192x192.png",
+          "width": null,
+          "height": null,
+          "align": "center",
+          "alt": "app-icon-192x192.png",
+          "href": null,
+          "attachmentId": "be79e3d4-24b5-46a5-ab23-509451ebb314",
+          "size": null,
+          "aspectRatio": null,
+          "placeholder": null
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "tableRow",
+     "content": [
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         }
+        }
+       ]
+      },
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         }
+        }
+       ]
+      },
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null,
+        "backgroundColor": null,
+        "backgroundColorName": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "indent": 0,
+          "textAlign": null
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "details",
+   "content": [
+    {
+     "type": "detailsSummary",
+     "content": [
+      {
+       "type": "text",
+       "text": "Mehr"
+      }
+     ]
+    },
+    {
+     "type": "detailsContent",
+     "content": [
+      {
+       "type": "paragraph",
+       "content": [
+        {
+         "type": "text",
+         "text": "Inhalt"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "futureNode",
+   "content": [
+    {
+     "type": "text",
+     "text": "x"
+    }
+   ]
+  }
+ ]
+}
