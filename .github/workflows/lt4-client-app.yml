@@ -114,11 +114,12 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - uses: android-actions/setup-android@v3
-
+      # Das Android-SDK ist auf den Ubuntu-Runnern vorinstalliert (ANDROID_HOME).
       - name: Android-SDK, NDK und Build-Tools
         run: |
-          sdkmanager --install "platforms;android-35" "build-tools;${BUILD_TOOLS}" "ndk;${NDK_VERSION}"
+          SDKMANAGER=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -n 1)
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" --install "platforms;android-35" "build-tools;${BUILD_TOOLS}" "ndk;${NDK_VERSION}"
           echo "NDK_HOME=$ANDROID_HOME/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
 
       - uses: pnpm/action-setup@v4
