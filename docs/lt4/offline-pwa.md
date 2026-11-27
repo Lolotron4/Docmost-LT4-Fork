@@ -1,6 +1,6 @@
 # Offline-Lesen und App installieren (PWA)
 
-Ab LT4 v1.9.0 lässt sich Docmost als App auf Handy, Tablet oder PC installieren,
+Ab LT4 v1.9.0 lässt sich LT4-Docs als App auf Handy, Tablet oder PC installieren,
 und Seiten bleiben ohne Verbindung lesbar (z. B. im Schulbus oder bei schlechtem Schul-WLAN).
 
 ## Voraussetzung
