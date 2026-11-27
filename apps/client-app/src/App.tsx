@@ -249,7 +249,7 @@ function Main({
         onStatus={setStatus}
         onWiped={onWiped}
       />
-      <ExportModal opened={exportOpen} onClose={exportModal.close} />
+      <ExportModal opened={exportOpen} onClose={exportModal.close} currentPageId={selectedId} />
     </AppShell>
   );
 }

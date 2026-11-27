@@ -360,8 +360,19 @@ export async function pageNodeToDocxBuffer(
   doc: Node,
   getImageBuffer: DocxImageResolver,
 ): Promise<Buffer> {
+  return writeDocx(await pageNodeToDocxDocument(doc, getImageBuffer));
+}
+
+/**
+ * LT4: liefert das docx-Dokument ohne es zu packen, damit es auch im Browser
+ * (Packer.toBlob, z. B. im LT4-Docs Client) genutzt werden kann.
+ */
+export async function pageNodeToDocxDocument(
+  doc: Node,
+  getImageBuffer: DocxImageResolver,
+) {
   const serializer = new DocxSerializerAsync(defaultAsyncNodes, defaultMarks);
-  const wordDoc = await serializer.serializeAsync(
+  return serializer.serializeAsync(
     doc,
     { getImageBuffer },
     // docx's built-in heading styles are blue (#2E74B5 / #1F4D78). The editor
@@ -444,5 +455,4 @@ export async function pageNodeToDocxBuffer(
         },
       }) as any,
   );
-  return writeDocx(wordDoc);
 }

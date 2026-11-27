@@ -36,6 +36,9 @@ export const importRead = (path: string) => invoke<string>("import_read", { path
 export const openServerWindow = (url: string, title: string) =>
   invoke<void>("open_server_window", { url, title });
 
+/** Druckdialog des Fensters öffnen (PDF über "Als PDF speichern"). */
+export const printPage = () => invoke<void>("print_page");
+
 export function errorText(err: unknown): string {
   if (typeof err === "string") return err;
   if (err && typeof err === "object" && "message" in err) {

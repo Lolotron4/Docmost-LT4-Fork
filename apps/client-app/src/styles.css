@@ -70,3 +70,18 @@ html, body, #root { height: 100%; margin: 0; }
 
 .lt4-image { margin: 0.75em 0; }
 .lt4-image-missing { padding: 20px; color: var(--mantine-color-dimmed); border: 1px dashed var(--mantine-color-default-border); border-radius: 6px; }
+
+/* PDF-Export: nur den Druckbereich drucken */
+#lt4-print-root { display: none; }
+#lt4-print-root [data-callout-type] { padding: 10px 12px; border-radius: 6px; margin: 0.75em 0; background: #e7f5ff; }
+#lt4-print-root [data-callout-type="success"] { background: #ebfbee; }
+#lt4-print-root [data-callout-type="warning"] { background: #fff9db; }
+#lt4-print-root [data-callout-type="danger"] { background: #fff5f5; }
+@media print {
+  @page { margin: 15mm; }
+  body > *:not(#lt4-print-root) { display: none !important; }
+  #lt4-print-root { display: block; min-height: 0; padding: 0; color: #000; }
+  #lt4-print-root th, #lt4-print-root td { border-color: #999; }
+  #lt4-print-root * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  #lt4-print-root table, #lt4-print-root img, #lt4-print-root [data-callout-type] { break-inside: avoid; }
+}

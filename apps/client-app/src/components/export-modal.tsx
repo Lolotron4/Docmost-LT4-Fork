@@ -1,15 +1,34 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 import { useEffect, useState } from "react";
-import { Alert, Button, Checkbox, Divider, Group, Modal, Radio, Stack, Text } from "@mantine/core";
+import { Alert, Button, Checkbox, Divider, Group, Modal, Radio, SegmentedControl, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconDownload, IconExternalLink, IconFileImport } from "@tabler/icons-react";
+import { IconDownload, IconExternalLink, IconFileImport, IconPrinter } from "@tabler/icons-react";
 import { useStore } from "../lib/store";
-import { exportToFile, pickAndReadLt4Docs, type ExportFormat } from "../lib/exporter";
+import {
+  NothingToExportError,
+  exportToFile,
+  pickAndReadLt4Docs,
+  type ExportFormat,
+  type ExportScope,
+} from "../lib/exporter";
 import { errorText, openServerWindow } from "../lib/native";
 
-export function ExportModal({ opened, onClose }: { opened: boolean; onClose: () => void }) {
+/** Formate, die auch einzelne Seiten können (.lt4docs/Markdown exportieren immer ganze Bereiche). */
+const PAGE_FORMATS: ExportFormat[] = ["docx", "pdf", "xlsx"];
+
+export function ExportModal({
+  opened,
+  onClose,
+  currentPageId,
+}: {
+  opened: boolean;
+  onClose: () => void;
+  currentPageId?: string | null;
+}) {
   const store = useStore();
   const [format, setFormat] = useState<ExportFormat>("lt4docs");
+  const [scopeKind, setScopeKind] = useState<"spaces" | "page">("spaces");
+  const [withChildren, setWithChildren] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<string | null>(null);
@@ -19,19 +38,32 @@ export function ExportModal({ opened, onClose }: { opened: boolean; onClose: () 
     if (opened) {
       setSelected(store.state.spaces.map((s) => s.id));
       setDone(null);
+      setScopeKind("spaces");
     }
   }, [opened]);
 
+  const currentPage = store.state.pages.find((p) => p.id === currentPageId) ?? null;
+  const pageScope = scopeKind === "page" && currentPage && PAGE_FORMATS.includes(format);
+  const scope: ExportScope = pageScope
+    ? { kind: "page", pageId: currentPage.id, withChildren }
+    : { kind: "spaces", spaceIds: selected };
+
   const run = async () => {
     setBusy(true);
+    setDone(null);
     try {
-      const path = await exportToFile(store.state, format, selected);
-      if (path) {
+      const path = await exportToFile(store.state, format, scope);
+      if (path && path !== "printed") {
         setDone(path);
-        store.setSettings({ lastExportAt: new Date().toISOString() });
+        // Nur vollständige Sicherungen zählen für die Export-Erinnerung.
+        if (format === "lt4docs") store.setSettings({ lastExportAt: new Date().toISOString() });
       }
     } catch (e) {
-      notifications.show({ color: "red", title: "Export fehlgeschlagen", message: errorText(e) });
+      if (e instanceof NothingToExportError) {
+        notifications.show({ color: "yellow", message: e.message });
+      } else {
+        notifications.show({ color: "red", title: "Export fehlgeschlagen", message: errorText(e) });
+      }
     } finally {
       setBusy(false);
     }
@@ -55,21 +87,6 @@ export function ExportModal({ opened, onClose }: { opened: boolean; onClose: () 
   return (
     <Modal opened={opened} onClose={onClose} title="Exportieren und Einlesen" size="lg">
       <Stack>
-        <Text fw={600}>Bereiche</Text>
-        <Stack gap={4}>
-          {store.state.spaces.map((s) => (
-            <Checkbox
-              key={s.id}
-              label={`${s.name} (${store.state.pages.filter((p) => p.spaceId === s.id).length} Seiten)`}
-              checked={selected.includes(s.id)}
-              onChange={(e) =>
-                setSelected((prev) =>
-                  e.currentTarget.checked ? [...prev, s.id] : prev.filter((x) => x !== s.id),
-                )
-              }
-            />
-          ))}
-        </Stack>
         <Radio.Group label="Format" value={format} onChange={(v) => setFormat(v as ExportFormat)}>
           <Stack gap="xs" mt={6}>
             <Radio
@@ -78,15 +95,72 @@ export function ExportModal({ opened, onClose }: { opened: boolean; onClose: () 
               description="Behält alle Formatierungen: Farben, Infoboxen, Tabellen, Aufgaben, Bilder."
             />
             <Radio
+              value="docx"
+              label="Word (.docx)"
+              description="Ein Dokument, jede Seite beginnt mit ihrem Titel. Bilder und Tabellen bleiben erhalten."
+            />
+            <Radio
+              value="pdf"
+              label="PDF (über den Druckdialog)"
+              description="Im Druckdialog „Als PDF speichern“ bzw. „Microsoft Print to PDF“ wählen."
+            />
+            <Radio
+              value="xlsx"
+              label="Excel (.xlsx) – nur Tabellen"
+              description="Jede Tabelle wird ein eigenes Blatt, benannt nach der Seite. Erste Zeile fett."
+            />
+            <Radio
               value="markdown"
               label="Markdown (.zip) – für andere Programme"
               description="Farben und LT4-Blöcke gehen dabei verloren."
             />
           </Stack>
         </Radio.Group>
+
+        {PAGE_FORMATS.includes(format) && currentPage && (
+          <SegmentedControl
+            value={scopeKind}
+            onChange={(v) => setScopeKind(v as "spaces" | "page")}
+            data={[
+              { value: "spaces", label: "Bereiche" },
+              { value: "page", label: `Seite „${currentPage.title || "Unbenannt"}“` },
+            ]}
+          />
+        )}
+
+        {pageScope ? (
+          <Checkbox
+            label="Unterseiten mitnehmen"
+            checked={withChildren}
+            onChange={(e) => setWithChildren(e.currentTarget.checked)}
+          />
+        ) : (
+          <>
+            <Text fw={600}>Bereiche</Text>
+            <Stack gap={4}>
+              {store.state.spaces.map((s) => (
+                <Checkbox
+                  key={s.id}
+                  label={`${s.name} (${store.state.pages.filter((p) => p.spaceId === s.id).length} Seiten)`}
+                  checked={selected.includes(s.id)}
+                  onChange={(e) =>
+                    setSelected((prev) =>
+                      e.currentTarget.checked ? [...prev, s.id] : prev.filter((x) => x !== s.id),
+                    )
+                  }
+                />
+              ))}
+            </Stack>
+          </>
+        )}
         <Group justify="flex-end">
-          <Button leftSection={<IconDownload size={16} />} loading={busy} disabled={!selected.length} onClick={run}>
-            Exportieren
+          <Button
+            leftSection={format === "pdf" ? <IconPrinter size={16} /> : <IconDownload size={16} />}
+            loading={busy}
+            disabled={!pageScope && !selected.length}
+            onClick={run}
+          >
+            {format === "pdf" ? "Druckdialog öffnen" : "Exportieren"}
           </Button>
         </Group>
 

@@ -19,6 +19,7 @@ export {
   defaultAsyncNodes,
   defaultMarks,
   pageNodeToDocxBuffer,
+  pageNodeToDocxDocument,
   type DocxImageResolver,
 } from './schema';
 export { writeDocx, createDocFromState, buildDoc } from './utils';

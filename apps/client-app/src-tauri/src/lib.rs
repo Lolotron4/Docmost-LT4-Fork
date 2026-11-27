@@ -236,6 +236,12 @@ fn import_read(state: State<AppState>, path: String) -> Result<String, String> {
     Ok(B64.encode(bytes))
 }
 
+#[tauri::command]
+fn print_page(window: tauri::WebviewWindow) -> Result<(), String> {
+    // Öffnet den Druckdialog des Systems (dort "Als PDF speichern" wählen).
+    window.print().map_err(|e| e.to_string())
+}
+
 /// Öffnet einen LT4-Server in einem eigenen Fenster. Fremde Seiten bekommen
 /// keinen Zugriff auf die Befehle oben (Rechte gelten nur für das Hauptfenster).
 #[tauri::command]
@@ -280,6 +286,7 @@ pub fn run() {
             file_write,
             file_read,
             file_delete,
+            print_page,
             export_write,
             import_read,
             open_server_window

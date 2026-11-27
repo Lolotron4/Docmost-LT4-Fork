@@ -58,7 +58,14 @@ Knopf **Exportieren** (Pfeil nach unten) oben rechts:
 | Format | Wofür | Formatierung |
 |---|---|---|
 | **LT4-Docs (.lt4docs)** | Import auf einem LT4-Server, Sicherung | verlustfrei |
+| Word (.docx) | Abgeben, weitergeben, in Word weiterbearbeiten | Text, Überschriften, Listen, Tabellen, Bilder; Infobox-Farben nicht |
+| PDF | Drucken, Abgeben | wie in der App; im Druckdialog „Als PDF speichern“ bzw. „Microsoft Print to PDF“ wählen |
+| Excel (.xlsx) | Tabellen weiterrechnen | nur Tabellen: jede Tabelle ein Blatt (Name = Seitentitel), erste Zeile fett und fixiert, Zahlen als Zahlen |
 | Markdown (.zip) | andere Programme | Farben und LT4-Blöcke gehen verloren |
+
+Word, PDF und Excel gehen für ganze Bereiche oder nur für die gerade offene Seite (wahlweise mit
+Unterseiten). Mehrere Seiten landen in einem Dokument, jede beginnt mit ihrem Titel als Überschrift.
+Nur ein .lt4docs-Export zählt als Sicherung für die 14-Tage-Erinnerung.
 
 Exportieren geht immer ohne Login. Für den Import auf dem Server musst du dort angemeldet sein:
 Bereich öffnen › **Seiten importieren › LT4-Docs** › Datei wählen. Die Seiten landen mit
