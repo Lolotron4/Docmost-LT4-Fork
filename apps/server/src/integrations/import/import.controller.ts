@@ -142,7 +142,8 @@ export class ImportController {
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
   ) {
-    const validFileExtensions = ['.zip'];
+    // LT4: .lt4docs (ZIP aus dem LT4-Docs Client)
+    const validFileExtensions = ['.zip', '.lt4docs'];
 
     const maxFileSize = bytes(this.environmentService.getFileImportSizeLimit());
 
@@ -173,10 +174,10 @@ export class ImportController {
     const spaceId = file.fields?.spaceId?.value;
     const source = file.fields?.source?.value;
 
-    const validZipSources = ['generic', 'notion', 'confluence'];
+    const validZipSources = ['generic', 'notion', 'confluence', 'lt4docs'];
     if (!validZipSources.includes(source)) {
       throw new BadRequestException(
-        'Invalid import source. Import source must either be generic, notion or confluence.',
+        'Invalid import source. Import source must either be generic, notion, confluence or lt4docs.',
       );
     }
 

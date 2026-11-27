@@ -48,6 +48,7 @@ export * from "./lib/footnotes";
 export * from "./lib/resizable-nodeview";
 export {
   pageNodeToDocxBuffer,
+  pageNodeToDocxDocument,
   type DocxImageResolver,
 } from "./lib/prosemirror-docx";
 export * from "./lib/base-embed";

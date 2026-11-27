@@ -9,6 +9,8 @@ import { FileTaskController } from './file-task.controller';
 import { PageModule } from '../../core/page/page.module';
 // LT4: eigener Confluence-Import (lt4/confluence-import)
 import { ConfluenceImportService } from '../../lt4/confluence-import/confluence-import.service';
+// LT4: Import von .lt4docs-Dateien aus dem LT4-Docs Client
+import { Lt4DocsImportService } from '../../lt4/lt4docs-import/lt4docs-import.service';
 
 @Module({
   providers: [
@@ -17,6 +19,7 @@ import { ConfluenceImportService } from '../../lt4/confluence-import/confluence-
     FileTaskProcessor,
     ImportAttachmentService,
     ConfluenceImportService,
+    Lt4DocsImportService,
   ],
   exports: [ImportService, ImportAttachmentService],
   controllers: [ImportController, FileTaskController],

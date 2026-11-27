@@ -136,6 +136,19 @@ export class FileImportTaskService {
           fileTask,
         });
       }
+      // LT4: .lt4docs aus dem LT4-Docs Client
+      if (fileTask.source === FileImportSource.Lt4Docs) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const Lt4DocsModule = require('./../../../lt4/lt4docs-import/lt4docs-import.service');
+        const lt4DocsImportService = this.moduleRef.get(
+          Lt4DocsModule.Lt4DocsImportService,
+          { strict: false },
+        );
+        await lt4DocsImportService.processLt4DocsImport({
+          extractDir: tmpExtractDir,
+          fileTask,
+        });
+      }
       try {
         await this.updateTaskStatus(fileTaskId, FileTaskStatus.Success, null);
         await cleanupTmpFile();

@@ -11,6 +11,8 @@ export enum FileImportSource {
   Generic = 'generic',
   Notion = 'notion',
   Confluence = 'confluence',
+  // LT4: Export des LT4-Docs Clients (.lt4docs)
+  Lt4Docs = 'lt4docs',
 }
 
 export enum FileTaskStatus {
