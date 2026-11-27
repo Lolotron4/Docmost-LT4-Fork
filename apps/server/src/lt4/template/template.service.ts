@@ -84,7 +84,9 @@ export class TemplateService {
       if (!cache.has(key)) {
         cache.set(key, await this.access.canManageScope(user, workspace, t.spaceId ?? null));
       }
-      result.push({ ...t, canEdit: cache.get(key) });
+      // LT4-Rollen: eigene Vorlagen mit "Vorlagen erstellen"
+      const canEdit = cache.get(key) || (await this.access.canEdit(user, workspace, t));
+      result.push({ ...t, canEdit });
     }
     return result;
   }
@@ -93,10 +95,10 @@ export class TemplateService {
     const spaceIds = await this.spaceMemberRepo.getUserSpaceIds(user.id);
     const manageableSpaceIds: string[] = [];
     for (const id of spaceIds) {
-      if (await this.access.canManageScope(user, workspace, id)) manageableSpaceIds.push(id);
+      if (await this.access.canCreateIn(user, workspace, id)) manageableSpaceIds.push(id);
     }
     return {
-      canManageWorkspace: await this.access.canManageScope(user, workspace, null),
+      canManageWorkspace: await this.access.canCreateIn(user, workspace, null),
       manageableSpaceIds,
       membersMayCreate: this.access.membersMayCreate(workspace),
     };
@@ -124,7 +126,7 @@ export class TemplateService {
 
   async create(user: User, workspace: Workspace, dto: CreateTemplateDto) {
     const spaceId = dto.spaceId || null;
-    if (!(await this.access.canManageScope(user, workspace, spaceId))) {
+    if (!(await this.access.canCreateIn(user, workspace, spaceId))) {
       throw new ForbiddenException();
     }
 
@@ -178,7 +180,7 @@ export class TemplateService {
     let spaceId = template.spaceId;
     if (dto.spaceId !== undefined && (dto.spaceId || null) !== template.spaceId) {
       spaceId = dto.spaceId || null;
-      if (!(await this.access.canManageScope(user, workspace, spaceId))) {
+      if (!(await this.access.canCreateIn(user, workspace, spaceId))) {
         throw new ForbiddenException();
       }
     }
@@ -301,16 +303,39 @@ export class TemplateService {
       }
     }
 
-    // Seite zuerst leer anlegen, damit Anhänge ihr zugeordnet werden können
-    const page = await this.pageService.create(user.id, workspace.id, {
+    const page = await this.createPageUnchecked(user, workspace, template, {
       spaceId: dto.spaceId,
       parentPageId: dto.parentPageId,
-      title: template.title ?? undefined,
+      variableValues: dto.variableValues,
+    });
+    return { id: page.id, slugId: page.slugId, spaceId: page.spaceId, title: page.title };
+  }
+
+  /**
+   * Legt eine Seite aus einer Vorlage an, ohne Rechte zu prüfen (der Aufrufer
+   * hat das schon getan, z. B. beim Verteilen einer Abgabe).
+   */
+  async createPageUnchecked(
+    user: User,
+    workspace: Workspace,
+    template: Template,
+    opts: {
+      spaceId: string;
+      parentPageId?: string;
+      title?: string;
+      variableValues?: Record<string, string>;
+    },
+  ) {
+    // Seite zuerst leer anlegen, damit Anhänge ihr zugeordnet werden können
+    const page = await this.pageService.create(user.id, workspace.id, {
+      spaceId: opts.spaceId,
+      parentPageId: opts.parentPageId,
+      title: opts.title ?? template.title ?? undefined,
       icon: template.icon ?? undefined,
     });
-    const content = await this.prepareForPage(template, dto.variableValues, page, user.id);
+    const content = await this.prepareForPage(template, opts.variableValues, page, user.id);
     await this.writeContent(page.id, content);
-    return { id: page.id, slugId: page.slugId, spaceId: page.spaceId, title: page.title };
+    return page;
   }
 
   private async writeContent(pageId: string, content: any) {

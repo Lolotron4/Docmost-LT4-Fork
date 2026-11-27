@@ -48,7 +48,8 @@ const EXPIRY_OPTIONS = [
 
 export default function ApiKeysPage() {
   const { t } = useTranslation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("api");
   const queryClient = useQueryClient();
   const [workspace, setWorkspace] = useAtom(workspaceAtom);
   const [scope, setScope] = useState<"mine" | "all">("mine");

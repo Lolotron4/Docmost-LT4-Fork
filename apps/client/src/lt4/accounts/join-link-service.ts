@@ -4,13 +4,14 @@ import api from "@/lib/api-client";
 export interface IJoinLink {
   id: string;
   code: string;
-  role: "member" | "admin";
+  role: string;
   maxUses: number | null;
   useCount: number;
   expiresAt: string | null;
   createdAt: string;
   creatorName?: string | null;
   isActive?: boolean;
+  groups?: { id: string; name: string }[];
 }
 
 export interface IJoinLinkInfo {
@@ -36,10 +37,13 @@ async function post<T>(url: string, body?: unknown): Promise<T> {
 
 export const listJoinLinks = () => post<{ items: IJoinLink[] }>("/join-links/list");
 export const createJoinLink = (data: {
-  role: "member" | "admin";
+  role: string;
   maxUses?: number;
   expiresInDays?: number;
+  groupIds?: string[];
 }) => post<IJoinLink>("/join-links/create", data);
+export const updateJoinLinkGroups = (id: string, groupIds: string[]) =>
+  post<void>("/join-links/update-groups", { id, groupIds });
 export const revokeJoinLink = (id: string) => post<void>("/join-links/revoke", { id });
 export const getJoinLinkInfo = (code: string) =>
   post<IJoinLinkInfo>("/join-links/info", { code });

@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateShareDto {
@@ -18,6 +19,16 @@ export class CreateShareDto {
   @IsOptional()
   @IsBoolean()
   searchIndexing: boolean;
+
+  // LT4: Gastlink-Einstellungen gleich beim Erstellen (siehe lt4/share-guard)
+  @IsOptional()
+  @IsString()
+  expiresAt?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  password?: string | null;
 }
 
 export class UpdateShareDto extends CreateShareDto {

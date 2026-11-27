@@ -1,4 +1,5 @@
 import { Table, Group, Text, Anchor, VisuallyHidden } from "@mantine/core";
+import { GroupRoleBadge } from "@/lt4/roles/group-role-select";
 import { useGetGroupsQuery } from "@/features/group/queries/group-query";
 import { Link } from "react-router-dom";
 import { IconGroupCircle } from "@/components/icons/icon-people-circle.tsx";
@@ -61,9 +62,12 @@ export default function GroupList() {
                     <Group gap="sm" wrap="nowrap">
                       <IconGroupCircle />
                       <div style={{ minWidth: 0, overflow: "hidden" }}>
-                        <AutoTooltipText fz="sm" fw={500} lineClamp={1}>
-                          {group.name}
-                        </AutoTooltipText>
+                        <Group gap={0} wrap="nowrap">
+                          <AutoTooltipText fz="sm" fw={500} lineClamp={1}>
+                            {group.name}
+                          </AutoTooltipText>
+                          <GroupRoleBadge groupId={group.id} />
+                        </Group>
                         <Text fz="xs" c="dimmed" lineClamp={2}>
                           {group.description}
                         </Text>

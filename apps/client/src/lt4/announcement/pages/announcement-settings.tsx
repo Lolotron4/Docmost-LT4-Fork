@@ -91,7 +91,8 @@ function statusOf(a: IAnnouncement): "active" | "scheduled" | "ended" | "archive
 
 export default function AnnouncementSettings() {
   const { t } = useTranslation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("announcements");
   const queryClient = useQueryClient();
   const [view, setView] = useState<"current" | "archived">("current");
   const [editing, setEditing] = useState<IAnnouncement | "new" | null>(null);

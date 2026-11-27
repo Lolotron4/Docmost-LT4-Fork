@@ -15,10 +15,14 @@ import { useDocsAccent } from "@/features/public-space/theme/docs-theme.ts";
 import { buildSharedPageUrl } from "@/features/page/page.utils.ts";
 import { ShareSearchSpotlight } from "@/features/search/components/share-search-spotlight.tsx";
 import { shareSearchSpotlight } from "@/features/search/constants";
+import { getShareBlock } from "@/lt4/share-guard/share-guard-service.ts";
+import { ShareGate } from "@/lt4/share-guard/share-gate.tsx";
 
 export default function ShareLayout() {
   const { shareId } = useParams();
-  const { data, isPlaceholderData } = useGetSharedPageTreeQuery(shareId);
+  const { data, isPlaceholderData, error } = useGetSharedPageTreeQuery(shareId);
+  // LT4: Gastlink mit Passwort oder abgelaufen
+  const shareBlock = getShareBlock(error);
 
   // Shares have no appearance settings; apply the default docs accent.
   useDocsAccent(undefined);
@@ -52,6 +56,10 @@ export default function ShareLayout() {
     }),
     [data, treeData, shareId],
   );
+
+  if (shareBlock) {
+    return <ShareGate block={shareBlock} />;
+  }
 
   return (
     <DocsShell

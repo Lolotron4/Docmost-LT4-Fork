@@ -1,5 +1,7 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 import {
+  ArrayMaxSize,
+  IsArray,
   IsEmail,
   IsIn,
   IsInt,
@@ -19,8 +21,11 @@ import { NoUrls } from '../../common/validators/no-urls.validator';
 import { USERNAME_PATTERN } from './username';
 
 export class CreateJoinCodeDto {
-  @IsIn(['member', 'admin'])
-  role: 'member' | 'admin';
+  // Eingebaute Rolle oder UUID einer eigenen Rolle (Prüfung im Service)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(64)
+  role: string;
 
   @IsOptional()
   @IsInt()
@@ -33,6 +38,23 @@ export class CreateJoinCodeDto {
   @Min(1)
   @Max(365)
   expiresInDays?: number;
+
+  /** Gruppen, in die neue Konten automatisch aufgenommen werden. */
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @IsUUID('all', { each: true })
+  groupIds?: string[];
+}
+
+export class UpdateJoinCodeGroupsDto {
+  @IsUUID()
+  id: string;
+
+  @IsArray()
+  @ArrayMaxSize(50)
+  @IsUUID('all', { each: true })
+  groupIds: string[];
 }
 
 export class JoinCodeIdDto {

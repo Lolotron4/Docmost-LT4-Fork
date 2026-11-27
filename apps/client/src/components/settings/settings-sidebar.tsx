@@ -12,15 +12,19 @@ import {
   IconPlug,
   IconShieldLock,
   IconSparkles,
+  IconWebhook,
   IconSpeakerphone,
   IconKey,
   IconHistory,
+  IconShieldCheck,
+  IconDatabaseExport,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
 import { useTranslation } from "react-i18next";
 import { isCloud } from "@/lib/config.ts";
 import useUserRole from "@/hooks/use-user-role.tsx";
+import { Lt4Permission } from "@/lt4/roles/role-permissions";
 import { useAtom } from "jotai";
 import { entitlementAtom } from "@/lt4/entitlement/entitlement-atom";
 import { workspaceAtom } from "@/features/user/atoms/current-user-atom.ts";
@@ -43,6 +47,8 @@ type DataItem = {
   path: string;
   feature?: string;
   role?: "admin" | "owner";
+  // LT4-Fork: benötigtes Recht der Rolle
+  permission?: Lt4Permission;
   env?: "cloud" | "selfhosted";
   requiresInstalledIntegration?: boolean;
 };
@@ -82,10 +88,16 @@ const groupedData: DataGroup[] = [
       { label: "Members", icon: IconUsers, path: "/settings/members" },
       { label: "Groups", icon: IconUsersGroup, path: "/settings/groups" },
       {
+        label: "Roles",
+        icon: IconShieldCheck,
+        path: "/settings/roles",
+        permission: "roles",
+      },
+      {
         label: "Spaces",
         icon: IconSpaces,
         path: "/settings/spaces",
-        role: "admin",
+        permission: "spaces",
       },
       { label: "Public sharing", icon: IconWorld, path: "/settings/sharing" },
       {
@@ -98,19 +110,31 @@ const groupedData: DataGroup[] = [
         label: "Announcements",
         icon: IconSpeakerphone,
         path: "/settings/announcements",
-        role: "admin",
+        permission: "announcements",
       },
       {
         label: "Audit log",
         icon: IconHistory,
         path: "/settings/audit-log",
-        role: "admin",
+        permission: "audit",
+      },
+      {
+        label: "Webhooks",
+        icon: IconWebhook,
+        path: "/settings/webhooks",
+        permission: "webhooks",
+      },
+      {
+        label: "Backups",
+        icon: IconDatabaseExport,
+        path: "/settings/backups",
+        permission: "backups",
       },
       {
         label: "AI assistant",
         icon: IconSparkles,
         path: "/settings/ai",
-        role: "admin",
+        permission: "ai_manage",
       },
       {
         label: "Integrations",
@@ -127,7 +151,7 @@ export default function SettingsSidebar() {
   const location = useLocation();
   const [active, setActive] = useState(location.pathname);
   const { goBack } = useSettingsNavigation();
-  const { isAdmin, isOwner } = useUserRole();
+  const { isAdmin, isOwner, can } = useUserRole();
   const [entitlements] = useAtom(entitlementAtom);
   const [workspace] = useAtom(workspaceAtom);
   const upgradeLabel = useUpgradeLabel();
@@ -148,6 +172,7 @@ export default function SettingsSidebar() {
     if (item.env === "selfhosted" && isCloud()) return false;
     if (item.role === "admin" && !isAdmin) return false;
     if (item.role === "owner" && !isOwner) return false;
+    if (item.permission && !can(item.permission)) return false;
     if (item.requiresInstalledIntegration && !installedIntegrations?.length) {
       return false;
     }

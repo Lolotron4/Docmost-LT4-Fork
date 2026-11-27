@@ -10,6 +10,7 @@ import { Workspace } from '@docmost/db/types/entity.types';
 import { htmlEscape } from '../../common/helpers/html-escaper';
 import { getWorkspaceDefaultLocale } from '../workspace/workspace.util';
 import { DEFAULT_LOCALE } from '../workspace/workspace.constants';
+import { ShareGuardService } from '../../lt4/share-guard/share-guard.service';
 
 @Controller('share')
 export class ShareSeoController {
@@ -17,6 +18,7 @@ export class ShareSeoController {
     private readonly shareService: ShareService,
     private workspaceRepo: WorkspaceRepo,
     private environmentService: EnvironmentService,
+    private readonly shareGuard: ShareGuardService,
   ) {}
 
   /*
@@ -75,6 +77,10 @@ export class ShareSeoController {
           shared.share.spaceId,
         );
         if (!sharingAllowed) {
+          return this.sendIndex(indexFilePath, res);
+        }
+        // LT4: geschützte/abgelaufene Gastlinks verraten keinen Titel
+        if (!(await this.shareGuard.canAccess({ id: shared.share.id }, req))) {
           return this.sendIndex(indexFilePath, res);
         }
         title = shared.page.title;

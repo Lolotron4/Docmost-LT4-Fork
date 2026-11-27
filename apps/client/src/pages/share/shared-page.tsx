@@ -14,6 +14,8 @@ import DocsBreadcrumbs from "@/features/public-space/components/docs/docs-breadc
 import DocsPageNav from "@/features/public-space/components/docs/docs-page-nav.tsx";
 import DocsFooterBranding from "@/features/public-space/components/docs/docs-footer-branding.tsx";
 import { PublicPageCover } from "@/features/page-cover/components/public-page-cover.tsx";
+import { getShareBlock } from "@/lt4/share-guard/share-guard-service.ts";
+import { ShareGate } from "@/lt4/share-guard/share-gate.tsx";
 
 export default function SharedPage() {
   const { t } = useTranslation();
@@ -56,6 +58,9 @@ export default function SharedPage() {
   }
 
   if (isError || !data) {
+    // LT4: Gastlink mit Passwort oder abgelaufen
+    const shareBlock = getShareBlock(error);
+    if (shareBlock) return <ShareGate block={shareBlock} />;
     if ([401, 403, 404].includes(error?.["status"])) {
       return <Error404 />;
     }

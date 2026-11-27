@@ -14,30 +14,42 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
-import { IconCheck, IconCopy, IconLink, IconPlus, IconTrash } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconCopy,
+  IconLink,
+  IconPlus,
+  IconTrash,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import useUserRole from "@/hooks/use-user-role.tsx";
+import { useRoleLabels } from "@/lt4/roles/use-roles";
 import {
   createJoinLink,
   IJoinLink,
   joinLinkUrl,
   listJoinLinks,
   revokeJoinLink,
+  updateJoinLinkGroups,
 } from "../join-link-service";
+import { JoinLinkGroupSelect } from "./join-link-group-select";
 
 const QUERY_KEY = ["lt4-join-links"];
 
 export function JoinLinksPanel() {
   const { t, i18n } = useTranslation();
+  const { labelOf } = useRoleLabels();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: QUERY_KEY, queryFn: listJoinLinks });
   const revoke = useMutation({
     mutationFn: revokeJoinLink,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
   });
+
+  const [editing, setEditing] = useState<IJoinLink | null>(null);
 
   const formatDate = (value: string | null) =>
     value ? new Date(value).toLocaleDateString(i18n.language) : t("Never");
@@ -74,12 +86,13 @@ export function JoinLinksPanel() {
       )}
 
       {!!data?.items.length && (
-        <Table.ScrollContainer minWidth={640}>
+        <Table.ScrollContainer minWidth={760}>
           <Table verticalSpacing="sm">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>{t("Code")}</Table.Th>
                 <Table.Th>{t("Role")}</Table.Th>
+                <Table.Th>{t("Groups")}</Table.Th>
                 <Table.Th>{t("Uses")}</Table.Th>
                 <Table.Th>{t("Expires")}</Table.Th>
                 <Table.Th />
@@ -101,7 +114,22 @@ export function JoinLinksPanel() {
                     </Group>
                   </Table.Td>
                   <Table.Td>
-                    <Text size="sm">{link.role === "admin" ? t("Admin") : t("Member")}</Text>
+                    <Text size="sm">{labelOf(link.role)}</Text>
+                  </Table.Td>
+                  <Table.Td>
+                    {link.groups?.length ? (
+                      <Group gap={4}>
+                        {link.groups.map((group) => (
+                          <Badge key={group.id} size="sm" variant="light" tt="none">
+                            {group.name}
+                          </Badge>
+                        ))}
+                      </Group>
+                    ) : (
+                      <Text size="sm" c="dimmed">
+                        –
+                      </Text>
+                    )}
                   </Table.Td>
                   <Table.Td>
                     <Text size="sm">
@@ -132,6 +160,11 @@ export function JoinLinksPanel() {
                           </Tooltip>
                         )}
                       </CopyButton>
+                      <Tooltip label={t("Edit groups")} withArrow>
+                        <ActionIcon variant="subtle" color="gray" onClick={() => setEditing(link)} aria-label={t("Edit groups")}>
+                          <IconUsersGroup size={16} />
+                        </ActionIcon>
+                      </Tooltip>
                       <Tooltip label={t("Delete")} withArrow>
                         <ActionIcon variant="subtle" color="red" onClick={() => confirmRevoke(link)} aria-label={t("Delete")}>
                           <IconTrash size={16} />
@@ -145,24 +178,75 @@ export function JoinLinksPanel() {
           </Table>
         </Table.ScrollContainer>
       )}
+
+      {editing && (
+        <EditJoinLinkGroupsModal link={editing} onClose={() => setEditing(null)} />
+      )}
     </Stack>
+  );
+}
+
+function EditJoinLinkGroupsModal({
+  link,
+  onClose,
+}: {
+  link: IJoinLink;
+  onClose: () => void;
+}) {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [groupIds, setGroupIds] = useState<string[]>(
+    () => link.groups?.map((g) => g.id) ?? [],
+  );
+  const save = useMutation({
+    mutationFn: () => updateJoinLinkGroups(link.id, groupIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      notifications.show({ message: t("Updated successfully") });
+      onClose();
+    },
+    onError: (err: any) =>
+      notifications.show({ message: err?.response?.data?.message, color: "red" }),
+  });
+
+  return (
+    <Modal opened onClose={onClose} title={t("Edit groups")} centered>
+      <Stack gap="md">
+        <Text size="sm" c="dimmed">
+          {t("Applies to accounts created from now on. Existing accounts keep their groups.")}
+        </Text>
+        <Text ff="monospace" size="sm">
+          {link.code}
+        </Text>
+        <JoinLinkGroupSelect
+          value={groupIds}
+          onChange={setGroupIds}
+          initialGroups={link.groups}
+        />
+        <Button onClick={() => save.mutate()} loading={save.isPending}>
+          {t("Save")}
+        </Button>
+      </Stack>
+    </Modal>
   );
 }
 
 function CreateJoinLinkButton() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { isOwner, isAdmin } = useUserRole();
+  const { assignableRoles } = useRoleLabels();
   const [opened, setOpened] = useState(false);
-  const [role, setRole] = useState<"member" | "admin">("member");
+  const [role, setRole] = useState<string>("member");
   const [maxUses, setMaxUses] = useState<number | string>("");
   const [expiresInDays, setExpiresInDays] = useState<number | string>(14);
+  const [groupIds, setGroupIds] = useState<string[]>([]);
   const [created, setCreated] = useState<IJoinLink | null>(null);
   const [busy, setBusy] = useState(false);
 
   const close = () => {
     setOpened(false);
     setCreated(null);
+    setGroupIds([]);
   };
 
   const submit = async () => {
@@ -172,6 +256,7 @@ function CreateJoinLinkButton() {
         role,
         maxUses: typeof maxUses === "number" ? maxUses : undefined,
         expiresInDays: typeof expiresInDays === "number" ? expiresInDays : undefined,
+        groupIds,
       });
       setCreated(link);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
@@ -219,13 +304,15 @@ function CreateJoinLinkButton() {
           <Stack gap="md">
             <Select
               label={t("Role")}
-              data={[
-                { value: "member", label: t("Member") },
-                ...(isAdmin || isOwner ? [{ value: "admin", label: t("Admin") }] : []),
-              ]}
+              data={assignableRoles().map((r) => ({ value: r.value, label: r.label }))}
               value={role}
-              onChange={(v) => v && setRole(v as "member" | "admin")}
+              onChange={(v) => v && setRole(v)}
               allowDeselect={false}
+            />
+            <JoinLinkGroupSelect
+              value={groupIds}
+              onChange={setGroupIds}
+              description={t("New accounts are added to these groups automatically.")}
             />
             <NumberInput
               label={t("Maximum number of accounts")}

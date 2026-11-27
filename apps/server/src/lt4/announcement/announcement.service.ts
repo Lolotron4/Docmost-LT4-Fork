@@ -1,6 +1,7 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 // Ankündigungs-Banner: Admins legen Hinweise an, die oben in der App
 // (und bei Zielgruppe "everyone" auch auf Login- und öffentlichen Seiten) erscheinen.
+import { hasPermission } from '../roles/role-store';
 import {
   BadRequestException,
   ForbiddenException,
@@ -11,7 +12,6 @@ import { InjectKysely } from 'nestjs-kysely';
 import { sql } from 'kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import { User, Workspace } from '@docmost/db/types/entity.types';
-import { UserRole } from '../../common/helpers/types/permission';
 import {
   CreateAnnouncementDto,
   UpdateAnnouncementDto,
@@ -38,7 +38,7 @@ export class AnnouncementService {
   constructor(@InjectKysely() private readonly db: KyselyDB) {}
 
   private assertAdmin(user: User) {
-    if (user.role !== UserRole.ADMIN && user.role !== UserRole.OWNER) {
+    if (!hasPermission(user, 'announcements')) {
       throw new ForbiddenException();
     }
   }

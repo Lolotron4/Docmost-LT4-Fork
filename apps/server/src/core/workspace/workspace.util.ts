@@ -5,12 +5,37 @@ import {
   WorkspaceUserListStatus,
 } from './workspace.constants';
 import { collapseBlankLines, stripLinks } from '../../common/helpers';
+import { canActOnRole, canActOnUser, findRole } from '../../lt4/roles/role-store';
 
 export function isAdminActingOnOwner(
   authUserRole: string,
   targetRole: string,
 ): boolean {
   return authUserRole === UserRole.ADMIN && targetRole === UserRole.OWNER;
+}
+
+/**
+ * LT4-Fork: Rangfolge der Rollen. Wer nicht Owner ist, darf nur Personen
+ * und Rollen verwalten, die unter der eigenen Rolle stehen.
+ */
+export function cannotActOnRole(
+  authUser: { role?: string | null; workspaceId?: string | null },
+  targetRole: string,
+): boolean {
+  return !canActOnRole(authUser, targetRole);
+}
+
+/** LT4-Fork: wie oben, aber mit Rollen aus Gruppen der Zielperson. */
+export function cannotActOnUser(
+  authUser: { id?: string; role?: string | null; workspaceId?: string | null },
+  target: { id?: string; role?: string | null; workspaceId?: string | null },
+): boolean {
+  return !canActOnUser(authUser, target);
+}
+
+/** LT4-Fork: Gibt es die Rolle in diesem Arbeitsbereich? */
+export function isKnownRole(workspaceId: string, role: string): boolean {
+  return !!findRole(workspaceId, role);
 }
 
 // without manage rights only active users are listed

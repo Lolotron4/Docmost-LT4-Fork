@@ -1,0 +1,11 @@
+/* LT4-Fork: Datum in offenen Aufgaben einfärben (nur im eigenen Absatz, nicht in Unteraufgaben) */
+li.lt4-task-overdue > div > p [data-node-view-wrapper] > :is(button, span):has(> time) {
+  color: var(--mantine-color-red-7);
+  background: light-dark(var(--mantine-color-red-0), rgba(250, 82, 82, 0.15));
+  border-color: var(--mantine-color-red-4);
+}
+li.lt4-task-due-today > div > p [data-node-view-wrapper] > :is(button, span):has(> time) {
+  color: var(--mantine-color-orange-8);
+  background: light-dark(var(--mantine-color-orange-0), rgba(253, 126, 20, 0.15));
+  border-color: var(--mantine-color-orange-4);
+}

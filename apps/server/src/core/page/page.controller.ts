@@ -10,6 +10,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { hasPermission } from '../../lt4/roles/role-store';
 import { PageService } from './services/page.service';
 import { BacklinkService } from './services/backlink.service';
 import { PageAccessService } from './page-access/page-access.service';
@@ -675,15 +676,21 @@ export class PageController {
 
     // If spaceId is provided, it's a copy to different space
     if (dto.spaceId) {
-      const abilities = await Promise.all([
+      const [sourceAbility, targetAbility] = await Promise.all([
         this.spaceAbility.createForUser(user, copiedPage.spaceId),
         this.spaceAbility.createForUser(user, dto.spaceId),
       ]);
 
+      // LT4-Fork: Mit dem Rollen-Recht "Seiten kopieren" reicht im
+      // Quellbereich Leserecht (validateCanView oben). Im Ziel braucht es
+      // immer Schreibrecht.
+      const sourceOk =
+        sourceAbility.can(SpaceCaslAction.Edit, SpaceCaslSubject.Page) ||
+        (hasPermission(user, 'pages_copy') &&
+          sourceAbility.can(SpaceCaslAction.Read, SpaceCaslSubject.Page));
       if (
-        abilities.some((ability) =>
-          ability.cannot(SpaceCaslAction.Edit, SpaceCaslSubject.Page),
-        )
+        !sourceOk ||
+        targetAbility.cannot(SpaceCaslAction.Edit, SpaceCaslSubject.Page)
       ) {
         throw new ForbiddenException();
       }

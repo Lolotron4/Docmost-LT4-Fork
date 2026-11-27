@@ -1,5 +1,6 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 // Audit-Log für Workspace-Admins: Einträge filtern und Aufbewahrung einstellen.
+import { hasPermission } from '../roles/role-store';
 import {
   Body,
   Controller,
@@ -70,7 +71,7 @@ export class AuditLogController {
   ) {}
 
   private assertAdmin(user: User) {
-    if (user.role !== 'admin' && user.role !== 'owner') throw new ForbiddenException();
+    if (!hasPermission(user, 'audit')) throw new ForbiddenException();
   }
 
   @HttpCode(HttpStatus.OK)

@@ -16,7 +16,8 @@ import { SpaceListStatus } from "@/features/space/types/space.types";
 
 export default function Spaces() {
   const { t } = useTranslation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("spaces");
   const { search, cursor, goNext, goPrev, handleSearch, resetPagination } =
     usePaginateAndSearch();
   const [status, setStatus] = useState<SpaceListStatus>("active");

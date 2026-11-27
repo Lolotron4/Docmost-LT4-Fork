@@ -3,7 +3,6 @@ import {
   ArrayMinSize,
   IsArray,
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -11,7 +10,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { InviteUserRole } from '../../../common/helpers/types/permission';
 import { NoUrls } from '../../../common/validators/no-urls.validator';
 
 export class InviteUserDto {
@@ -32,7 +30,10 @@ export class InviteUserDto {
   @IsUUID('all', { each: true })
   groupIds: string[];
 
-  @IsEnum(InviteUserRole)
+  // LT4-Fork: auch eigene Rollen (UUID); Prüfung im Service
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(64)
   role: string;
 
   @IsOptional()

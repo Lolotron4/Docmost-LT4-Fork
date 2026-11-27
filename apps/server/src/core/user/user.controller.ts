@@ -25,6 +25,7 @@ import {
 import { UserProfileService } from './user-profile.service';
 import { UserIdDto } from './dto/user-id.dto';
 import { ProfileViewer } from './user.types';
+import { permissionsOf } from '../../lt4/roles/role-store';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -54,7 +55,12 @@ export class UserController {
       memberCount,
     };
 
-    return { user: authUser, workspace: workspaceInfo };
+    // LT4-Fork: Rechte der (ggf. eigenen) Rolle für die Oberfläche
+    return {
+      user: authUser,
+      workspace: workspaceInfo,
+      permissions: permissionsOf(authUser),
+    };
   }
 
   @HttpCode(HttpStatus.OK)

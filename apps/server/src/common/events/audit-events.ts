@@ -94,6 +94,7 @@ export const AuditEvent = {
   // Share
   SHARE_CREATED: 'share.created',
   SHARE_DELETED: 'share.deleted',
+  SHARE_UPDATED: 'share.updated', // LT4: Gastlink (Ablauf/Passwort) geändert
 
   // Import / Export
   PAGE_IMPORTED: 'page.imported',
@@ -136,9 +137,31 @@ export const AuditEvent = {
   ANNOUNCEMENT_UNARCHIVED: 'announcement.unarchived',
   ANNOUNCEMENT_DELETED: 'announcement.deleted',
 
+  // LT4: Rollen
+  ROLE_CREATED: 'role.created',
+  ROLE_UPDATED: 'role.updated',
+  ROLE_DELETED: 'role.deleted',
+
+  // LT4: Lesebestätigung
+  READ_CONFIRMATION_REQUESTED: 'page.read_confirmation_requested',
+  READ_CONFIRMATION_COMPLETED: 'page.read_confirmation_completed',
+
+  // LT4: Webhooks
+  WEBHOOK_CREATED: 'webhook.created',
+  WEBHOOK_UPDATED: 'webhook.updated',
+  WEBHOOK_DELETED: 'webhook.deleted',
+
   // Base
   BASE_PROPERTY_UPDATED: 'base.property.updated',
   BASE_FORM_SHARE_UPDATED: 'base.form_share.updated',
+
+  // LT4: Sicherungen
+  BACKUP_CREATED: 'backup.created',
+  BACKUP_DELETED: 'backup.deleted',
+  BACKUP_DOWNLOADED: 'backup.downloaded',
+  BACKUP_UPLOADED: 'backup.uploaded',
+  BACKUP_RESTORED: 'backup.restored',
+  BACKUP_SETTINGS_UPDATED: 'backup.settings_updated',
 } as const;
 
 export type AuditEventType = (typeof AuditEvent)[keyof typeof AuditEvent];
@@ -172,6 +195,9 @@ export const AuditResource = {
   SIEM_DESTINATION: 'siem_destination',
   TEMPLATE: 'template',
   ANNOUNCEMENT: 'announcement',
+  ROLE: 'role',
+  WEBHOOK: 'webhook',
+  BACKUP: 'backup',
 } as const;
 
 export type AuditResourceType =

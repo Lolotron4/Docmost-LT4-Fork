@@ -37,7 +37,8 @@ export default function GroupMembersList() {
     query: search,
   });
   const removeGroupMember = useRemoveGroupMemberMutation();
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("groups");
 
   const onRemove = async (userId: string) => {
     const memberToRemove = {

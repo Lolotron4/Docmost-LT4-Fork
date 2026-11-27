@@ -19,7 +19,8 @@ export default function UserProfilePage() {
   const { t } = useTranslation();
   const { userId } = useParams<{ userId: string }>();
   const currentUser = useAtomValue(userAtom);
-  const { isAdmin } = useUserRole();
+  const { can } = useUserRole();
+  const isAdmin = can("members");
   const validUserId = isValidUuid(userId) ? userId : undefined;
   const { data: profile, isError } = useUserProfileQuery(validUserId);
   const notFound = !validUserId || (!profile && isError);
