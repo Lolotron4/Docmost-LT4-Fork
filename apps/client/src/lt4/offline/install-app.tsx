@@ -52,7 +52,7 @@ export function InstallAppCard() {
           <Text fw={500}>{t("Install app")}</Text>
           <Text size="sm" c="dimmed">
             {deferredPrompt
-              ? t("Add Docmost to your home screen. Saved pages then open without a connection.")
+              ? t("Add LT4-Docs to your home screen. Saved pages then open without a connection.")
               : t('On iPhone/iPad: tap "Share" in Safari, then "Add to Home Screen".')}
           </Text>
         </div>

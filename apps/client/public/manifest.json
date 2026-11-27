@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Docmost LT4",
-  "short_name": "Docmost",
+  "name": "LT4-Docs",
+  "short_name": "LT4-Docs",
   "description": "Wiki und Dokumentation – auch offline lesbar",
   "lang": "de",
   "start_url": "/home",
