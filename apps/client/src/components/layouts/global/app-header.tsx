@@ -3,10 +3,10 @@ import {
   Badge,
   Box,
   Group,
-  Text,
   Tooltip,
   UnstyledButton,
 } from "@mantine/core";
+import { Lt4Brand } from "@/lt4/branding/lt4-brand.tsx";
 import classes from "./app-header.module.css";
 import React from "react";
 import TopMenu from "@/components/layouts/global/top-menu.tsx";
@@ -84,23 +84,18 @@ export function AppHeader() {
             />
           </Tooltip>
 
-          <Link to="/home" className={classes.brand} aria-label="Docmost">
+          <Link to="/home" className={classes.brand} aria-label="LT4-Docs">
             <Box hiddenFrom="sm" className={classes.brandIcon}>
               <img
                 src="/icons/favicon-32x32.png"
-                alt="Docmost"
+                alt="LT4-Docs"
                 width={22}
                 height={22}
               />
             </Box>
-            <Text
-              size="lg"
-              fw={600}
-              style={{ userSelect: "none" }}
-              visibleFrom="sm"
-            >
-              Docmost
-            </Text>
+            <Box visibleFrom="sm">
+              <Lt4Brand />
+            </Box>
           </Link>
 
           <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
