@@ -28,6 +28,7 @@ export const LT4_FEATURES: ReadonlySet<string> = new Set<string>([
   Feature.ATTACHMENT_INDEXING,
   Feature.INTEGRATIONS,
   Feature.MCP,
+  Feature.SCIM,
 ]);
 
 export const LT4_TIER = 'lt4';

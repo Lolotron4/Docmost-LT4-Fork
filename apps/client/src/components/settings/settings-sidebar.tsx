@@ -18,6 +18,7 @@ import {
   IconHistory,
   IconShieldCheck,
   IconDatabaseExport,
+  IconIdBadge,
 } from "@tabler/icons-react";
 import { Link, useLocation } from "react-router-dom";
 import classes from "./settings.module.css";
@@ -129,6 +130,12 @@ const groupedData: DataGroup[] = [
         icon: IconDatabaseExport,
         path: "/settings/backups",
         permission: "backups",
+      },
+      {
+        label: "SCIM provisioning",
+        icon: IconIdBadge,
+        path: "/settings/scim",
+        permission: "scim",
       },
       {
         label: "AI assistant",

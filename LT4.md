@@ -30,6 +30,7 @@ Eigener Code liegt bewusst in eigenen Ordnern, damit Updates von Docmost (`upstr
 | Abgaben für Gruppenarbeit (Frist, Sperre, Freischalten), siehe docs/lt4/abgaben.md | fertig |
 | Seitenstatistik und veraltete Seiten, siehe docs/lt4/seitenstatistik.md | fertig |
 | Webhooks für Discord und andere Dienste (pro Bereich), siehe docs/lt4/webhooks.md | fertig |
+| SCIM 2.0: Konten und Gruppen aus Entra ID, Okta, Authentik abgleichen, siehe docs/lt4/scim.md | fertig |
 | SSO (OIDC) | geplant |
 | Bases (Inline-Datenbanken) | geplant |
 | Kanban, Kalender | geplant |

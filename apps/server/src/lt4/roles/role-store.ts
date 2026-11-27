@@ -34,6 +34,7 @@ export const LT4_PERMISSIONS = [
   'page_stats', // Seitenstatistik aller Seiten mit Namen der Lesenden sehen
   'webhooks', // Webhooks (Discord & Co.) einrichten
   'backups', // Sicherungen erstellen, herunterladen und wiederherstellen
+  'scim', // SCIM-Abgleich mit einem Identitätsanbieter einrichten (Tokens)
 ] as const;
 
 export type Lt4Permission = (typeof LT4_PERMISSIONS)[number];
@@ -54,7 +55,7 @@ const ALL: Lt4Permission[] = [...LT4_PERMISSIONS];
  * Rechte, die die eingebaute Admin-Rolle NICHT automatisch hat. Owner
  * können sie Admins (oder eigenen Rollen) bewusst geben.
  */
-const OWNER_DEFAULT_ONLY: Lt4Permission[] = ['backups'];
+const OWNER_DEFAULT_ONLY: Lt4Permission[] = ['backups', 'scim'];
 const ADMIN_DEFAULT: Lt4Permission[] = ALL.filter((p) => !OWNER_DEFAULT_ONLY.includes(p));
 
 export function defaultRoles(): Lt4Role[] {
