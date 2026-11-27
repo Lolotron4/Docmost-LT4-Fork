@@ -28,6 +28,7 @@ import { RESET } from "jotai/utils";
 import { useTranslation } from "react-i18next";
 import { isCloud } from "@/lib/config.ts";
 import { deleteLocalPageData } from "@/lib/local-page-data.ts";
+import { clearOfflineData } from "@/lt4/offline/offline-store";
 import { exchangeTokenRedirectUrl, getHostnameUrl } from "@/lt4/utils.ts";
 
 export default function useAuth() {
@@ -167,6 +168,7 @@ export default function useAuth() {
   const handleLogout = async () => {
     setCurrentUser(RESET);
     await deleteLocalPageData();
+    await clearOfflineData();
     await logout();
     window.location.replace(`${APP_ROUTE.AUTH.LOGIN}?logout=1`);
   };

@@ -17,6 +17,8 @@ import { IconAlertTriangle } from "@tabler/icons-react";
 import { useEntitlements } from "@/lt4/entitlement/use-entitlements";
 import { entitlementAtom } from "@/lt4/entitlement/entitlement-atom";
 import { useSyncUserTimezone } from "@/features/user/hooks/use-sync-user-timezone";
+import { isNetworkError } from "@/lt4/offline/use-online-status";
+import { OfflineRedirect } from "@/lt4/offline/offline-redirect";
 
 export function UserProvider({
   children, pending,
@@ -98,6 +100,11 @@ export function UserProvider({
 
   if (isError && error?.["response"]?.status === 404) {
     return <Error404 />;
+  }
+
+  // LT4: ohne Verbindung zu den offline gespeicherten Seiten
+  if (error && isNetworkError(error)) {
+    return <OfflineRedirect />;
   }
 
   if (error) {
