@@ -24,6 +24,11 @@ rand = "0.8"
 base64 = "0.22"
 zeroize = "1"
 
+# Android: Dateien über Inhalts-Adressen (content://) lesen/schreiben, Server im Browser öffnen.
+[target.'cfg(target_os = "android")'.dependencies]
+tauri-plugin-fs = "2"
+tauri-plugin-opener = "2"
+
 [target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
 keyring = { version = "3", features = ["apple-native", "windows-native"] }
 

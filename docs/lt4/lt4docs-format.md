@@ -1,6 +1,12 @@
 # Dateiformat .lt4docs (Version 1)
 
 Verlustfreier Austausch von Seiten zwischen LT4-Docs Client und LT4-Server.
+
+Erzeugt wird das Format vom Client (Exportieren) und vom Server (Seite oder Bereich exportieren ›
+„LT4-Docs (.lt4docs)“, Code `apps/server/src/lt4/lt4docs-export`). Der Server-Export enthält nur
+Seiten und Anhänge, die der Nutzer sehen darf (Seitenrechte), und rechnet die Docmost-Positionen
+in ganze Zahlen je Ebene um. Gelesen wird es vom Client („Datei einlesen“) und vom Server
+(„Seiten importieren › LT4-Docs“).
 Eine `.lt4docs`-Datei ist ein ZIP:
 
 ```

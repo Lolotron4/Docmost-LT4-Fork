@@ -104,4 +104,6 @@ export enum ExportFormat {
   HTML = "html",
   Markdown = "markdown",
   Docx = "docx",
+  // LT4: verlustfreies Format des LT4-Docs Clients
+  Lt4Docs = "lt4docs",
 }

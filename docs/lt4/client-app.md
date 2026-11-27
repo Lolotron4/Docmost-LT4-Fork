@@ -15,10 +15,41 @@ Plan für die weiteren Phasen: Dokument „LT4-Docs Client für Desktop und Andr
    - `lt4-docs-windows`: `.msi` oder `…-setup.exe`
    - `lt4-docs-linux`: `.deb` (Debian/Ubuntu) oder `.AppImage` (alle Distributionen)
    - `lt4-docs-macos`: `.dmg` (Apple Silicon)
+   - `lt4-docs-android`: `LT4-Docs_<version>.apk`
 3. Die Dateien sind **nicht signiert**:
    - Windows: SmartScreen › „Weitere Informationen“ › „Trotzdem ausführen“.
    - macOS: Rechtsklick auf die App › „Öffnen“ (oder Systemeinstellungen › Datenschutz & Sicherheit › „Dennoch öffnen“).
    - Linux (AppImage): Datei ausführbar machen (`chmod +x`).
+   - Android: APK aufs Handy laden und öffnen; einmalig „Installieren aus unbekannten Quellen“
+     für den Browser/Dateimanager erlauben.
+
+### Android-Schlüssel (einmal einrichten)
+
+Android installiert Updates nur, wenn jede APK mit **demselben Schlüssel** signiert ist. Ohne
+hinterlegten Schlüssel signiert der Workflow mit einem Einmal-Schlüssel (Warnung im Lauf); dann
+muss man die App vor einem Update deinstallieren, und die lokalen Daten sind weg.
+
+Schlüssel einmal erzeugen (Java nötig) und als Secrets hinterlegen
+(GitHub › Settings › Secrets and variables › Actions):
+
+```bash
+keytool -genkeypair -keystore lt4docs.jks -alias lt4docs -keyalg RSA -keysize 2048 -validity 10000
+base64 -w0 lt4docs.jks   # macOS: base64 -i lt4docs.jks
+```
+
+| Secret | Inhalt |
+|---|---|
+| `LT4_ANDROID_KEYSTORE` | Ausgabe von `base64` |
+| `LT4_ANDROID_KEYSTORE_PASSWORD` | Passwort aus `keytool` |
+| `LT4_ANDROID_KEY_ALIAS` | `lt4docs` |
+
+Die Datei `lt4docs.jks` gut aufheben, sie lässt sich nicht neu erzeugen.
+
+### Unterschiede auf Android
+
+- Server öffnen sich im Browser des Handys (eigene Fenster gibt es dort nicht).
+- PDF-Export fehlt noch (kein Druckdialog in der App); Word, Excel, .lt4docs und Markdown gehen.
+- Fingerabdruck kommt mit Phase 4.
 
 Für eine feste Version einen Tag `client-vX.Y.Z` pushen, dann entsteht ein Release-Entwurf mit allen Dateien.
 
@@ -71,6 +102,9 @@ Exportieren geht immer ohne Login. Für den Import auf dem Server musst du dort 
 Bereich öffnen › **Seiten importieren › LT4-Docs** › Datei wählen. Die Seiten landen mit
 Seitenbaum, Bildern und Formatierung im Bereich. Bei mehreren Bereichen in einer Datei gibt
 es pro Bereich eine Sammelseite.
+
+Umgekehrt geht es auch: In der Web-App **Seite oder Bereich exportieren › Format „LT4-Docs (.lt4docs)“**
+und die Datei im Client über „Datei einlesen“ übernehmen (z. B. um einen Bereich mitzunehmen).
 
 „Datei einlesen“ im selben Fenster übernimmt eine .lt4docs-Datei in das lokale Notizbuch
 (z. B. auf ein zweites Gerät). Dabei bekommen alle Seiten neue IDs, es wird nichts überschrieben.

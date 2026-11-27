@@ -8,7 +8,9 @@ use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Mutex;
-use tauri::{AppHandle, Manager, State, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, Manager, State};
+#[cfg(desktop)]
+use tauri::{WebviewUrl, WebviewWindowBuilder};
 use vault::*;
 use zeroize::Zeroize;
 
@@ -222,28 +224,91 @@ fn file_delete(app: AppHandle, state: State<AppState>, id: String) -> Result<(),
 
 /// Schreibt eine Export-Datei an den im Speichern-Dialog gewählten Ort (unverschlüsselt).
 #[tauri::command]
-fn export_write(state: State<AppState>, path: String, base64: String) -> Result<(), String> {
+fn export_write(
+    app: AppHandle,
+    state: State<AppState>,
+    path: String,
+    base64: String,
+) -> Result<(), String> {
     current_key(&state)?;
     let bytes = B64.decode(base64).map_err(|e| e.to_string())?;
+    write_user_file(&app, &path, &bytes)
+}
+
+#[cfg(not(target_os = "android"))]
+fn write_user_file(_app: &AppHandle, path: &str, bytes: &[u8]) -> Result<(), String> {
     fs::write(PathBuf::from(path), bytes).map_err(|e| e.to_string())
+}
+
+#[cfg(not(target_os = "android"))]
+fn read_user_file(_app: &AppHandle, path: &str) -> Result<Vec<u8>, String> {
+    fs::read(PathBuf::from(path)).map_err(|e| e.to_string())
+}
+
+/// Android: Der Speichern-/Öffnen-Dialog liefert Inhalts-Adressen (content://…).
+#[cfg(target_os = "android")]
+fn write_user_file(app: &AppHandle, path: &str, bytes: &[u8]) -> Result<(), String> {
+    use std::io::Write;
+    use tauri_plugin_fs::{FilePath, FsExt, OpenOptions};
+    let fp: FilePath = path.parse().map_err(|_| "Ungültiger Pfad".to_string())?;
+    let mut opts = OpenOptions::new();
+    opts.write(true).create(true).truncate(true);
+    let mut file = app.fs().open(fp, opts).map_err(|e| e.to_string())?;
+    file.write_all(bytes).map_err(|e| e.to_string())
+}
+
+#[cfg(target_os = "android")]
+fn read_user_file(app: &AppHandle, path: &str) -> Result<Vec<u8>, String> {
+    use std::io::Read;
+    use tauri_plugin_fs::{FilePath, FsExt, OpenOptions};
+    let fp: FilePath = path.parse().map_err(|_| "Ungültiger Pfad".to_string())?;
+    let mut opts = OpenOptions::new();
+    opts.read(true);
+    let mut file = app.fs().open(fp, opts).map_err(|e| e.to_string())?;
+    let mut out = Vec::new();
+    file.read_to_end(&mut out).map_err(|e| e.to_string())?;
+    Ok(out)
 }
 
 /// Liest eine vom Nutzer gewählte Datei (z. B. .lt4docs zum Einlesen).
 #[tauri::command]
-fn import_read(state: State<AppState>, path: String) -> Result<String, String> {
+fn import_read(app: AppHandle, state: State<AppState>, path: String) -> Result<String, String> {
     current_key(&state)?;
-    let bytes = fs::read(PathBuf::from(path)).map_err(|e| e.to_string())?;
+    let bytes = read_user_file(&app, &path)?;
     Ok(B64.encode(bytes))
 }
 
+#[cfg(desktop)]
 #[tauri::command]
 fn print_page(window: tauri::WebviewWindow) -> Result<(), String> {
     // Öffnet den Druckdialog des Systems (dort "Als PDF speichern" wählen).
     window.print().map_err(|e| e.to_string())
 }
 
+#[cfg(mobile)]
+#[tauri::command]
+fn print_page() -> Result<(), String> {
+    Err("PDF-Export gibt es auf dem Handy noch nicht. Bitte Word nutzen.".into())
+}
+
+/// Android: Server im Browser des Handys öffnen (eigene Fenster gibt es dort nicht).
+#[cfg(mobile)]
+#[tauri::command]
+async fn open_server_window(app: AppHandle, url: String, title: String) -> Result<(), String> {
+    use tauri_plugin_opener::OpenerExt;
+    let _ = title;
+    let parsed: tauri::Url = url.parse().map_err(|_| "Ungültige Adresse".to_string())?;
+    if parsed.scheme() != "https" && parsed.scheme() != "http" {
+        return Err("Nur http(s)-Adressen sind erlaubt.".into());
+    }
+    app.opener()
+        .open_url(parsed.as_str(), None::<&str>)
+        .map_err(|e| e.to_string())
+}
+
 /// Öffnet einen LT4-Server in einem eigenen Fenster. Fremde Seiten bekommen
 /// keinen Zugriff auf die Befehle oben (Rechte gelten nur für das Hauptfenster).
+#[cfg(desktop)]
 #[tauri::command]
 async fn open_server_window(app: AppHandle, url: String, title: String) -> Result<(), String> {
     let parsed: tauri::Url = url.parse().map_err(|_| "Ungültige Adresse".to_string())?;
@@ -270,8 +335,12 @@ async fn open_server_window(app: AppHandle, url: String, title: String) -> Resul
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        .plugin(tauri_plugin_dialog::init())
+    let builder = tauri::Builder::default().plugin(tauri_plugin_dialog::init());
+    #[cfg(target_os = "android")]
+    let builder = builder
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_opener::init());
+    builder
         .manage(AppState::default())
         .invoke_handler(tauri::generate_handler![
             vault_status,

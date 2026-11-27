@@ -44,6 +44,7 @@ import {
 } from '../../common/helpers/prosemirror/utils';
 import { htmlToMarkdown, ItemsByLabel } from '@docmost/editor-ext';
 import { validate as isValidUUID } from 'uuid';
+import { buildLt4DocsZip } from '../../lt4/lt4docs-export/lt4docs-export';
 
 type AllowedAttachment = { id: string; fileName: string; filePath: string };
 
@@ -158,6 +159,11 @@ export class ExportService {
     // set to null to make export of pages with parentId work
     pages[parentPageIndex].parentPageId = null;
 
+    if (format === ExportFormat.Lt4Docs) {
+      const stream = await this.buildLt4Docs(pages, userId, ignorePermissions);
+      return { type: 'zip' as const, stream, page: pages[0] };
+    }
+
     const baseUrl = await this.getWorkspaceBaseUrl(pages[0].workspaceId);
     const isSinglePage = pages.length === 1 && !includeAttachments;
 
@@ -245,6 +251,18 @@ export class ExportService {
       if (pages.length === 0) {
         throw new BadRequestException('No accessible pages to export');
       }
+    }
+
+    if (format === ExportFormat.Lt4Docs) {
+      return {
+        fileStream: await this.buildLt4Docs(
+          pages as Page[],
+          userId,
+          ignorePermissions,
+        ),
+        fileName: `${space.name}.lt4docs`,
+        spaceName: space.name,
+      };
     }
 
     const tree = buildTree(pages as Page[]);
@@ -450,6 +468,41 @@ export class ExportService {
     }
 
     return new Map(visible.map((a) => [a.id, a]));
+  }
+
+  /** LT4: Seiten (schon nach Rechten gefiltert) als .lt4docs packen. */
+  private async buildLt4Docs(
+    pages: Page[],
+    userId: string | undefined,
+    ignorePermissions: boolean,
+  ) {
+    const space = await this.db
+      .selectFrom('spaces')
+      .select(['id', 'name'])
+      .where('id', '=', pages[0].spaceId)
+      .executeTakeFirst();
+    const allowed = await this.resolveAccessibleAttachments(
+      buildTree(pages),
+      userId,
+      ignorePermissions,
+    );
+    return buildLt4DocsZip({
+      space: { id: pages[0].spaceId, name: space?.name ?? 'Bereich' },
+      pages: pages.map((p) => ({
+        id: p.id,
+        spaceId: p.spaceId,
+        parentPageId: p.parentPageId ?? null,
+        title: p.title ?? null,
+        icon: p.icon ?? null,
+        position: p.position ?? null,
+        content: p.content,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+      })),
+      attachments: allowed,
+      readFile: (filePath) => this.storageService.read(filePath),
+      generator: `LT4-Docs Server ${packageJson.version}`,
+    });
   }
 
   private applyCurrentUserNames(prosemirrorJson: any, workspaceId: string) {

@@ -10,6 +10,8 @@ import {
 export enum ExportFormat {
   HTML = 'html',
   Markdown = 'markdown',
+  // LT4: verlustfreies Format des LT4-Docs Clients
+  Lt4Docs = 'lt4docs',
 }
 
 export class ExportPageDto {
@@ -18,7 +20,7 @@ export class ExportPageDto {
   pageId: string;
 
   @IsString()
-  @IsIn(['html', 'markdown'])
+  @IsIn(['html', 'markdown', 'lt4docs'])
   format: ExportFormat;
 
   @IsOptional()
@@ -37,7 +39,7 @@ export class ExportSpaceDto {
   spaceId: string;
 
   @IsString()
-  @IsIn(['html', 'markdown'])
+  @IsIn(['html', 'markdown', 'lt4docs'])
   format: ExportFormat;
 
   @IsOptional()

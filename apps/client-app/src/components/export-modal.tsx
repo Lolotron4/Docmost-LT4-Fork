@@ -11,7 +11,7 @@ import {
   type ExportFormat,
   type ExportScope,
 } from "../lib/exporter";
-import { errorText, openServerWindow } from "../lib/native";
+import { errorText, isAndroid, openServerWindow } from "../lib/native";
 
 /** Formate, die auch einzelne Seiten können (.lt4docs/Markdown exportieren immer ganze Bereiche). */
 const PAGE_FORMATS: ExportFormat[] = ["docx", "pdf", "xlsx"];
@@ -99,11 +99,13 @@ export function ExportModal({
               label="Word (.docx)"
               description="Ein Dokument, jede Seite beginnt mit ihrem Titel. Bilder und Tabellen bleiben erhalten."
             />
-            <Radio
-              value="pdf"
-              label="PDF (über den Druckdialog)"
-              description="Im Druckdialog „Als PDF speichern“ bzw. „Microsoft Print to PDF“ wählen."
-            />
+            {!isAndroid() && (
+              <Radio
+                value="pdf"
+                label="PDF (über den Druckdialog)"
+                description="Im Druckdialog „Als PDF speichern“ bzw. „Microsoft Print to PDF“ wählen."
+              />
+            )}
             <Radio
               value="xlsx"
               label="Excel (.xlsx) – nur Tabellen"
