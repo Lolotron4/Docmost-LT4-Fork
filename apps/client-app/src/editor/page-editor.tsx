@@ -45,6 +45,7 @@ import {
 } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { buildExtensions } from "./extensions";
+import { ColumnsMenu } from "./columns-menu";
 import { loadDoc, saveDoc, useStore } from "../lib/store";
 import type { PageMeta, PmDoc } from "../lib/types";
 import { errorText } from "../lib/native";
@@ -252,6 +253,7 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
   const saveTimer = useRef<number | null>(null);
   const pending = useRef<PmDoc | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const [wrap, setWrap] = useState<HTMLDivElement | null>(null);
 
   const flush = async () => {
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -345,6 +347,8 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
         }}
       />
       <div
+        ref={setWrap}
+        style={{ position: "relative" }}
         onDrop={(e) => {
           if (e.dataTransfer.files?.length) {
             e.preventDefault();
@@ -362,6 +366,7 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
         }}
       >
         <EditorContent editor={editor} />
+        <ColumnsMenu editor={editor} container={wrap} />
       </div>
     </Stack>
   );

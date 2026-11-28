@@ -82,7 +82,7 @@ XChaCha20-Poly1305). Ohne Sperre liegt der Schlüssel im Schlüsselbund des Syst
 - Editor im Aussehen der Web-Version mit Überschriften, Fett/Kursiv/Unterstrichen,
   **Hex-Textfarben und Hervorhebungen**, Links, Listen, Aufgabenlisten, Zitaten, Codeblöcken,
   Infoboxen, aufklappbaren Bereichen, Tabellen, Trennlinien und Bildern (auch per Einfügen/Ziehen).
-- Ab Client 0.3.0 im „/“-Menü außerdem: **2 oder 3 Spalten**, **Registerkarten** (Reiter per
+- Ab Client 0.3.0 im „/“-Menü außerdem: **2 bis 5 Spalten** (Menü unter dem Block: Anzahl, Aufteilung, volle Breite, duplizieren, löschen), **Registerkarten** (Reiter per
   Doppelklick umbenennen, Menü am aktiven Reiter zum Duplizieren, Verschieben, Löschen),
   **Formel** und **Formelblock** (LaTeX mit KaTeX, Live-Vorschau), **Status**-Label und **Datum**.
 - **Datenbanken** wie in der Web-Version: über **+ › Neue Datenbank** (Tabelle, Kanban-Board,
