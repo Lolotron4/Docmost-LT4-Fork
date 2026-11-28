@@ -46,6 +46,7 @@ import {
 import { notifications } from "@mantine/notifications";
 import { buildExtensions } from "./extensions";
 import { ColumnsMenu } from "./columns-menu";
+import { TableMenu } from "./table-menu";
 import { loadDoc, saveDoc, useStore } from "../lib/store";
 import type { PageMeta, PmDoc } from "../lib/types";
 import { errorText } from "../lib/native";
@@ -367,6 +368,7 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
       >
         <EditorContent editor={editor} />
         <ColumnsMenu editor={editor} container={wrap} />
+        <TableMenu editor={editor} container={wrap} />
       </div>
     </Stack>
   );

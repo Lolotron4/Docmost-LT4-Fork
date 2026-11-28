@@ -84,7 +84,7 @@ XChaCha20-Poly1305). Ohne Sperre liegt der Schlüssel im Schlüsselbund des Syst
   Infoboxen, aufklappbaren Bereichen, Tabellen, Trennlinien und Bildern (auch per Einfügen/Ziehen).
 - Ab Client 0.3.0 im „/“-Menü außerdem: **2 bis 5 Spalten** (Menü unter dem Block: Anzahl, Aufteilung, volle Breite, duplizieren, löschen), **Registerkarten** (Reiter per
   Doppelklick umbenennen, Menü am aktiven Reiter zum Duplizieren, Verschieben, Löschen),
-  **Formel** und **Formelblock** (LaTeX mit KaTeX, Live-Vorschau), **Status**-Label und **Datum**.
+  **Tabellen-Menü** unter der Tabelle (Spalten/Zeilen einfügen und löschen, Zellen verbinden/teilen, Kopfzeile/-spalte, Zellfarbe auch per Hex, Ausrichtung), **Formel** und **Formelblock** (LaTeX mit KaTeX, Live-Vorschau), **Status**-Label und **Datum**.
 - **Datenbanken** wie in der Web-Version: über **+ › Neue Datenbank** (Tabelle, Kanban-Board,
   Kalender) als eigene Seite, oder im Text über „/Kanban-Board“, „/Kalender“,
   „/Datenbank (Tabelle)“ – dann als Unterseite angelegt und direkt eingebettet. Spalten-Typen

@@ -41,7 +41,7 @@ export function ColumnsMenu({ editor, container }: { editor: Editor; container: 
   const info = useEditorState({
     editor,
     selector: ({ editor: e }) => {
-      if (!e?.isEditable) return null;
+      if (!e?.isEditable || e.isActive("table")) return null;
       const parent = findColumns(e.state.selection);
       if (!parent) return null;
       return {
@@ -93,7 +93,7 @@ export function ColumnsMenu({ editor, container }: { editor: Editor; container: 
         // Fokus im Editor lassen, sonst verschwindet das Menü
         if (!(e.target as HTMLElement).closest("input")) e.preventDefault();
       }}
-      style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)", zIndex: 99 }}
+      style={{ position: "absolute", top, left: "50%", transform: "translateX(-50%)", zIndex: 99, width: "max-content", maxWidth: "calc(100vw - 32px)" }}
     >
       <div className={classes.toolbar}>
         <Menu position="bottom-start" withinPortal={false} shadow="md" returnFocus={false}>
