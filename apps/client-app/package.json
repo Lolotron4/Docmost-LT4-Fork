@@ -1,7 +1,7 @@
 {
   "name": "lt4-client-app",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,6 +28,7 @@
     "@tiptap/pm": "3.35.0",
     "@tiptap/react": "3.35.0",
     "@tiptap/starter-kit": "3.35.0",
+    "@tiptap/suggestion": "3.35.0",
     "docx": "9.7.1",
     "jszip": "3.10.1",
     "react": "19.2.7",
@@ -40,6 +41,7 @@
     "@vitejs/plugin-react": "6.0.1",
     "postcss": "8.5.25",
     "postcss-preset-mantine": "1.18.0",
+    "postcss-simple-vars": "7.0.1",
     "typescript": "5.9.3",
     "vite": "8.3.4",
     "vitest": "4.1.12"

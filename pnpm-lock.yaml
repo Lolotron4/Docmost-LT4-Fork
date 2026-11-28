@@ -733,6 +733,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: 3.35.0
         version: 3.35.0
+      '@tiptap/suggestion':
+        specifier: 3.35.0
+        version: 3.35.0(@floating-ui/dom@1.7.3)(@tiptap/core@3.35.0(patch_hash=048b023dd171acd9e15d7b779f45b0057f0e38ddc0c2eff8b190ada8ed3dc5b2)(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)
       docx:
         specifier: 9.7.1
         version: 9.7.1
@@ -764,6 +767,9 @@ importers:
       postcss-preset-mantine:
         specifier: 1.18.0
         version: 1.18.0(postcss@8.5.25)
+      postcss-simple-vars:
+        specifier: 7.0.1
+        version: 7.0.1(postcss@8.5.25)
       typescript:
         specifier: 5.9.3
         version: 5.9.3

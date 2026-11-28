@@ -193,7 +193,7 @@ function Main({
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <Container size="md" px={0}>
+        <Container size={900} px={0}>
           {exportDue && (
             <Alert color="blue" mb="md" withCloseButton onClose={() => store.setSettings({ lastExportAt: new Date().toISOString() })}>
               <Group justify="space-between" wrap="nowrap">
@@ -211,11 +211,11 @@ function Main({
             <Stack gap="sm">
               <TextInput
                 key={page.id}
+                className="lt4-title"
                 variant="unstyled"
                 placeholder="Unbenannt"
                 defaultValue={page.title}
                 onChange={(e) => store.updatePage(page.id, { title: e.currentTarget.value })}
-                styles={{ input: { fontSize: 32, fontWeight: 700, height: "auto", lineHeight: 1.3 } }}
                 aria-label="Seitentitel"
               />
               <PageEditor page={page} />
