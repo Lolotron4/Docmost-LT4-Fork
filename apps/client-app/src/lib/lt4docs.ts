@@ -6,6 +6,8 @@
  * apps/server/src/lt4/lt4docs-import.
  */
 import JSZip from "jszip";
+import { APP_VERSION } from "../version";
+import { normalizeBase, type LocalBase } from "../base/local-base";
 import type {
   AttachmentMeta,
   NotebookState,
@@ -15,7 +17,7 @@ import type {
 } from "./types";
 
 export const LT4DOCS_VERSION = 1;
-export const GENERATOR = "LT4-Docs Client 0.1.0";
+export const GENERATOR = `LT4-Docs Client ${APP_VERSION}`;
 
 export interface Lt4DocsManifest {
   format: "lt4docs";
@@ -25,7 +27,7 @@ export interface Lt4DocsManifest {
   spaces: Pick<Space, "id" | "name" | "icon">[];
   pages: Pick<
     PageMeta,
-    "id" | "spaceId" | "parentId" | "title" | "icon" | "position" | "createdAt" | "updatedAt"
+    "id" | "spaceId" | "parentId" | "title" | "icon" | "position" | "createdAt" | "updatedAt" | "isBase"
   >[];
   attachments: (Pick<AttachmentMeta, "id" | "pageId" | "fileName" | "mimeType" | "size"> & {
     path: string;
@@ -64,7 +66,7 @@ export function buildManifest(
     generator: GENERATOR,
     exportedAt: now.toISOString(),
     spaces: spaces.map(({ id, name, icon }) => ({ id, name, icon: icon ?? null })),
-    pages: pages.map(({ id, spaceId, parentId, title, icon, position, createdAt, updatedAt }) => ({
+    pages: pages.map(({ id, spaceId, parentId, title, icon, position, createdAt, updatedAt, isBase }) => ({
       id,
       spaceId,
       parentId,
@@ -73,6 +75,7 @@ export function buildManifest(
       position,
       createdAt,
       updatedAt,
+      ...(isBase ? { isBase: true } : {}),
     })),
     attachments: attachments.map((a) => ({
       id: a.id,
@@ -90,12 +93,20 @@ export async function createLt4DocsZip(opts: {
   spaceIds?: string[];
   loadDoc: (pageId: string) => Promise<PmDoc>;
   loadFile: (attachmentId: string) => Promise<Uint8Array | null>;
+  loadBase?: (pageId: string) => Promise<LocalBase>;
 }): Promise<Uint8Array> {
   const manifest = buildManifest(opts.state, opts.spaceIds);
   const zip = new JSZip();
   zip.file("manifest.json", JSON.stringify(manifest, null, 2));
   for (const p of manifest.pages) {
     zip.file(`pages/${p.id}.json`, JSON.stringify(await opts.loadDoc(p.id)));
+    if (p.isBase && opts.loadBase) {
+      const b = await opts.loadBase(p.id);
+      zip.file(
+        `bases/${p.id}.json`,
+        JSON.stringify({ properties: b.properties, views: b.views, rows: b.rows }),
+      );
+    }
   }
   for (const a of manifest.attachments) {
     const bytes = await opts.loadFile(a.id);
@@ -108,6 +119,7 @@ export interface ReadLt4Docs {
   manifest: Lt4DocsManifest;
   docs: Map<string, PmDoc>;
   files: Map<string, Uint8Array>;
+  bases: Map<string, LocalBase>;
 }
 
 export async function readLt4DocsZip(bytes: Uint8Array): Promise<ReadLt4Docs> {
@@ -137,14 +149,36 @@ export async function readLt4DocsZip(bytes: Uint8Array): Promise<ReadLt4Docs> {
     const f = zip.file(`attachments/${a.id}/${safeFileName(a.fileName)}`);
     if (f) files.set(a.id, await f.async("uint8array"));
   }
-  return { manifest, docs, files };
+  const bases = new Map<string, LocalBase>();
+  for (const p of manifest.pages ?? []) {
+    if (!p.isBase) continue;
+    const f = zip.file(`bases/${p.id}.json`);
+    let raw: unknown = null;
+    try {
+      raw = f ? JSON.parse(await f.async("string")) : null;
+    } catch {
+      raw = null;
+    }
+    bases.set(p.id, normalizeBase(raw));
+  }
+  return { manifest, docs, files, bases };
 }
 
-/** Ersetzt Anhang-IDs in einem Dokument (für das Einlesen mit neuen IDs). */
-export function remapAttachments(doc: PmDoc, map: Map<string, { id: string; fileName: string }>): PmDoc {
+/**
+ * Ersetzt Anhang-IDs in einem Dokument (für das Einlesen mit neuen IDs) und
+ * passt eingebettete Datenbanken (Knoten "base") an die neuen Seiten-IDs an.
+ */
+export function remapAttachments(
+  doc: PmDoc,
+  map: Map<string, { id: string; fileName: string }>,
+  pageMap?: Map<string, string>,
+): PmDoc {
   const walk = (node: any): any => {
     if (!node || typeof node !== "object") return node;
     const out = { ...node };
+    if (node.type === "base" && pageMap && node.attrs?.pageId && pageMap.has(node.attrs.pageId)) {
+      out.attrs = { ...node.attrs, pageId: pageMap.get(node.attrs.pageId) };
+    }
     if (node.attrs?.attachmentId && map.has(node.attrs.attachmentId)) {
       const ref = map.get(node.attrs.attachmentId)!;
       out.attrs = {
@@ -191,6 +225,7 @@ export function planImport(read: ReadLt4Docs, newId: () => string, now = new Dat
     position: Number(p.position) || 0,
     createdAt: p.createdAt || ts,
     updatedAt: p.updatedAt || ts,
+    ...(p.isBase ? { isBase: true } : {}),
   }));
   const attachments: AttachmentMeta[] = (read.manifest.attachments ?? [])
     .filter((a) => pageMap.has(a.pageId) && read.files.has(a.id))
@@ -208,11 +243,16 @@ export function planImport(read: ReadLt4Docs, newId: () => string, now = new Dat
   const docs = new Map<string, PmDoc>();
   for (const [oldId, doc] of read.docs) {
     const id = pageMap.get(oldId);
-    if (id) docs.set(id, remapAttachments(doc, attMap));
+    if (id) docs.set(id, remapAttachments(doc, attMap, pageMap));
   }
   const files = new Map<string, Uint8Array>();
   for (const [oldId, ref] of attMap) files.set(ref.id, read.files.get(oldId)!);
-  return { spaces, pages, attachments, docs, files };
+  const bases = new Map<string, LocalBase>();
+  for (const [oldId, b] of read.bases ?? new Map()) {
+    const id = pageMap.get(oldId);
+    if (id) bases.set(id, b);
+  }
+  return { spaces, pages, attachments, docs, files, bases };
 }
 
 /** Pfad im Markdown-ZIP: Bereich/Eltern/…/Titel.md (eindeutig gemacht). */

@@ -22,6 +22,7 @@ import { notifications } from "@mantine/notifications";
 import {
   IconDownload,
   IconExternalLink,
+  IconFileText,
   IconLock,
   IconPlus,
   IconSettings,
@@ -35,8 +36,12 @@ import { Sidebar } from "./components/sidebar";
 import { SettingsModal } from "./components/settings";
 import { ExportModal } from "./components/export-modal";
 import { PageEditor } from "./editor/page-editor";
+import { BasePage, NewBaseItems } from "./base/base-page";
+import type { BaseTemplate } from "../../client/src/lt4/base/types/base.types";
 import { Lt4Logo } from "./components/logo";
 import { clearAttachmentCache } from "./editor/attachment-cache";
+import { forgetBaseCache } from "./base/local-base";
+import { useQueryClient } from "@tanstack/react-query";
 
 const EXPORT_REMINDER_DAYS = 14;
 
@@ -119,6 +124,12 @@ function Main({
     select(store.createPage(space, null).id);
   };
 
+  const newBase = async (template: BaseTemplate) => {
+    const space = page ? page.spaceId : store.state.spaces[0]?.id;
+    if (!space) return;
+    select((await store.createBase(space, null, template)).id);
+  };
+
   return (
     <AppShell
       header={{ height: 52 }}
@@ -133,11 +144,22 @@ function Main({
             <Text fw={700}>LT4-Docs</Text>
           </Group>
           <Group gap={4} wrap="nowrap">
-            <Tooltip label="Neue Seite">
-              <ActionIcon variant="subtle" size="lg" aria-label="Neue Seite" onClick={newPage}>
-                <IconPlus size={18} />
-              </ActionIcon>
-            </Tooltip>
+            <Menu position="bottom-end" withinPortal>
+              <Menu.Target>
+                <Tooltip label="Neu">
+                  <ActionIcon variant="subtle" size="lg" aria-label="Neu">
+                    <IconPlus size={18} />
+                  </ActionIcon>
+                </Tooltip>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item leftSection={<IconFileText size={14} />} onClick={newPage}>
+                  Neue Seite
+                </Menu.Item>
+                <Menu.Label>Neue Datenbank</Menu.Label>
+                <NewBaseItems onPick={newBase} />
+              </Menu.Dropdown>
+            </Menu>
             <Tooltip label="Exportieren / Einlesen">
               <ActionIcon variant="subtle" size="lg" aria-label="Exportieren" onClick={exportModal.open}>
                 <IconDownload size={18} />
@@ -193,7 +215,7 @@ function Main({
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <Container size="md" px={0}>
+        <Container size={page?.isBase ? "100%" : 900} px={0}>
           {exportDue && (
             <Alert color="blue" mb="md" withCloseButton onClose={() => store.setSettings({ lastExportAt: new Date().toISOString() })}>
               <Group justify="space-between" wrap="nowrap">
@@ -211,22 +233,32 @@ function Main({
             <Stack gap="sm">
               <TextInput
                 key={page.id}
+                className={page.isBase ? "lt4-title lt4-title-base" : "lt4-title"}
                 variant="unstyled"
                 placeholder="Unbenannt"
                 defaultValue={page.title}
                 onChange={(e) => store.updatePage(page.id, { title: e.currentTarget.value })}
-                styles={{ input: { fontSize: 32, fontWeight: 700, height: "auto", lineHeight: 1.3 } }}
                 aria-label="Seitentitel"
               />
-              <PageEditor page={page} />
+              {page.isBase ? <BasePage page={page} /> : <PageEditor page={page} />}
             </Stack>
           ) : (
             <Center mih="60vh">
               <Stack align="center" gap="sm">
                 <Text c="dimmed">Wähle links eine Seite oder lege eine neue an.</Text>
-                <Button leftSection={<IconPlus size={16} />} onClick={newPage}>
-                  Neue Seite
-                </Button>
+                <Group gap="xs">
+                  <Button leftSection={<IconPlus size={16} />} onClick={newPage}>
+                    Neue Seite
+                  </Button>
+                  <Menu withinPortal>
+                    <Menu.Target>
+                      <Button variant="default">Neue Datenbank</Button>
+                    </Menu.Target>
+                    <Menu.Dropdown>
+                      <NewBaseItems onPick={newBase} />
+                    </Menu.Dropdown>
+                  </Menu>
+                </Group>
                 {defaultServer && (
                   <Button
                     variant="subtle"
@@ -314,20 +346,24 @@ function LockBridge(props: {
   onWiped: () => void;
 }) {
   const store = useStore();
+  const queryClient = useQueryClient();
   const lock = useCallback(async () => {
     await store.flush().catch(() => undefined);
     // Offene Eingaben (Editor speichert verzögert) kurz abwarten.
     await new Promise((r) => setTimeout(r, 700));
     await store.flush().catch(() => undefined);
     clearAttachmentCache();
+    forgetBaseCache();
+    queryClient.clear();
     props.setStatus(await vault.lock());
     props.onLocked();
-  }, [store, props]);
+  }, [store, props, queryClient]);
   useIdleLock(store.state.settings.autoLockMinutes, props.status.kind !== "none", lock);
   return <Main status={props.status} setStatus={props.setStatus} onLock={lock} onWiped={props.onWiped} />;
 }
 
 export default function App() {
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<VaultStatus | null>(null);
   const [session, setSession] = useState(0);
 
@@ -366,6 +402,8 @@ export default function App() {
       onLocked={() => setSession((n) => n + 1)}
       onWiped={() => {
         clearAttachmentCache();
+        forgetBaseCache();
+        queryClient.clear();
         setSession((n) => n + 1);
         refresh();
       }}

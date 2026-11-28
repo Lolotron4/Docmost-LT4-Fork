@@ -22,6 +22,8 @@ import {
   type Space,
 } from "./types";
 import { localAttachmentSrc, safeFileName } from "./lt4docs";
+import { removeBase, setBasePageLookup, templateBase, writeBase, type LocalBase } from "../base/local-base";
+import type { BaseTemplate } from "../../../client/src/lt4/base/types/base.types";
 
 export const newId = () => crypto.randomUUID();
 const nowIso = () => new Date().toISOString();
@@ -70,6 +72,7 @@ interface StoreApi {
   renameSpace: (id: string, name: string) => void;
   deleteSpace: (id: string) => Promise<void>;
   createPage: (spaceId: string, parentId: string | null, title?: string) => PageMeta;
+  createBase: (spaceId: string, parentId: string | null, template: BaseTemplate, title?: string) => Promise<PageMeta>;
   updatePage: (id: string, patch: Partial<PageMeta>) => void;
   movePage: (id: string, parentId: string | null) => void;
   deletePage: (id: string) => Promise<void>;
@@ -83,6 +86,7 @@ interface StoreApi {
     attachments: AttachmentMeta[];
     docs: Map<string, PmDoc>;
     files: Map<string, Uint8Array>;
+    bases?: Map<string, LocalBase>;
   }) => Promise<void>;
   flush: () => Promise<void>;
 }
@@ -147,6 +151,12 @@ export function StoreProvider({
 
   useEffect(() => () => void persist().catch(() => undefined), [persist]);
 
+  // Datenbank-Oberfläche liest Titel und Bereich der Seite hierüber.
+  useEffect(() => {
+    setBasePageLookup((id) => latest.current.pages.find((p) => p.id === id));
+    return () => setBasePageLookup(() => undefined);
+  }, []);
+
   const api = useMemo<StoreApi>(() => {
     const removePages = async (ids: string[]) => {
       const set = new Set(ids);
@@ -157,7 +167,26 @@ export function StoreProvider({
         attachments: s.attachments.filter((a) => !set.has(a.pageId)),
       }));
       for (const id of ids) await data.remove(pageKey(id)).catch(() => undefined);
+      for (const id of ids) await removeBase(id);
       for (const a of atts) await files.remove(a.id).catch(() => undefined);
+    };
+
+    const newPage = (spaceId: string, parentId: string | null, title: string, extra: Partial<PageMeta> = {}) => {
+      const siblings = childrenOf(latest.current.pages, spaceId, parentId);
+      const ts = nowIso();
+      const page: PageMeta = {
+        id: newId(),
+        spaceId,
+        parentId,
+        title,
+        icon: null,
+        position: siblings.length ? siblings[siblings.length - 1].position + 1 : 0,
+        createdAt: ts,
+        updatedAt: ts,
+        ...extra,
+      };
+      update((s) => ({ ...s, pages: [...s.pages, page] }));
+      return page;
     };
 
     return {
@@ -178,21 +207,11 @@ export function StoreProvider({
         await removePages(ids);
         update((s) => ({ ...s, spaces: s.spaces.filter((x) => x.id !== id) }));
       },
-      createPage: (spaceId, parentId, title = "") => {
-        const siblings = childrenOf(latest.current.pages, spaceId, parentId);
-        const ts = nowIso();
-        const page: PageMeta = {
-          id: newId(),
-          spaceId,
-          parentId,
-          title,
-          icon: null,
-          position: siblings.length ? siblings[siblings.length - 1].position + 1 : 0,
-          createdAt: ts,
-          updatedAt: ts,
-        };
-        update((s) => ({ ...s, pages: [...s.pages, page] }));
-        return page;
+      createPage: (spaceId, parentId, title = "") => newPage(spaceId, parentId, title),
+      createBase: async (spaceId, parentId, template, title = "") => {
+        const id = newId();
+        await writeBase(id, templateBase(template));
+        return newPage(spaceId, parentId, title, { id, isBase: true });
       },
       updatePage: (id, patch) =>
         update((s) => ({
@@ -237,6 +256,7 @@ export function StoreProvider({
       importBundle: async (b) => {
         for (const [id, doc] of b.docs) await saveDoc(id, doc);
         for (const [id, bytes] of b.files) await files.write(id, bytesToBase64(bytes));
+        for (const [id, base] of b.bases ?? new Map()) await writeBase(id, base);
         update((s) => ({
           ...s,
           spaces: [...s.spaces, ...b.spaces],

@@ -1,3 +1,4 @@
+import { sql } from 'kysely';
 import {
   BadRequestException,
   Injectable,
@@ -44,6 +45,7 @@ import {
 } from '../../common/helpers/prosemirror/utils';
 import { htmlToMarkdown, ItemsByLabel } from '@docmost/editor-ext';
 import { validate as isValidUUID } from 'uuid';
+import { buildLt4DocsZip } from '../../lt4/lt4docs-export/lt4docs-export';
 
 type AllowedAttachment = { id: string; fileName: string; filePath: string };
 
@@ -158,6 +160,11 @@ export class ExportService {
     // set to null to make export of pages with parentId work
     pages[parentPageIndex].parentPageId = null;
 
+    if (format === ExportFormat.Lt4Docs) {
+      const stream = await this.buildLt4Docs(pages, userId, ignorePermissions);
+      return { type: 'zip' as const, stream, page: pages[0] };
+    }
+
     const baseUrl = await this.getWorkspaceBaseUrl(pages[0].workspaceId);
     const isSinglePage = pages.length === 1 && !includeAttachments;
 
@@ -245,6 +252,18 @@ export class ExportService {
       if (pages.length === 0) {
         throw new BadRequestException('No accessible pages to export');
       }
+    }
+
+    if (format === ExportFormat.Lt4Docs) {
+      return {
+        fileStream: await this.buildLt4Docs(
+          pages as Page[],
+          userId,
+          ignorePermissions,
+        ),
+        fileName: `${space.name}.lt4docs`,
+        spaceName: space.name,
+      };
     }
 
     const tree = buildTree(pages as Page[]);
@@ -450,6 +469,87 @@ export class ExportService {
     }
 
     return new Map(visible.map((a) => [a.id, a]));
+  }
+
+  /** LT4: Seiten (schon nach Rechten gefiltert) als .lt4docs packen. */
+  private async buildLt4Docs(
+    pages: Page[],
+    userId: string | undefined,
+    ignorePermissions: boolean,
+  ) {
+    const space = await this.db
+      .selectFrom('spaces')
+      .select(['id', 'name'])
+      .where('id', '=', pages[0].spaceId)
+      .executeTakeFirst();
+    const allowed = await this.resolveAccessibleAttachments(
+      buildTree(pages),
+      userId,
+      ignorePermissions,
+    );
+    // Nicht jede Seitenabfrage liefert isBase mit, darum hier nachschlagen.
+    const baseIds = new Set<string>();
+    const ids = pages.map((p) => p.id);
+    for (let i = 0; i < ids.length; i += 1000) {
+      const rows = await this.db
+        .selectFrom('pages')
+        .select('id')
+        .where('id', 'in', ids.slice(i, i + 1000))
+        .where('isBase', '=', true)
+        .execute();
+      rows.forEach((r) => baseIds.add(r.id));
+    }
+    return buildLt4DocsZip({
+      space: { id: pages[0].spaceId, name: space?.name ?? 'Bereich' },
+      pages: pages.map((p) => ({
+        id: p.id,
+        spaceId: p.spaceId,
+        parentPageId: p.parentPageId ?? null,
+        title: p.title ?? null,
+        icon: p.icon ?? null,
+        position: p.position ?? null,
+        content: p.content,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+        isBase: baseIds.has(p.id),
+      })),
+      attachments: allowed,
+      readFile: (filePath) => this.storageService.read(filePath),
+      loadBase: (pageId) => this.loadBaseForExport(pageId),
+      generator: `LT4-Docs Server ${packageJson.version}`,
+    });
+  }
+
+  /** Datenbank einer Seite für .lt4docs (gleicher Aufbau wie die Datenbank-API). */
+  private async loadBaseForExport(pageId: string) {
+    const [properties, views, rows] = await Promise.all([
+      this.db
+        .selectFrom('baseProperties')
+        .select(['id', 'name', 'type', 'position', 'typeOptions', 'isPrimary'])
+        .where('pageId', '=', pageId)
+        .where('deletedAt', 'is', null)
+        .orderBy('isPrimary', 'desc')
+        .orderBy(sql`position collate "C"`)
+        .orderBy('id')
+        .execute(),
+      this.db
+        .selectFrom('baseViews')
+        .select(['id', 'name', 'type', 'position', 'config'])
+        .where('pageId', '=', pageId)
+        .orderBy(sql`position collate "C"`)
+        .orderBy('id')
+        .execute(),
+      this.db
+        .selectFrom('baseRows')
+        .select(['id', 'cells', 'position', 'createdAt', 'updatedAt'])
+        .where('pageId', '=', pageId)
+        .where('deletedAt', 'is', null)
+        .orderBy(sql`position collate "C"`)
+        .orderBy('id')
+        .limit(5000)
+        .execute(),
+    ]);
+    return { properties, views, rows };
   }
 
   private applyCurrentUserNames(prosemirrorJson: any, workspaceId: string) {

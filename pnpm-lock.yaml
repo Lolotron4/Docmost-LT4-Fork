@@ -685,6 +685,9 @@ importers:
       '@mantine/core':
         specifier: 9.8.0
         version: 9.8.0(@mantine/hooks@9.8.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@mantine/dates':
+        specifier: 9.8.0
+        version: 9.8.0(@mantine/core@9.8.0(@mantine/hooks@9.8.0(react@19.2.7))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@mantine/hooks@9.8.0(react@19.2.7))(dayjs@1.11.21)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@mantine/hooks':
         specifier: 9.8.0
         version: 9.8.0(react@19.2.7)
@@ -697,6 +700,9 @@ importers:
       '@tabler/icons-react':
         specifier: 3.40.0
         version: 3.40.0(react@19.2.7)
+      '@tanstack/react-query':
+        specifier: 5.90.17
+        version: 5.90.17(react@19.2.7)
       '@tauri-apps/api':
         specifier: 2.12.5
         version: 2.12.5
@@ -733,18 +739,36 @@ importers:
       '@tiptap/starter-kit':
         specifier: 3.35.0
         version: 3.35.0
+      '@tiptap/suggestion':
+        specifier: 3.35.0
+        version: 3.35.0(@floating-ui/dom@1.7.3)(@tiptap/core@3.35.0(patch_hash=048b023dd171acd9e15d7b779f45b0057f0e38ddc0c2eff8b190ada8ed3dc5b2)(@tiptap/pm@3.35.0))(@tiptap/pm@3.35.0)
+      dayjs:
+        specifier: 1.11.21
+        version: 1.11.21
       docx:
         specifier: 9.7.1
         version: 9.7.1
+      fractional-indexing-jittered:
+        specifier: 1.0.0
+        version: 1.0.0
+      i18next:
+        specifier: 26.7.2
+        version: 26.7.2(typescript@5.9.3)
       jszip:
         specifier: 3.10.1
         version: 3.10.1
+      katex:
+        specifier: 0.19.0
+        version: 0.19.0
       react:
         specifier: 19.2.7
         version: 19.2.7
       react-dom:
         specifier: 19.2.7
         version: 19.2.7(react@19.2.7)
+      react-i18next:
+        specifier: 16.5.8
+        version: 16.5.8(i18next@26.7.2(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3)
     devDependencies:
       '@tauri-apps/cli':
         specifier: 2.12.5
@@ -764,6 +788,9 @@ importers:
       postcss-preset-mantine:
         specifier: 1.18.0
         version: 1.18.0(postcss@8.5.25)
+      postcss-simple-vars:
+        specifier: 7.0.1
+        version: 7.0.1(postcss@8.5.25)
       typescript:
         specifier: 5.9.3
         version: 5.9.3

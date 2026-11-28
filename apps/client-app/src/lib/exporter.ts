@@ -2,6 +2,7 @@
 import JSZip from "jszip";
 import { generateHTML } from "@tiptap/core";
 import { htmlToMarkdown } from "@docmost/editor-ext";
+import { decorateForPrint } from "./print-decorate";
 import { save, open } from "@tauri-apps/plugin-dialog";
 import { buildExtensions } from "../editor/extensions";
 import { base64ToBytes, bytesToBase64, exportWrite, files, importRead, printPage } from "./native";
@@ -9,6 +10,11 @@ import { buildDocx, buildXlsx, collectSheets, combineDocs, pagesInTreeOrder } fr
 import { createLt4DocsZip, markdownPaths, planImport, readLt4DocsZip, safeFileName, selectForExport } from "./lt4docs";
 import { descendants, loadDoc, newId } from "./store";
 import type { NotebookState, PageMeta, PmDoc } from "./types";
+import { readBase } from "../base/local-base";
+import { baseToDoc } from "../base/base-export";
+
+/** Inhalt einer Seite; Datenbanken als Tabelle. */
+const loadContent = async (p: PageMeta): Promise<PmDoc> => (p.isBase ? baseToDoc(await readBase(p.id)) : loadDoc(p.id));
 
 const loadFile = async (id: string) => {
   const b64 = await files.read(id);
@@ -40,7 +46,7 @@ export async function buildMarkdownZip(state: NotebookState, spaceIds?: string[]
   for (const p of pages) {
     const path = paths.get(p.id)!;
     const depth = path.split("/").length - 1;
-    const doc = relinkForMarkdown(await loadDoc(p.id), "../".repeat(depth));
+    const doc = relinkForMarkdown(await loadContent(p), "../".repeat(depth));
     let md = "";
     try {
       md = htmlToMarkdown(generateHTML(doc as any, ext));
@@ -85,7 +91,7 @@ export function pagesForScope(state: NotebookState, scope: ExportScope): PageMet
 
 async function loadEntries(pages: PageMeta[]) {
   const out: { title: string; doc: PmDoc }[] = [];
-  for (const p of pages) out.push({ title: p.title || "Unbenannt", doc: await loadDoc(p.id) });
+  for (const p of pages) out.push({ title: p.title || "Unbenannt", doc: await loadContent(p) });
   return out;
 }
 
@@ -125,6 +131,7 @@ async function printAsPdf(state: NotebookState, scope: ExportScope): Promise<voi
     document.body.appendChild(root);
   }
   root.innerHTML = html;
+  decorateForPrint(root);
   const prevTitle = document.title;
   document.title = scopeBaseName(state, scope);
   // Bilder fertig laden lassen, sonst fehlen sie im PDF.
@@ -189,7 +196,7 @@ export async function exportToFile(
   let bytes: Uint8Array;
   if (format === "docx") bytes = await buildDocx(combineDocs(entries), loadFile);
   else if (format === "xlsx") bytes = await buildXlsx(sheets);
-  else if (format === "lt4docs") bytes = await createLt4DocsZip({ state, spaceIds, loadDoc, loadFile });
+  else if (format === "lt4docs") bytes = await createLt4DocsZip({ state, spaceIds, loadDoc, loadFile, loadBase: readBase });
   else bytes = await buildMarkdownZip(state, spaceIds);
   await exportWrite(path, bytesToBase64(bytes));
   return path;

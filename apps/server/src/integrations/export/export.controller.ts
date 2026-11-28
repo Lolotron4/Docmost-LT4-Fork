@@ -107,9 +107,10 @@ export class ExportController {
 
       res.send(result.content);
     } else {
+      // LT4: .lt4docs ist ebenfalls ein ZIP, bekommt aber die eigene Endung.
       const fileName =
         sanitizeFileName(page.title || 'untitled', { preserveSpaces: true }) +
-        '.zip';
+        (dto.format === 'lt4docs' ? '.lt4docs' : '.zip');
 
       res.headers({
         'Content-Type': 'application/zip',

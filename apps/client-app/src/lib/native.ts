@@ -36,6 +36,9 @@ export const importRead = (path: string) => invoke<string>("import_read", { path
 export const openServerWindow = (url: string, title: string) =>
   invoke<void>("open_server_window", { url, title });
 
+/** Läuft die App auf Android? (Kein Druckdialog, Server öffnet im Browser.) */
+export const isAndroid = () => /Android/i.test(navigator.userAgent);
+
 /** Druckdialog des Fensters öffnen (PDF über "Als PDF speichern"). */
 export const printPage = () => invoke<void>("print_page");
 

@@ -43,6 +43,8 @@ export default function ExportModal({
   const { t } = useTranslation();
   const upgradeLabel = useUpgradeLabel();
   const isDocx = format === ExportFormat.Docx;
+  // LT4: .lt4docs enthält Bilder und Dateien immer (für Client und Server-Import).
+  const isLt4Docs = format === ExportFormat.Lt4Docs;
   const docxEntitled = useHasFeature(Feature.DOCX_EXPORT);
   const blockedByLicense = isDocx && !docxEntitled;
 
@@ -57,12 +59,16 @@ export default function ExportModal({
             pageId: id,
             format,
             includeChildren,
-            includeAttachments,
+            includeAttachments: isLt4Docs || includeAttachments,
           });
         }
       }
       if (type === "space") {
-        await exportSpace({ spaceId: id, format, includeAttachments });
+        await exportSpace({
+          spaceId: id,
+          format,
+          includeAttachments: isLt4Docs || includeAttachments,
+        });
       }
       notifications.show({
         message: t("Export successful"),
@@ -129,6 +135,7 @@ export default function ExportModal({
                 />
               </Group>
 
+              {!isLt4Docs && (
               <Group justify="space-between" wrap="nowrap" mt="md">
                 <div>
                   <Text size="md">{t("Include attachments")}</Text>
@@ -140,10 +147,11 @@ export default function ExportModal({
                   checked={includeAttachments}
                 />
               </Group>
+              )}
             </>
           )}
 
-          {type === "space" && (
+          {type === "space" && !isLt4Docs && (
             <>
               <Divider my="sm" />
 
@@ -159,6 +167,14 @@ export default function ExportModal({
                 />
               </Group>
             </>
+          )}
+
+          {isLt4Docs && (
+            <Text size="sm" c="dimmed" mt="sm">
+              {t(
+                "Lossless format with images and files. Can be opened in the LT4-Docs app or imported on any LT4-Docs server.",
+              )}
+            </Text>
           )}
 
           <Group justify="center" mt="md">
@@ -199,6 +215,7 @@ function ExportFormatSelection({
   const data = [
     { value: "markdown", label: "Markdown" },
     { value: "html", label: "HTML" },
+    { value: "lt4docs", label: "LT4-Docs (.lt4docs)" },
     ...(includeDocx
       ? [{ value: "docx", label: "Word (.docx)", disabled: !docxEntitled }]
       : []),

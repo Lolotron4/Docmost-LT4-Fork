@@ -1,7 +1,7 @@
 {
   "name": "lt4-client-app",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.3.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,10 +12,12 @@
   "dependencies": {
     "@docmost/editor-ext": "workspace:*",
     "@mantine/core": "9.8.0",
+    "@mantine/dates": "9.8.0",
     "@mantine/hooks": "9.8.0",
     "@mantine/modals": "9.8.0",
     "@mantine/notifications": "9.8.0",
     "@tabler/icons-react": "3.40.0",
+    "@tanstack/react-query": "5.90.17",
     "@tauri-apps/api": "2.12.5",
     "@tauri-apps/plugin-dialog": "2.8.4",
     "@tiptap/core": "3.35.0",
@@ -28,10 +30,16 @@
     "@tiptap/pm": "3.35.0",
     "@tiptap/react": "3.35.0",
     "@tiptap/starter-kit": "3.35.0",
+    "@tiptap/suggestion": "3.35.0",
+    "dayjs": "1.11.21",
     "docx": "9.7.1",
+    "fractional-indexing-jittered": "1.0.0",
+    "i18next": "26.7.2",
     "jszip": "3.10.1",
+    "katex": "0.19.0",
     "react": "19.2.7",
-    "react-dom": "19.2.7"
+    "react-dom": "19.2.7",
+    "react-i18next": "16.5.8"
   },
   "devDependencies": {
     "@tauri-apps/cli": "2.12.5",
@@ -40,6 +48,7 @@
     "@vitejs/plugin-react": "6.0.1",
     "postcss": "8.5.25",
     "postcss-preset-mantine": "1.18.0",
+    "postcss-simple-vars": "7.0.1",
     "typescript": "5.9.3",
     "vite": "8.3.4",
     "vitest": "4.1.12"

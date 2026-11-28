@@ -19,7 +19,11 @@ import {
   IconFileText,
   IconPlus,
   IconSearch,
+  IconTable,
 } from "@tabler/icons-react";
+import { NewBaseItems } from "../base/base-page";
+import { baseToRows } from "../base/base-export";
+import { readBase } from "../base/local-base";
 import { childrenOf, descendants, loadDoc, useStore } from "../lib/store";
 import type { PageMeta, Space } from "../lib/types";
 
@@ -92,7 +96,7 @@ function PageNode({
         </ActionIcon>
         <UnstyledButton className="lt4-tree-label" onClick={() => onSelect(page.id)}>
           <Group gap={6} wrap="nowrap">
-            {page.icon ? <span>{page.icon}</span> : <IconFileText size={15} />}
+            {page.icon ? <span>{page.icon}</span> : page.isBase ? <IconTable size={15} /> : <IconFileText size={15} />}
             <Text size="sm" truncate>
               {page.title || "Unbenannt"}
             </Text>
@@ -115,6 +119,20 @@ function PageNode({
             >
               Unterseite anlegen
             </Menu.Item>
+            <Menu.Sub>
+              <Menu.Sub.Target>
+                <Menu.Sub.Item leftSection={<IconTable size={14} />}>Datenbank darunter anlegen</Menu.Sub.Item>
+              </Menu.Sub.Target>
+              <Menu.Sub.Dropdown>
+                <NewBaseItems
+                  onPick={async (t) => {
+                    const p = await store.createBase(page.spaceId, page.id, t);
+                    setOpen(true);
+                    onSelect(p.id);
+                  }}
+                />
+              </Menu.Sub.Dropdown>
+            </Menu.Sub>
             <Menu.Sub>
               <Menu.Sub.Target>
                 <Menu.Sub.Item>Verschieben unter …</Menu.Sub.Item>
@@ -256,7 +274,9 @@ export function Sidebar({
         hits.push(p);
         continue;
       }
-      const text = docText(await loadDoc(p.id)).toLowerCase();
+      const text = (
+        p.isBase ? baseToRows(await readBase(p.id)).flat().join(" ") : docText(await loadDoc(p.id))
+      ).toLowerCase();
       if (text.includes(needle)) hits.push(p);
     }
     setResults(hits);

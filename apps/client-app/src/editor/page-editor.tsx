@@ -1,5 +1,6 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 import { useEffect, useRef, useState } from "react";
+import { INSERT_BASE_EVENT, INSERT_IMAGE_EVENT, SlashCommand } from "./slash-command";
 import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
 import {
   ActionIcon,
@@ -44,6 +45,8 @@ import {
 } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 import { buildExtensions } from "./extensions";
+import { ColumnsMenu } from "./columns-menu";
+import { TableMenu } from "./table-menu";
 import { loadDoc, saveDoc, useStore } from "../lib/store";
 import type { PageMeta, PmDoc } from "../lib/types";
 import { errorText } from "../lib/native";
@@ -172,7 +175,7 @@ function Toolbar({ editor, onImage }: { editor: Editor; onImage: () => void }) {
   const c = () => editor.chain().focus();
 
   return (
-    <Group gap={2} wrap="wrap" className="lt4-toolbar">
+    <Group gap={2} wrap="wrap" className="lt4-toolbar lt4-toolbar-pad">
       <Btn label="Rückgängig" icon={IconArrowBackUp} onClick={() => c().undo().run()} disabled={!s.canUndo} />
       <Btn label="Wiederholen" icon={IconArrowForwardUp} onClick={() => c().redo().run()} disabled={!s.canRedo} />
       <Divider orientation="vertical" mx={4} />
@@ -251,6 +254,7 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
   const saveTimer = useRef<number | null>(null);
   const pending = useRef<PmDoc | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const [wrap, setWrap] = useState<HTMLDivElement | null>(null);
 
   const flush = async () => {
     if (saveTimer.current) window.clearTimeout(saveTimer.current);
@@ -268,7 +272,7 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
 
   const editor = useEditor(
     {
-      extensions: buildExtensions(),
+      extensions: [...buildExtensions({ placeholder: "Schreib los oder tippe „/“ für Blöcke …" }), SlashCommand],
       content: doc,
       immediatelyRender: true,
       editorProps: { attributes: { class: "lt4-prose", spellcheck: "true" } },
@@ -283,6 +287,30 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
     },
     [page.id],
   );
+
+  // "/"-Menü › Bild: Dateiauswahl öffnen
+  useEffect(() => {
+    const open = () => fileInput.current?.click();
+    window.addEventListener(INSERT_IMAGE_EVENT, open);
+    return () => window.removeEventListener(INSERT_IMAGE_EVENT, open);
+  }, []);
+
+  // "/"-Menü › Datenbank: als Unterseite anlegen und hier einbetten
+  useEffect(() => {
+    const insert = async (ev: Event) => {
+      if (!editor) return;
+      const template = (ev as CustomEvent).detail ?? "table";
+      try {
+        const title = template === "kanban" ? "Kanban-Board" : template === "calendar" ? "Kalender" : "Tabelle";
+        const base = await store.createBase(page.spaceId, page.id, template, title);
+        (editor.chain().focus() as any).insertBaseEmbed({ pageId: base.id }).run();
+      } catch (e) {
+        notifications.show({ color: "red", message: errorText(e) });
+      }
+    };
+    window.addEventListener(INSERT_BASE_EVENT, insert);
+    return () => window.removeEventListener(INSERT_BASE_EVENT, insert);
+  }, [editor, page.id, page.spaceId, store.createBase]);
 
   // Beim Seitenwechsel oder Schließen ausstehende Änderungen sichern.
   useEffect(() => () => void flush(), [page.id]);
@@ -320,6 +348,8 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
         }}
       />
       <div
+        ref={setWrap}
+        style={{ position: "relative" }}
         onDrop={(e) => {
           if (e.dataTransfer.files?.length) {
             e.preventDefault();
@@ -337,6 +367,8 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
         }}
       >
         <EditorContent editor={editor} />
+        <ColumnsMenu editor={editor} container={wrap} />
+        <TableMenu editor={editor} container={wrap} />
       </div>
     </Stack>
   );

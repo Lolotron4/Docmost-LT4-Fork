@@ -28,6 +28,8 @@ export interface Lt4DocsPage {
   title: string;
   icon?: string | null;
   position: number;
+  /** Datenbank (Tabelle/Kanban/Kalender); Daten in bases/<id>.json */
+  isBase?: boolean;
 }
 
 export interface Lt4DocsAttachment {
@@ -100,6 +102,7 @@ export function parseManifest(raw: string): Lt4DocsManifest {
       title: str(p.title, 500) || 'Unbenannt',
       icon: str(p.icon, 50) || null,
       position: Number.isFinite(Number(p.position)) ? Number(p.position) : idx,
+      ...(p.isBase === true ? { isBase: true } : {}),
     }));
 
   // Eltern, die nicht existieren oder Zyklen bilden, werden entfernt.
@@ -178,12 +181,17 @@ export interface NewAttachmentRef {
 export function rewriteAttachmentRefs(
   doc: any,
   map: Map<string, NewAttachmentRef>,
+  /** Alte -> neue Seiten-IDs, für eingebettete Datenbanken (Knoten "base"). */
+  pageMap?: Map<string, string>,
 ): any {
   const walk = (node: any): any => {
     if (!node || typeof node !== 'object') return node;
     const out: any = { ...node };
     if (node.attrs && typeof node.attrs === 'object') {
       const attrs = { ...node.attrs };
+      if (node.type === 'base' && pageMap && typeof attrs.pageId === 'string' && pageMap.has(attrs.pageId)) {
+        attrs.pageId = pageMap.get(attrs.pageId);
+      }
       const ref = attrs.attachmentId ? map.get(attrs.attachmentId) : undefined;
       if (ref) {
         const url = `/api/files/${ref.id}/${encodeURIComponent(ref.fileName)}`;
