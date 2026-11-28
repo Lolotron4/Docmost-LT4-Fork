@@ -195,3 +195,38 @@ jobs:
           draft: true
           name: LT4-Docs Client ${{ github.ref_name }}
           files: apps/client-app/dist-apk/*.apk
+
+  # Alle Dateien als Vorab-Release "client-latest" veröffentlichen: ohne GitHub-Login
+  # herunterladbar unter Releases (nur bei main oder manuellem Start, nicht bei Tags).
+  publish:
+    needs: [build, android]
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dl
+          merge-multiple: true
+
+      - name: Release "Neueste Version" ersetzen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -e
+          mapfile -t FILES < <(find dl -type f \( -name '*.exe' -o -name '*.msi' -o -name '*.dmg' -o -name '*.deb' -o -name '*.AppImage' -o -name '*.apk' \))
+          printf '%s\n' "${FILES[@]}"
+          test ${#FILES[@]} -gt 0
+          gh release delete client-latest --cleanup-tag --yes || true
+          gh release create client-latest "${FILES[@]}" \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "LT4-Docs Client – neueste Version" \
+            --notes "Automatisch gebaut aus ${GITHUB_REF_NAME} (${GITHUB_SHA::7}).
+
+          - Windows: \`*-setup.exe\` oder \`.msi\`
+          - macOS: \`.dmg\`
+          - Linux: \`.deb\` oder \`.AppImage\`
+          - Android: \`LT4-Docs_*.apk\`
+
+          Die Dateien sind nicht signiert. Hinweise: docs/lt4/client-app.md"

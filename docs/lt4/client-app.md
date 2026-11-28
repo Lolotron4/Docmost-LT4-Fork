@@ -9,9 +9,11 @@ Plan für die weiteren Phasen: Dokument „LT4-Docs Client für Desktop und Andr
 
 ## Installieren
 
-1. Auf GitHub unter **Actions › LT4 Client-App** den neuesten erfolgreichen Lauf öffnen
-   (oder „Run workflow“ drücken, dauert ca. 15 Minuten).
-2. Unten bei **Artifacts** die Datei für dein System laden:
+1. Auf GitHub rechts bei **Releases** die Vorab-Version **„LT4-Docs Client – neueste Version“**
+   öffnen (Adresse: `…/releases/tag/client-latest`). Sie wird nach jedem Build automatisch
+   ersetzt und lässt sich ohne GitHub-Login laden. Alternativ: **Actions › LT4 Client-App ›
+   Lauf › Artifacts** (nur mit Login, als ZIP).
+2. Die Datei für dein System laden:
    - `lt4-docs-windows`: `.msi` oder `…-setup.exe`
    - `lt4-docs-linux`: `.deb` (Debian/Ubuntu) oder `.AppImage` (alle Distributionen)
    - `lt4-docs-macos`: `.dmg` (Apple Silicon)
