@@ -27,6 +27,8 @@ export interface PageMeta {
   position: number;
   createdAt: string;
   updatedAt: string;
+  /** Datenbank (Tabelle/Kanban/Kalender) statt Textseite. */
+  isBase?: boolean;
 }
 
 export interface AttachmentMeta {

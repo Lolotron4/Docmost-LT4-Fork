@@ -34,6 +34,7 @@ import {
   resolveInside,
   rewriteAttachmentRefs,
 } from './lt4docs-format';
+import { planBaseImport, PlannedBase } from './lt4docs-base';
 
 interface PlannedPage {
   sourceId: string | null;
@@ -44,6 +45,7 @@ interface PlannedPage {
   parentId: string | null;
   position?: string;
   order: number;
+  isBase?: boolean;
 }
 
 /**
@@ -117,6 +119,7 @@ export class Lt4DocsImportService {
         icon: p.icon ?? null,
         parentId: null,
         order: p.position,
+        isBase: p.isBase === true,
       };
       bySource.set(p.id, node);
       planned.push(node);
@@ -192,6 +195,23 @@ export class Lt4DocsImportService {
       attachmentMap.set(a.id, { id: newId, fileName: a.fileName });
     }
 
+    const newPageIds = new Map<string, string>();
+    for (const [sourceId, node] of bySource) newPageIds.set(sourceId, node.id);
+
+    // ---- Datenbanken lesen ----
+    const bases = new Map<string, PlannedBase>();
+    for (const p of planned) {
+      if (!p.isBase || !p.sourceId) continue;
+      const file = resolveInside(extractDir, 'bases', `${p.sourceId}.json`);
+      let raw: unknown = null;
+      try {
+        raw = file ? JSON.parse(await fs.readFile(file, 'utf-8')) : null;
+      } catch {
+        raw = null;
+      }
+      bases.set(p.id, planBaseImport(raw));
+    }
+
     // ---- Seiten anlegen ----
     const validPageIds = new Set<string>();
     const pageTitles = new Map<string, string>();
@@ -210,10 +230,10 @@ export class Lt4DocsImportService {
           } else {
             json = { type: 'doc', content: [{ type: 'subpages' }] };
           }
-          if (!json || json.type !== 'doc') {
+          if (p.isBase || !json || json.type !== 'doc') {
             json = getProsemirrorContent(null);
           }
-          json = rewriteAttachmentRefs(json, attachmentMap);
+          json = rewriteAttachmentRefs(json, attachmentMap, newPageIds);
           // Unbekannte Knoten (z. B. aus neueren Client-Versionen) entfernen.
           const prosemirrorJson = parseDocumentJson(json).node.toJSON();
 
@@ -231,8 +251,11 @@ export class Lt4DocsImportService {
             creatorId: fileTask.creatorId,
             lastUpdatedById: fileTask.creatorId,
             parentPageId: p.parentId,
+            ...(p.isBase ? { isBase: true } : {}),
           };
           await trx.insertInto('pages').values(insertable).execute();
+          const base = bases.get(p.id);
+          if (base) await this.insertBase(trx, p.id, fileTask, base);
           validPageIds.add(p.id);
           pageTitles.set(p.id, p.title);
         }
@@ -276,7 +299,55 @@ export class Lt4DocsImportService {
     );
 
     this.logger.log(
-      `LT4-Docs-Import: ${validPageIds.size} Seiten, ${uploadedRows.length} Anhänge`,
+      `LT4-Docs-Import: ${validPageIds.size} Seiten (${bases.size} Datenbanken), ${uploadedRows.length} Anhänge`,
     );
+  }
+
+  /** Eigenschaften, Ansichten und Zeilen einer importierten Datenbank anlegen. */
+  private async insertBase(trx: any, pageId: string, fileTask: FileTask, base: PlannedBase) {
+    const ws = { pageId, workspaceId: fileTask.workspaceId };
+    if (base.properties.length) {
+      await trx
+        .insertInto('baseProperties')
+        .values(
+          base.properties.map((p) => ({
+            ...ws,
+            id: p.id,
+            name: p.name,
+            type: p.type,
+            position: p.position,
+            typeOptions: (p.typeOptions ?? null) as any,
+            isPrimary: p.isPrimary,
+          })),
+        )
+        .execute();
+    }
+    await trx
+      .insertInto('baseViews')
+      .values(
+        base.views.map((v) => ({
+          ...ws,
+          name: v.name,
+          type: v.type,
+          position: v.position,
+          config: v.config as any,
+          creatorId: fileTask.creatorId,
+        })),
+      )
+      .execute();
+    for (let i = 0; i < base.rows.length; i += 200) {
+      await trx
+        .insertInto('baseRows')
+        .values(
+          base.rows.slice(i, i + 200).map((r) => ({
+            ...ws,
+            position: r.position,
+            cells: r.cells as any,
+            creatorId: fileTask.creatorId,
+            lastUpdatedById: fileTask.creatorId,
+          })),
+        )
+        .execute();
+    }
   }
 }

@@ -20,6 +20,14 @@ export interface Lt4DocsExportPage {
   content: unknown;
   createdAt?: Date | string | null;
   updatedAt?: Date | string | null;
+  isBase?: boolean;
+}
+
+/** Datenbank-Inhalt einer Seite (Eigenschaften, Ansichten, Zeilen). */
+export interface Lt4DocsExportBase {
+  properties: unknown[];
+  views: unknown[];
+  rows: unknown[];
 }
 
 export interface Lt4DocsExportAttachment {
@@ -75,6 +83,8 @@ export async function buildLt4DocsZip(opts: {
   /** Anhänge, die der Nutzer sehen darf (nach ID). */
   attachments: Map<string, Lt4DocsExportAttachment>;
   readFile: (filePath: string) => Promise<Buffer>;
+  /** Datenbank-Daten für Seiten mit isBase. */
+  loadBase?: (pageId: string) => Promise<Lt4DocsExportBase>;
   generator: string;
   now?: Date;
 }): Promise<NodeJS.ReadableStream> {
@@ -88,6 +98,9 @@ export async function buildLt4DocsZip(opts: {
   for (const p of pages) {
     const doc = parseContent(p.content);
     zip.file(`pages/${p.id}.json`, JSON.stringify(doc));
+    if (p.isBase && opts.loadBase) {
+      zip.file(`bases/${p.id}.json`, JSON.stringify(await opts.loadBase(p.id)));
+    }
     for (const id of getAttachmentIds(doc)) {
       const a = attachments.get(id);
       if (!a || seen.has(id)) continue;
@@ -130,6 +143,7 @@ export async function buildLt4DocsZip(opts: {
       position: positions.get(p.id) ?? 0,
       createdAt: iso(p.createdAt),
       updatedAt: iso(p.updatedAt),
+      ...(p.isBase ? { isBase: true } : {}),
     })),
     attachments: manifestAttachments,
   };

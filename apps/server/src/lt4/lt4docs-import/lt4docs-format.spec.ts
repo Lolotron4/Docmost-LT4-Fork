@@ -89,6 +89,18 @@ describe('lt4docs-format', () => {
     // Original bleibt unverändert
     expect(doc.content[0].attrs.attachmentId).toBe('a1');
   });
+
+  it('passt eingebettete Datenbanken an die neuen Seiten-IDs an', () => {
+    const doc = {
+      type: 'doc',
+      content: [
+        { type: 'base', attrs: { pageId: 'alt1' } },
+        { type: 'base', attrs: { pageId: 'fremd' } },
+      ],
+    };
+    const out = rewriteAttachmentRefs(doc, new Map(), new Map([['alt1', 'neu1']]));
+    expect(out.content.map((n: any) => n.attrs.pageId)).toEqual(['neu1', 'fremd']);
+  });
 });
 
 describe('lt4docs: Seite aus dem Client im Server-Schema', () => {

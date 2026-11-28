@@ -47,12 +47,21 @@ html, body, #root { height: 100%; margin: 0; }
   .lt4-title input { padding-left: 1rem; padding-right: 1rem; font-size: 2rem; }
   .lt4-toolbar-pad { padding-left: calc(1rem - 4px); }
 }
+/* Datenbank: Titel bündig mit der Tabelle */
+.lt4-title.lt4-title-base input { padding-left: 0; padding-right: 0; }
 
 .lt4-image { margin: 0.75em 0; }
 .lt4-image-missing { padding: 20px; color: var(--mantine-color-dimmed); border: 1px dashed var(--mantine-color-default-border); border-radius: 6px; }
 
 /* PDF-Export: nur den Druckbereich drucken */
 #lt4-print-root { display: none; }
+#lt4-print-root [data-type="columns"] { display: flex; gap: 1rem; }
+#lt4-print-root [data-type="column"] { flex: 1; min-width: 0; }
+#lt4-print-root [data-type="tabs"] { border: 1px solid #ccc; border-radius: 6px; padding: 0 12px 8px; margin: 0.75em 0; }
+
+/* Datum im Editor */
+.lt4-date { display: inline-flex; align-items: center; padding: 0 4px; border-radius: 4px; cursor: pointer;
+  background: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5)); }
 #lt4-print-root [data-callout-type] { padding: 10px 12px; border-radius: 6px; margin: 0.75em 0; background: #e7f5ff; }
 #lt4-print-root [data-callout-type="success"] { background: #ebfbee; }
 #lt4-print-root [data-callout-type="warning"] { background: #fff9db; }

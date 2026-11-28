@@ -104,3 +104,37 @@ describe("office-export", () => {
     expect(pagesInTreeOrder(state, ["s"]).map((p) => p.id)).toEqual(["a", "a2", "b"]);
   });
 });
+
+describe("neue Blöcke (Spalten, Mathe, Registerkarten, Status, Datum)", () => {
+  const p = (text: string) => ({ type: "paragraph", content: [{ type: "text", text }] });
+  const doc: any = {
+    type: "doc",
+    content: [
+      { type: "columns", attrs: { layout: "two_equal" }, content: [
+        { type: "column", content: [p("Links")] },
+        { type: "column", content: [p("Rechts")] },
+      ] },
+      { type: "mathBlock", attrs: { text: "a^2+b^2=c^2" } },
+      { type: "paragraph", content: [
+        { type: "text", text: "Inline " },
+        { type: "mathInline", attrs: { text: "x_1" } },
+        { type: "status", attrs: { text: "FERTIG", color: "green" } },
+        { type: "date", attrs: { date: "2026-11-28" } },
+      ] },
+      { type: "tabs", content: [
+        { type: "tab", attrs: { id: "t1" }, content: [
+          { type: "tabLabel", content: [{ type: "text", text: "Reiter A" }] },
+          { type: "tabPanel", content: [p("Inhalt A")] },
+        ] },
+      ] },
+    ],
+  };
+
+  it("lässt sich als Word-Datei exportieren", async () => {
+    const bytes = await buildDocx(combineDocs([{ title: "Blöcke", doc }]), async () => null);
+    const xml = await (await JSZip.loadAsync(bytes)).file("word/document.xml")!.async("string");
+    expect(xml).toContain("Links");
+    expect(xml).toContain("Rechts");
+    expect(xml).toContain("Inhalt A");
+  });
+});

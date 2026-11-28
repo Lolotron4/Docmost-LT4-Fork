@@ -12,8 +12,31 @@ Eine `.lt4docs`-Datei ist ein ZIP:
 ```
 manifest.json
 pages/<seiten-id>.json          Seiteninhalt als ProseMirror-JSON (Editor-Format)
+bases/<seiten-id>.json          nur bei Datenbanken: Eigenschaften, Ansichten, Zeilen
 attachments/<anhang-id>/<name>  Bilder und Dateien
 ```
+
+## Datenbanken (Tabelle, Kanban, Kalender)
+
+Eine Seite mit `"isBase": true` im Manifest ist eine Datenbank. Ihr Inhalt steht in
+`bases/<seiten-id>.json`, im gleichen Aufbau wie die LT4-Datenbank-API:
+
+```json
+{
+  "properties": [{ "id": "pab12", "name": "Status", "type": "select", "position": "a1",
+                   "typeOptions": { "options": [{ "id": "o1", "name": "Erledigt", "color": "green" }] },
+                   "isPrimary": false }],
+  "views": [{ "id": "…", "name": "Board", "type": "kanban", "position": "a0",
+              "config": { "groupByPropertyId": "pab12" } }],
+  "rows": [{ "id": "…", "position": "a0", "cells": { "pab12": "o1" } }]
+}
+```
+
+Typen: `text`, `number`, `select`, `multiSelect`, `date` (`{start, end?}`, mit `includeTime`
+auch `JJJJ-MM-TTTHH:mm`), `checkbox`, `url`, `formula` (wird nicht gespeichert, sondern berechnet).
+Ansichten: `table`, `kanban`, `calendar`. Beim Import prüft der Server alle Werte wie bei
+Eingaben in der Oberfläche, behält die Eigenschafts-IDs und vergibt neue Zeilen- und Ansichts-IDs.
+Eingebettete Datenbanken (Knoten `base` mit `pageId`) werden auf die neuen Seiten-IDs umgestellt.
 
 ## manifest.json
 

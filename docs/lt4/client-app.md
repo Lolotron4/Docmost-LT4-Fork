@@ -79,10 +79,19 @@ XChaCha20-Poly1305). Ohne Sperre liegt der Schlüssel im Schlüsselbund des Syst
 ## Notizbuch
 
 - Bereiche und Seiten mit Unterseiten, Seiten verschieben und löschen.
-- Editor mit Überschriften, Fett/Kursiv/Unterstrichen, **Hex-Textfarben und Hervorhebungen**,
-  Links, Listen, Aufgabenlisten, Zitaten, Codeblöcken, Infoboxen, aufklappbaren Bereichen,
-  Tabellen, Trennlinien und Bildern (auch per Einfügen/Ziehen).
-- Suche über Titel und Inhalt, funktioniert offline.
+- Editor im Aussehen der Web-Version mit Überschriften, Fett/Kursiv/Unterstrichen,
+  **Hex-Textfarben und Hervorhebungen**, Links, Listen, Aufgabenlisten, Zitaten, Codeblöcken,
+  Infoboxen, aufklappbaren Bereichen, Tabellen, Trennlinien und Bildern (auch per Einfügen/Ziehen).
+- Ab Client 0.3.0 im „/“-Menü außerdem: **2 oder 3 Spalten**, **Registerkarten** (Reiter per
+  Doppelklick umbenennen, Menü am aktiven Reiter zum Duplizieren, Verschieben, Löschen),
+  **Formel** und **Formelblock** (LaTeX mit KaTeX, Live-Vorschau), **Status**-Label und **Datum**.
+- **Datenbanken** wie in der Web-Version: über **+ › Neue Datenbank** (Tabelle, Kanban-Board,
+  Kalender) als eigene Seite, oder im Text über „/Kanban-Board“, „/Kalender“,
+  „/Datenbank (Tabelle)“ – dann als Unterseite angelegt und direkt eingebettet. Spalten-Typen
+  Text, Zahl, Auswahl, Mehrfachauswahl, Datum (mit Uhrzeit), Checkbox, URL und Formel; Ansichten
+  Tabelle, Kanban (Karten ziehen) und Kalender; Filter, Sortierung, Suche. Alles offline und
+  verschlüsselt im Tresor.
+- Suche über Titel und Inhalt (auch Datenbank-Einträge), funktioniert offline.
 
 ## Exportieren und auf dem Server importieren
 
@@ -95,6 +104,10 @@ Knopf **Exportieren** (Pfeil nach unten) oben rechts:
 | PDF | Drucken, Abgeben | wie in der App; im Druckdialog „Als PDF speichern“ bzw. „Microsoft Print to PDF“ wählen |
 | Excel (.xlsx) | Tabellen weiterrechnen | nur Tabellen: jede Tabelle ein Blatt (Name = Seitentitel), erste Zeile fett und fixiert, Zahlen als Zahlen |
 | Markdown (.zip) | andere Programme | Farben und LT4-Blöcke gehen verloren |
+
+Datenbanken landen in Word, PDF und Markdown als Tabelle und in Excel als eigenes Blatt.
+Im .lt4docs-Format bleiben sie vollständig erhalten (Spalten, Ansichten, Einträge) und werden auf
+dem Server wieder zu echten Datenbanken – und umgekehrt.
 
 Word, PDF und Excel gehen für ganze Bereiche oder nur für die gerade offene Seite (wahlweise mit
 Unterseiten). Mehrere Seiten landen in einem Dokument, jede beginnt mit ihrem Titel als Überschrift.
@@ -125,6 +138,9 @@ Direktes Hochladen aus dem Client und ganze Bereiche offline speichern kommen in
 - Code: `apps/client-app` (React + Mantine + Tiptap im Tauri-2-WebView), Rust-Teil in
   `apps/client-app/src-tauri` (Tresor, Export, Server-Fenster).
 - Editor-Knoten kommen aus `@docmost/editor-ext`, damit Seiten auf dem Server gleich aussehen.
+- Datenbanken: die Oberfläche kommt unverändert aus `apps/client/src/lt4/base`; deren Server-Aufrufe
+  (`services/base-service.ts`) leitet `apps/client-app/vite.config.ts` auf
+  `apps/client-app/src/base/base-service.ts` um (lokaler Tresor, gleiche Regeln wie der Server).
 - Daten: App-Datenordner › `vault/` (`vault.json`, `data/*.bin`, `files/*.bin`, alles verschlüsselt).
 - Server-Import: `apps/server/src/lt4/lt4docs-import`, Quelle `lt4docs` in `POST /api/pages/import-zip`.
 - Format: [lt4docs-format.md](lt4docs-format.md).

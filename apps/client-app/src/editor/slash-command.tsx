@@ -8,6 +8,16 @@ import { ReactRenderer } from "@tiptap/react";
 import { Group, Paper, ScrollArea, Text, ThemeIcon, UnstyledButton } from "@mantine/core";
 import {
   IconBlockquote,
+  IconCalendarEvent,
+  IconColumns2,
+  IconColumns3,
+  IconLayoutNavbar,
+  IconMathFunction,
+  IconMathXDivideY,
+  IconStatusChange,
+  IconLayoutKanban,
+  IconCalendar,
+  IconDatabase,
   IconH1,
   IconH2,
   IconH3,
@@ -23,9 +33,12 @@ import {
   IconTypography,
   type Icon,
 } from "@tabler/icons-react";
+import { markMathAutoOpen } from "./math-view";
 
 /** Ereignis, mit dem das "/"-Menü den Bild-Dialog des Editors öffnet. */
 export const INSERT_IMAGE_EVENT = "lt4-insert-image";
+/** Neue Datenbank als Unterseite anlegen und hier einbetten (detail = Vorlage). */
+export const INSERT_BASE_EVENT = "lt4-insert-base";
 
 export interface SlashItem {
   title: string;
@@ -67,6 +80,41 @@ export const SLASH_ITEMS: SlashItem[] = [
     } },
   { title: "Trennlinie", description: "Waagerechte Linie", keywords: ["hr", "divider", "linie"], icon: IconSeparatorHorizontal,
     run: (e, r) => e.chain().focus().deleteRange(r).setHorizontalRule().run() },
+  { title: "2 Spalten", description: "Inhalt nebeneinander", keywords: ["columns", "spalten", "layout"], icon: IconColumns2,
+    run: (e, r) => (e.chain().focus().deleteRange(r) as any).insertColumns({ layout: "two_equal" }).run() },
+  { title: "3 Spalten", description: "Drei Spalten nebeneinander", keywords: ["columns", "spalten", "layout"], icon: IconColumns3,
+    run: (e, r) => (e.chain().focus().deleteRange(r) as any).insertColumns({ layout: "three_equal" }).run() },
+  { title: "Registerkarten", description: "Inhalt in Reitern", keywords: ["tabs", "reiter", "register"], icon: IconLayoutNavbar,
+    run: (e, r) => (e.chain().focus().deleteRange(r) as any).insertTabs().run() },
+  { title: "Formel", description: "Mathe-Formel im Text (LaTeX)", keywords: ["math", "mathe", "latex", "katex", "inline"], icon: IconMathFunction,
+    run: (e, r) => {
+      markMathAutoOpen();
+      (e.chain().focus().deleteRange(r) as any).setMathInline().run();
+    } },
+  { title: "Formelblock", description: "Abgesetzte Mathe-Formel (LaTeX)", keywords: ["math", "mathe", "latex", "katex", "gleichung"], icon: IconMathXDivideY,
+    run: (e, r) => {
+      markMathAutoOpen();
+      (e.chain().focus().deleteRange(r) as any).setMathBlock().run();
+    } },
+  { title: "Datenbank (Tabelle)", description: "Tabelle mit Spalten-Typen, als Unterseite", keywords: ["database", "datenbank", "base", "tabelle"], icon: IconDatabase,
+    run: (e, r) => {
+      e.chain().focus().deleteRange(r).run();
+      window.dispatchEvent(new CustomEvent(INSERT_BASE_EVENT, { detail: "table" }));
+    } },
+  { title: "Kanban-Board", description: "Karten in Spalten nach Status", keywords: ["kanban", "board", "datenbank", "aufgaben"], icon: IconLayoutKanban,
+    run: (e, r) => {
+      e.chain().focus().deleteRange(r).run();
+      window.dispatchEvent(new CustomEvent(INSERT_BASE_EVENT, { detail: "kanban" }));
+    } },
+  { title: "Kalender", description: "Einträge im Monatskalender", keywords: ["kalender", "calendar", "termine", "datenbank"], icon: IconCalendar,
+    run: (e, r) => {
+      e.chain().focus().deleteRange(r).run();
+      window.dispatchEvent(new CustomEvent(INSERT_BASE_EVENT, { detail: "calendar" }));
+    } },
+  { title: "Status", description: "Farbiges Status-Label", keywords: ["status", "label", "badge"], icon: IconStatusChange,
+    run: (e, r) => (e.chain().focus().deleteRange(r) as any).setStatus().run() },
+  { title: "Datum", description: "Datum einfügen", keywords: ["date", "datum", "heute", "kalender"], icon: IconCalendarEvent,
+    run: (e, r) => (e.chain().focus().deleteRange(r) as any).insertDate().run() },
 ];
 
 export function filterSlashItems(query: string): SlashItem[] {

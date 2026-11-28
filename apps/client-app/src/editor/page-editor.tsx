@@ -1,6 +1,6 @@
 // LT4-Fork: eigenständige Implementierung (AGPL-3.0). Kein Docmost-Enterprise-Code.
 import { useEffect, useRef, useState } from "react";
-import { INSERT_IMAGE_EVENT, SlashCommand } from "./slash-command";
+import { INSERT_BASE_EVENT, INSERT_IMAGE_EVENT, SlashCommand } from "./slash-command";
 import { EditorContent, useEditor, useEditorState, type Editor } from "@tiptap/react";
 import {
   ActionIcon,
@@ -291,6 +291,23 @@ function LoadedEditor({ page, doc }: { page: PageMeta; doc: PmDoc }) {
     window.addEventListener(INSERT_IMAGE_EVENT, open);
     return () => window.removeEventListener(INSERT_IMAGE_EVENT, open);
   }, []);
+
+  // "/"-Menü › Datenbank: als Unterseite anlegen und hier einbetten
+  useEffect(() => {
+    const insert = async (ev: Event) => {
+      if (!editor) return;
+      const template = (ev as CustomEvent).detail ?? "table";
+      try {
+        const title = template === "kanban" ? "Kanban-Board" : template === "calendar" ? "Kalender" : "Tabelle";
+        const base = await store.createBase(page.spaceId, page.id, template, title);
+        (editor.chain().focus() as any).insertBaseEmbed({ pageId: base.id }).run();
+      } catch (e) {
+        notifications.show({ color: "red", message: errorText(e) });
+      }
+    };
+    window.addEventListener(INSERT_BASE_EVENT, insert);
+    return () => window.removeEventListener(INSERT_BASE_EVENT, insert);
+  }, [editor, page.id, page.spaceId, store.createBase]);
 
   // Beim Seitenwechsel oder Schließen ausstehende Änderungen sichern.
   useEffect(() => () => void flush(), [page.id]);

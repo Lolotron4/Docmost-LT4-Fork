@@ -70,4 +70,26 @@ describe('lt4docs-export', () => {
     const savedC = JSON.parse(await zip.file(`pages/${C}.json`)!.async('string'));
     expect(savedC.type).toBe('doc');
   });
+
+  it('nimmt Datenbanken als bases/<id>.json mit', async () => {
+    const base = {
+      properties: [{ id: 'pname', name: 'Name', type: 'text', position: 'a0', typeOptions: null, isPrimary: true }],
+      views: [{ id: 'v', name: 'Board', type: 'kanban', position: 'a0', config: {} }],
+      rows: [{ id: 'r', cells: { pname: 'Folien' }, position: 'a0' }],
+    };
+    const stream = await buildLt4DocsZip({
+      space: { id: S, name: 'Klasse 9b' },
+      pages: [{ ...page(A, null, 'a0', null), isBase: true }, page(B, null, 'a1', null)],
+      attachments: new Map(),
+      readFile: async () => Buffer.from(''),
+      loadBase: async () => base,
+      generator: 'test',
+    });
+    const zip = await JSZip.loadAsync(await streamToBuffer(stream));
+    const manifest = parseManifest(await zip.file('manifest.json')!.async('string'));
+    expect(manifest.pages.find((p) => p.id === A)!.isBase).toBe(true);
+    expect(manifest.pages.find((p) => p.id === B)!.isBase).toBeUndefined();
+    expect(JSON.parse(await zip.file(`bases/${A}.json`)!.async('string'))).toEqual(base);
+    expect(zip.file(`bases/${B}.json`)).toBeNull();
+  });
 });
